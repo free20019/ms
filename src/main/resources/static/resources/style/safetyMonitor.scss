@@ -1,0 +1,121 @@
+$margin: 15px;
+$success-color: #28a745;
+$danger-color: #dc3545;
+html, body {
+  height: 100%;
+}
+.success {
+  text-shadow: 0 0 2px $success-color;
+  color: $success-color;
+}
+.danger {
+  text-shadow: 0 0 2px $danger-color;
+  color: $danger-color;
+}
+
+.template {
+  &-wrapper {
+    height: 100%;
+  }
+  &-title {
+    position: relative;
+    height: 50px;
+    color: #ffffff;
+    background-color: #128efa;
+    .text {
+      line-height: 50px;
+      font-size: 24px;
+      text-align: center;
+    }
+    .datetime {
+      position: absolute;
+      top: 50%;
+      right: 40px;
+      transform: translateY(-50%);
+    }
+  }
+  &-body {
+    height: calc(100% - 50px);
+  }
+}
+
+.mp-panel {
+  border: 1px solid #eeeeee;
+  border-radius: 4px;
+  box-shadow: 2px 2px 6px #eeeeee;
+  &-title {
+    height: 40px;
+    border-bottom: 1px solid #eeeeee;
+    font-size: 16px;
+    line-height: 40px;
+    text-align: center;
+    color: #ffffff;
+    background-color: #128efa;
+  }
+  &-body {
+    height: calc(100% - 40px);
+    padding: $margin;
+    &.air {
+      padding: 0;
+    }
+  }
+}
+
+.mp-table {
+  width: 100%;
+  .mp-table-th, .mp-table-td {
+    text-align: center;
+    border-right: 1px solid #eeeeee;
+    &:last-child {
+      border-right: none;
+    }
+  }
+  .mp-table-th {
+    border-bottom: 1px solid #eeeeee;
+    font-weight: bold;
+    line-height: 30px;
+  }
+  .mp-table-td {
+    line-height: 28px;
+  }
+  &.last-border {
+    .mp-table-th {
+      border-bottom: none;
+    }
+    thead {
+      tr:last-child {
+        .mp-table-th {
+          border-bottom: 1px solid #eeeeee;
+        }
+      }
+    }
+  }
+  &.size-lg {
+    .mp-table-th {
+      line-height: 40px;
+    }
+    .mp-table-td {
+      line-height: 35px;
+    }
+  }
+  &.border {
+    .mp-table-td {
+      border-bottom: 1px solid #eeeeee;
+    }
+  }
+}
+
+.container-fluid {
+  padding: $margin $margin * 2;
+  height: 100%;
+  .row {
+    height: 50%;
+    margin-bottom: 15px;
+    > div {
+      height: 100%;
+    }
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}

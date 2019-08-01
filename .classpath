@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="target/classes" path="src/main/java">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/java">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry including="**/*.java" kind="src" path="src/main/resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/ews.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/amqp-client-4.0.3.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/android-json-0.0.20131108.vaadin1.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/aspectjweaver-1.6.11.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/classmate-1.3.4.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/commons-beanutils-1.9.3.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/commons-codec-1.10.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/commons-collections-3.2.2.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/commons-digester-2.1.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/commons-jexl-2.0.1.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/commons-lang-2.5.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/commons-lang3-3.6.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/commons-pool2-2.4.2.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/dom4j-1.6.1.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/druid-1.1.10.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/druid-spring-boot-starter-1.1.10.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/ews-java-api-2.0.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/ezmorph-1.0.6.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/fastjson-1.2.38.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/geronimo-stax-api_1.0_spec-1.0.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/groovy-2.4.12.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/hibernate-validator-5.3.5.Final.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/http-client-1.1.1.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/httpclient-4.5.3.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/httpcore-4.4.8.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/jackson-annotations-2.8.0.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/jackson-core-2.8.10.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/jackson-core-asl-1.8.5.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/jackson-databind-2.8.10.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/jackson-mapper-asl-1.8.5.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/javassist-3.21.0-GA.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/jboss-logging-3.3.1.Final.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/jcl-over-slf4j-1.7.25.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/jedis-2.9.0.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/joda-time-2.9.9.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/json-lib-2.4-jdk15.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/jsqlparser-0.9.5.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/jts-1.8.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/jul-to-slf4j-1.7.25.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/jxls-core-1.0-RC-2.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/jxls-reader-1.0-RC-2.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/log4j-1.2.13.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/log4j-over-slf4j-1.7.25.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/logback-classic-1.1.11.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/logback-core-1.1.11.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/mybatis-3.4.6.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/mybatis-spring-1.3.2.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/mybatis-spring-boot-autoconfigure-1.3.2.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/mybatis-spring-boot-starter-1.3.2.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/mysql-connector-java-5.1.44.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/ognl-3.0.8.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/ojdbc6-11.2.0.3.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/pagehelper-4.1.6.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/poi-3.6.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/poi-ooxml-3.6.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/poi-ooxml-schemas-3.6.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/slf4j-api-1.7.25.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/snakeyaml-1.17.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/spring-amqp-1.7.4.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/spring-aop-4.3.12.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/spring-beans-4.3.12.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/spring-boot-1.5.8.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/spring-boot-autoconfigure-1.5.8.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/spring-boot-starter-1.5.8.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/spring-boot-starter-amqp-1.5.8.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/spring-boot-starter-aop-1.5.8.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/spring-boot-starter-jdbc-1.5.8.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/spring-boot-starter-logging-1.5.8.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/spring-boot-starter-thymeleaf-1.5.8.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/spring-boot-starter-validation-1.5.8.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/spring-boot-starter-web-1.5.8.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/spring-context-4.3.12.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/spring-core-4.3.12.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/spring-expression-4.3.12.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/spring-jdbc-4.3.12.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/spring-messaging-4.3.12.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/spring-rabbit-1.7.4.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/spring-retry-1.2.1.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/spring-tx-4.3.12.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/spring-web-4.3.12.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/spring-webmvc-4.3.12.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/stax-api-1.0.1.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/thymeleaf-2.1.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/thymeleaf-layout-dialect-1.4.0.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/thymeleaf-spring4-2.1.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/tomcat-embed-el-7.0.68.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/tomcat-jdbc-7.0.68.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/tomcat-juli-7.0.68.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/unbescape-1.1.0.RELEASE.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/validation-api-1.1.0.Final.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/xml-apis-1.4.01.jar"/>
+	<classpathentry kind="lib" path="target/zhpt/WEB-INF/lib/xmlbeans-2.3.0.jar"/>
+	<classpathentry kind="output" path="target/classes"/>
+</classpath>

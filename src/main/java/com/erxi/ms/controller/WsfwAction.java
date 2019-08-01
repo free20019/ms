@@ -1,0 +1,404 @@
+
+package com.erxi.ms.controller;
+
+
+import com.erxi.ms.result.DownloadAct;
+import com.erxi.ms.service.WsfwServics;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 网上服务中的几个功能
+ * @author xianlehuang
+ * @date 2018/12/20 
+ */
+@RequestMapping("/wsfw")
+@RestController
+public class WsfwAction {
+
+    private DownloadAct downloadAct = new DownloadAct();
+
+    @Autowired
+    private WsfwServics wsfwservics;
+
+    /**
+	 * 下拉所有公司
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/qycomp")
+	@ResponseBody
+	public String qycomp() {
+		String msg = wsfwservics.qycomp();
+		return msg;
+	}
+	/**
+	 * 下拉栏
+	 * @param request
+	 * @param table
+	 * @param field
+	 * @return
+	 */
+	@RequestMapping("/xll")
+	@ResponseBody
+	public String findxll(HttpServletRequest request,@RequestParam("table") String table,@RequestParam("field") String field) {
+		String msg = wsfwservics.findxll(table,field);
+		return msg;
+	}
+	
+	/**
+	 * 车辆在线查询
+	 * @param request
+	 * @param stime
+	 * @param etime
+	 * @param vehicle
+	 * @param company
+	 * @param pageIndex
+	 * @param pageSize
+	 * @return
+	 */
+	@RequestMapping("/findclzxcx")
+	@ResponseBody
+	public String findclzxcx(HttpServletRequest request,
+			@RequestParam("stime") String stime,
+			@RequestParam("etime") String etime,
+			@RequestParam("vehicle") String vehicle,
+			@RequestParam("company") String company,
+			@RequestParam("pageIndex") Integer pageIndex,
+			@RequestParam("pageSize") Integer pageSize) {
+		String msg = wsfwservics.findclzxcx(stime,etime,vehicle,company,pageIndex,pageSize);
+		return msg;
+	}
+	
+	/**
+	 * 车辆在线导出
+	 * @param request
+	 * @param stime
+	 * @param etime
+	 * @param vehicle
+	 * @param company
+	 * @param pageIndex
+	 * @param pageSize
+	 * @return
+	 * @throws IOException 
+	 */
+	@RequestMapping("/findclzxcxdc")
+	@ResponseBody
+	public String findclzxcxdc(HttpServletRequest request,
+			HttpServletResponse response,
+			@RequestParam("stime") String stime,
+			@RequestParam("etime") String etime,
+			@RequestParam("vehicle") String vehicle,
+			@RequestParam("company") String company) throws IOException {
+		  String a[] = {"公司", "车牌号", "SIM卡号", "联系人", "联系电话", "最后汇报时间", "状态"};
+          String b[] = {"COMP_NAME", "VEHI_NO", "VEHI_SIM", "OWN_NAME", "HOME_TEL", "ONLINE_TIME","LICHENG"};
+          String gzb = "未上线车辆查询";
+          List<Map<String, Object>> list = wsfwservics.findclzxcxdc(stime,etime,vehicle,company);
+          downloadAct.download(request, response, a, b, gzb, list);
+          return null;
+	}
+	/**
+	 * 分公司里程统计
+	 * @param request
+	 * @param stime
+	 * @param etime
+	 * @param company
+	 * @param pageIndex
+	 * @param pageSize
+	 * @return
+	 */
+	@RequestMapping("/findfgslctj")
+	@ResponseBody
+	public String findfgslctj(HttpServletRequest request,
+			@RequestParam("stime") String stime,
+			@RequestParam("etime") String etime,
+			@RequestParam("company") String company,
+			@RequestParam("vehicle") String vehicle,
+			@RequestParam("pageIndex") Integer pageIndex,
+			@RequestParam("pageSize") Integer pageSize) {
+		String msg = wsfwservics.findfgslctj(stime,etime,company,vehicle,pageIndex,pageSize);
+		return msg;
+	}
+	/**
+	 * 分公司里程导出
+	 * @param request
+	 * @param stime
+	 * @param etime
+	 * @param company
+	 * @return
+	 */
+	@RequestMapping("/findfgslctjdc")
+	@ResponseBody
+	public String findfgslctjdc(HttpServletRequest request,
+			HttpServletResponse response,
+			@RequestParam("stime") String stime,
+			@RequestParam("etime") String etime,
+			@RequestParam("company") String company,
+			@RequestParam("vehicle") String vehicle) throws IOException {
+		  String a[] = {"公司", "车号", "里程（公里）"};
+          String b[] = {"FGS", "CPHM", "ZLC"};
+          String gzb = "分公司里程";
+          List<Map<String, Object>> list = wsfwservics.findfgslctjdc(stime,etime,company,vehicle);
+          downloadAct.download(request, response, a, b, gzb, list);
+          return null;
+	}
+	/**
+	 * 司机营运数据分析
+	 * @param request
+	 * @param stime
+	 * @param etime
+	 * @param vehicle
+	 * @param company
+	 * @param pageIndex
+	 * @param pageSize
+	 * @return
+	 */
+	@RequestMapping("/findsjyysjfx")
+	@ResponseBody
+	public String findsjyysjfx(HttpServletRequest request,
+			@RequestParam("stime") String stime,
+			@RequestParam("etime") String etime,
+			@RequestParam("vehicle") String vehicle,
+			@RequestParam("company") String company,
+			@RequestParam("pageIndex") Integer pageIndex,
+			@RequestParam("pageSize") Integer pageSize) {
+		String msg = wsfwservics.findsjyysjfx(stime,etime,vehicle,company,pageIndex,pageSize);
+		return msg;
+	}
+	
+	/**
+	 * 司机营运数据分析导出
+	 * @param request
+	 * @param stime
+	 * @param etime
+	 * @param vehicle
+	 * @param company
+	 * @param pageIndex
+	 * @param pageSize
+	 * @return
+	 * @throws IOException 
+	 */
+	@RequestMapping("/findsjyysjfxdc")
+	@ResponseBody
+	public String findsjyysjfxdc(HttpServletRequest request,
+			HttpServletResponse response,
+			@RequestParam("stime") String stime,
+			@RequestParam("etime") String etime,
+			@RequestParam("vehicle") String vehicle,
+			@RequestParam("company") String company) throws IOException {
+		  String a[] = {"公司", "车牌号", "SIM卡号", "营运次数/(次)", "营运金额/(元)", "总里程/(公里)","载客里程/(公里)", "空驶里程/(公里)", "实载率", "载客时间/(分钟)", "载客等候时间/(分钟)"};
+          String b[] = {"COMP_NAME", "VEHI_NO", "VEHI_SIM", "YYCS", "YYJE", "ZLC","ZKLC", "KSLC", "SZL", "ZKSJ", "ZKDHSJ"};
+          String gzb = "司机营运数据分析";
+          List<Map<String, Object>> list = wsfwservics.findsjyysjfxdc(stime,etime,vehicle,company);
+          downloadAct.download(request, response, a, b, gzb, list);
+          return null;
+	}
+	
+	/**
+	 * 企业营运数据分析
+	 * @param request
+	 * @param stime
+	 * @param etime
+	 * @param company
+	 * @param pageIndex
+	 * @param pageSize
+	 * @return
+	 */
+	@RequestMapping("/findqyyysjfx")
+	@ResponseBody
+	public String findqyyysjfx(HttpServletRequest request,
+			@RequestParam("stime") String stime,
+			@RequestParam("etime") String etime,
+			@RequestParam("company") String company,
+			@RequestParam("pageIndex") Integer pageIndex,
+			@RequestParam("pageSize") Integer pageSize) {
+		String msg = wsfwservics.findqyyysjfx(stime,etime,company,pageIndex,pageSize);
+		return msg;
+	}
+	/**
+	 * 企业营运数据分析导出
+	 * @param request
+	 * @param stime
+	 * @param etime
+	 * @param company
+	 * @return
+	 */
+	@RequestMapping("/findqyyysjfxdc")
+	@ResponseBody
+	public String findqyyysjfxdc(HttpServletRequest request,
+			HttpServletResponse response,
+			@RequestParam("stime") String stime,
+			@RequestParam("etime") String etime,
+			@RequestParam("company") String company) throws IOException {		
+		String a[] = {"公司", "车辆数", "营运数","出车率", "营运次数/(次)", "营运金额/(元)", "总里程/(公里)","载客里程/(公里)", "空驶里程/(公里)", "实载率", "载客时间/(分钟)", "载客等候时间/(分钟)"};
+		String b[] = {"ZGS", "CLS","CCL", "YYS", "YYCS", "YYJE", "ZLC","ZKLC", "KSLC", "SZL", "ZKSJ", "ZKDHSJ"};
+		String gzb = "企业营运数据分析";
+		List<Map<String, Object>> list = wsfwservics.findqyyysjfxdc(stime,etime,company);
+		downloadAct.download(request, response, a, b, gzb, list);
+		return null;
+	}
+	/**
+	 * 执法稽查信息
+	 * @param request
+	 * @param stime
+	 * @param etime
+	 * @param company
+	 * @param pageIndex
+	 * @param pageSize
+	 * @return
+	 */
+	@RequestMapping("/findzfjc")
+	@ResponseBody
+	public String findzfjc(HttpServletRequest request,
+			@RequestParam("stime") String stime,
+			@RequestParam("etime") String etime,
+			@RequestParam("event") String event,
+			@RequestParam("vehicle") String vehicle,
+			@RequestParam("pageIndex") Integer pageIndex,
+			@RequestParam("pageSize") Integer pageSize) {
+		String msg = wsfwservics.findzfjc(stime,etime,event,vehicle,pageIndex,pageSize);
+		return msg;
+	}
+	/**
+	 * 执法稽查信息导出
+	 * @param request
+	 * @param stime
+	 * @param etime
+	 * @param company
+	 * @return
+	 */
+	@RequestMapping("/findzfjcdc")
+	@ResponseBody
+	public String findzfjcdc(HttpServletRequest request,
+			HttpServletResponse response,
+			@RequestParam("stime") String stime,
+			@RequestParam("etime") String etime,
+			@RequestParam("event") String event,
+			@RequestParam("vehicle") String vehicle) throws IOException {		
+		String a[]={"车号","事件名称","稽查时间","当事人姓名","稽查地点"};//导出列明
+		String b[]={"VEHICLE_PLATE_NUMBER","ILLEGAL_FACT","ILLEGAL_TIME","PARTY_NAME","ILLEGAL_LOCATION"};//导出map中的key
+		String gzb="执法稽查信息";//导出sheet名和导出的文件名
+		List<Map<String, Object>> list = wsfwservics.findzfjcdc(stime,etime,event,vehicle);
+		downloadAct.download(request, response, a, b, gzb, list);
+		return null;
+	}
+	/**
+	 * 单车平均分析
+	 * @param request
+	 * @param field1
+	 * @param field2
+	 * @param field3
+	 * @param time
+	 * @return
+	 */
+	@RequestMapping("/finddcpjfx")
+	@ResponseBody
+	public String finddcpjfx(HttpServletRequest request,
+			@RequestParam("module") String module,
+			@RequestParam("field1") String field1,
+			@RequestParam("field2") String field2,
+			@RequestParam("field3") String field3,
+			@RequestParam("time") String time) {
+		String msg = wsfwservics.finddcpjfx(module,field1,field2,field3,time);
+		return msg;
+	}
+	/**
+	 * 单车平均分析导出
+	 * @param request
+	 * @param response
+	 * @param field1
+	 * @param field2
+	 * @param field3
+	 * @param time
+	 * @return
+	 * @throws IOException
+	 */
+	@RequestMapping("/finddcpjfxdc")
+	@ResponseBody
+	public String finddcpjfxdc(HttpServletRequest request,
+			HttpServletResponse response,
+			@RequestParam("module") String module,
+			@RequestParam("field1") String field1,
+			@RequestParam("field2") String field2,
+			@RequestParam("field3") String field3,
+			@RequestParam("time") String time) throws IOException {	
+		String gzb ="";
+		String a[]={};
+		if(module.equals("yysy")){
+			gzb = "单车平均营运收益分析";//导出sheet名和导出的文件名
+			a= new String[] {"营运收益(元/时)","0:00","1:00","2:00","3:00","4:00","5:00","6:00","7:00","8:00","9:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00","23:00"};//导出列明			
+		}else if(module.equals("zklc")){
+			gzb = "单车平均载客里程分析";//导出sheet名和导出的文件名
+			a= new String[] {"载客里程(公里/时)","0:00","1:00","2:00","3:00","4:00","5:00","6:00","7:00","8:00","9:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00","23:00"};//导出列明			
+		}else if(module.equals("kslc")){
+			gzb = "单车平均空驶里程分析";//导出sheet名和导出的文件名
+			a= new String[] {"空驶里程(公里/时)","0:00","1:00","2:00","3:00","4:00","5:00","6:00","7:00","8:00","9:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00","23:00"};//导出列明			
+		}else if(module.equals("xszlc")){
+			gzb = "单车平均行驶总里程分析";//导出sheet名和导出的文件名
+			a= new String[] {"行驶总里程(公里/时)","0:00","1:00","2:00","3:00","4:00","5:00","6:00","7:00","8:00","9:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00","23:00"};//导出列明			
+		}else if(module.equals("yycs")){
+			gzb = "单车平均营运次数分析";//导出sheet名和导出的文件名
+			a= new String[] {"营运次数(次/时)","0:00","1:00","2:00","3:00","4:00","5:00","6:00","7:00","8:00","9:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00","23:00"};//导出列明			
+		}else if(module.equals("zksj")){
+			gzb = "单车平均载客时间分析";//导出sheet名和导出的文件名
+			a= new String[] {"载客时间（分/时）","0:00","1:00","2:00","3:00","4:00","5:00","6:00","7:00","8:00","9:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00","23:00"};//导出列明			
+		}else if(module.equals("zkdhsj")){
+			gzb = "单车平均载客等候时间分析";//导出sheet名和导出的文件名
+			a= new String[] {"载客等候时间（分/时）","0:00","1:00","2:00","3:00","4:00","5:00","6:00","7:00","8:00","9:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00","23:00"};//导出列明			
+		}
+		String b[] = {"message","y0","y1","y2","y3","y4","y5","y6","y7","y8","y9","y10","y11","y12","y13","y14","y15","y16","y17","y18","y19","y20","y21","y22","y23"};//导出map中的key
+		List<Map<String, Object>> list = downloadAct.strlist(wsfwservics.finddcpjfx(module,field1,field2,field3,time));
+		downloadAct.download(request, response, a, b, gzb, list);
+		return null;
+	}
+	
+	/**
+	 * 服务质量综合评定
+	 * @param request
+	 * @param stime
+	 * @param etime
+	 * @param company
+	 * @param pageIndex
+	 * @param pageSize
+	 * @return
+	 */
+	@RequestMapping("/findfwzlxx")
+	@ResponseBody
+	public String findfwzlxx(HttpServletRequest request,
+			@RequestParam("postData") String postData) {
+		String msg = wsfwservics.findfwzlxx(postData);
+		return msg;
+	}
+	/**
+	 * 服务质量综合评定导出
+	 * @param request
+	 * @param stime
+	 * @param etime
+	 * @param company
+	 * @return
+	 */
+	@RequestMapping("/findfwzlxxdc")
+	@ResponseBody
+	public String findfwzlxxdc(HttpServletRequest request,
+			HttpServletResponse response,
+			@RequestParam("postData") String postData) throws IOException {		
+		String a[]={"企业名称","年度","信誉等级"};//导出列明
+		String b[]={"YHMC","SJ","XYDJ"};//导出map中的key
+		String gzb="服务质量综合评定";//导出sheet名和导出的文件名
+		List<Map<String, Object>> list = wsfwservics.findfwzlxxdc(postData);
+		downloadAct.download(request, response, a, b, gzb, list);
+		return null;
+	}
+}
+

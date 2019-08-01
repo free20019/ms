@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>车辆查询</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer,AMap.MouseTool"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+
+<!-- 	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script> -->
+<!-- 	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script> -->
+    <script src="../../resources/script/jsgrid/jsgrid.core.js"></script>
+    <script src="../../resources/script/jsgrid/jsgrid.load-indicator.js"></script>
+    <script src="../../resources/script/jsgrid/jsgrid.load-strategies.js"></script>
+    <script src="../../resources/script/jsgrid/jsgrid.sort-strategies.js"></script>
+    <script src="../../resources/script/jsgrid/jsgrid.field.js"></script>
+
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="./clcx.js"></script>
+
+	<style>
+		.panel-layout[layout='left'] {
+			width: 100%;
+		}
+		.panel-layout[layout='left'] ~ .panel-layout[layout='center'] {
+			width: calc(100% - 500px);
+			margin-left: 500px;
+		}
+
+		.panel-title {
+			height: calc(100% - 20px);
+		}
+
+		.list-header[type='fluid'] {
+			line-height: 47px;
+			display: flex;
+			padding: 0 10px;
+			border-bottom: 1px solid #9aa3fd;
+		}
+		.list-bodyer[type='fluid'] {
+			padding: 0 10px;
+			margin-bottom: 0;
+		}
+		.list-bodyer[type='fluid'] .listItem {
+			display: flex;
+		}
+		.list-bodyer[type='fluid'] .listItem:not(:last-child) {
+			border-bottom: 1px solid #ccd1fe;
+		}
+		.list-header[type='fluid'] .item-col,
+		.list-bodyer[type='fluid'] .item-col {
+			align-items: end;
+			display: flex;
+			flex: .65;
+			justify-content:center;
+		}
+		.list-header[type='fluid'] .item-col[type='vehicleNum'],
+		.list-bodyer[type='fluid'] .item-col[type='vehicleNum'] {
+			align-items: end;
+			display: flex;
+			flex: .35;
+			justify-content:center;
+		}
+		.list-bodyer[type='fluid'] .item-col {
+			height: 30px;
+			line-height: 30px;
+		}
+		.list-header[type='fluid'] .item-col:not(:last-child),
+		.list-bodyer[type='fluid'] .item-col:not(:last-child) {
+			position: relative;
+		}
+		.list-header[type='fluid'] .item-col:not(:last-child):after,
+		.list-bodyer[type='fluid'] .item-col:not(:last-child):after {
+			content: '';
+			position: absolute;
+			top: 50%;
+			right: 0;
+			border-right: 1px solid #9aa3fd;
+			transform: translate(-50%, -50%);
+		}
+		.list-header[type='fluid'] .item-col:not(:last-child):after {
+			top: 58%;
+			height: 40%;
+		}
+		.list-bodyer[type='fluid'] .item-col:not(:last-child):after {
+			height: 45%;
+		}
+		.list-header[type='fluid'] .item-col[type='labelName'],
+		.list-bodyer[type='fluid'] .item-col[type='labelName'] {
+			flex: 1;
+			width: 130px;
+		}
+		.list-bodyer[type='fluid'] .item-col[type='labelName'] {
+			justify-content: left;
+			overflow: hidden;
+			font-size: 14px;
+		}
+		.list-bodyer[type='fluid'] .item-col.icon-location:before {
+			margin-left: -2px;
+			margin-right: 2px;
+			font-size: 16px;
+			color: #fe5c87;
+		}
+		.list-header[type='fluid'] .item-col[type='vehicleNum'],
+		.list-bodyer[type='fluid'] .item-col[type='vehicleNum'] {
+		}
+		.list-header[type='fluid'] .item-col[type='alarmsNum'],
+		.list-bodyer[type='fluid'] .item-col[type='alarmsNum'] {
+		}
+		.scrollbar-macosx {
+			height: calc(100% - 45px);
+		}
+		.item-col{
+			overflow: hidden;
+			white-space: nowrap;
+		}
+		#clcxTable {margin-top: 10px;}
+
+		/* dialog style */
+		#clcx-dialog .modal-dialog {width: 900px;}
+		.modal-body form {}
+		.modal-body .panel-heading + .panel-body {padding-bottom: 0;}
+		.modal-body .control-label {display: inline-block;width: 7em;text-align: right;}
+		.modal-body .control-label, .modal-body .form-control {display: inline-block;margin-bottom: 15px;}
+		textarea.form-control {resize: none;}
+		.ip-type-input div.form-control, .ip-type-text input.form-control, .ip-type-text select.form-control, .ip-type-text textarea.form-control, .ip-type-text .select2.select2-container {display: none;}
+		.ip-type-text div.form-control {width: 168px;}
+		#clcx-dialog textarea.form-control, #clcx-dialog textarea.form-control + div.form-control {
+			width: calc(100% - 104px);
+			height: 50px;
+		}
+	</style>
+</head>
+<body>
+<div class="panel-wrapper" id="clcxPanel" style="position: relative;">
+	<div class="panel-layout" layout="center">
+		<div class="dataListPanel" style="padding: 15px;">
+			<div class="card panel-queryBar" border="left" color="red">
+				<!--<span class="title">起点时间</span>-->
+				<div class="form-inline">
+					<div class="form-group form-group-sm">
+						<select id="clcx_cph" class="select2" style="width: 150px;" data-placeholder="车牌号"><option/></select>
+<!-- 						<input type="text" class="form-control" style="width: 150px;" placeholder="车牌号"  id="clcx_cph"> -->
+						<select id="clcx_xm" class="select2" style="width: 200px;" data-placeholder="业户名称"><option/></select>
+						<select id="clcx_age" class="select2" style="width: 200px;" data-placeholder="年限"><option/></select>
+						<input type="text" class="form-control" style="width: 150px;" placeholder="车辆品牌"  id="clcx_type">
+						<select class="select2" id="clcx_city" style="width: 150px;"  data-placeholder="区域"><option/></select>
+						<input type="text" class="form-control" style="width: 150px;" placeholder="道路运输证号"  id="clcx_yszh">
+						<input type="text" class="form-control" style="width: 150px;" placeholder="经营许可证号"  id="clcx_jyxkzh">
+<!-- 						<select class="form-control" id="clcx_status" data-placeholder="证照状态"><option></select> -->
+						<a class="btn btn-primary btn-sm" id="clcx_cx">查询</a>
+						<a class="btn btn-primary btn-sm" id="clcx_dc">导出</a>
+<!-- 						<a class="btn btn-primary btn-sm" id="clcx-add">添加</a> -->
+					</div>
+				</div>
+			</div>
+			<div id="clcxTable"></div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="clcx-dialog" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">服务违章</h4>
+			</div>
+			<div class="modal-body" style="height: 400px; overflow-y: auto;">
+				<form class="form-inline ip-type-input" id="clcx-dialog-form">
+					<div class="panel panel-default">
+						<div class="panel-heading">业户基本信息</div>
+						<div class="panel-body">
+							<div class="form-group form-group-sm" id="clcx-dialog-yhmc">
+								<label class="control-label">业户名称:</label>
+								<input type="text" class="form-control" placeholder="业户名称">
+								<div type="text" class="form-control" style="white-space: nowrap;overflow: hidden;">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-xkzh">
+								<label class="control-label">经营许可证号:</label>
+								<input type="text" class="form-control" placeholder="经营许可证号">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-jyfw">
+								<label class="control-label">业户经营范围:</label>
+								<input type="text" class="form-control" placeholder="业户经营范围">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">车辆基本信息</div>
+						<div class="panel-body">
+							<div class="form-group form-group-sm" id="clcx-dialog-cphm">
+								<label class="control-label">车牌号码:</label>
+								<input type="text" class="form-control" placeholder="车牌号码">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-cpys">
+								<label class="control-label">车牌颜色:</label>
+								<input type="text" class="form-control" placeholder="车牌颜色">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-cplx">
+								<label class="control-label">车牌类型:</label>
+								<input type="text" class="form-control" placeholder="车牌类型">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-hdzk">
+								<label class="control-label">核定载客:</label>
+								<input type="text" class="form-control" placeholder="核定载客">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-cpai">
+								<label class="control-label">厂牌:</label>
+								<input type="text" class="form-control" placeholder="厂牌">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-xhao">
+								<label class="control-label">型号:</label>
+								<input type="text" class="form-control" placeholder="型号">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-chec">
+								<label class="control-label">车长:</label>
+								<input type="text" class="form-control" placeholder="车长">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-chek">
+								<label class="control-label">车宽:</label>
+								<input type="text" class="form-control" placeholder="车宽">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-cheg">
+								<label class="control-label">车高:</label>
+								<input type="text" class="form-control" placeholder="车高">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-clys">
+								<label class="control-label">车辆颜色:</label>
+								<input type="text" class="form-control" placeholder="车辆颜色">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-clda">
+								<label class="control-label">车辆档案号:</label>
+								<input type="text" class="form-control" placeholder="车辆档案号">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-zozl">
+								<label class="control-label">总质量:</label>
+								<input type="text" class="form-control" placeholder="总质量">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-clbz" style="width: 100%;">
+								<label class="control-label">车辆备注:</label>
+								<textarea class="form-control" name="" placeholder="车辆备注" rows="4"></textarea>
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">技术信息</div>
+						<div class="panel-body">
+							<div class="form-group form-group-sm" id="clcx-dialog-fdjh">
+								<label class="control-label">发动机号:</label>
+								<input type="text" class="form-control" placeholder="发动机号">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-jsdj">
+								<label class="control-label">技术等级:</label>
+								<input type="text" class="form-control" placeholder="技术等级">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-yxqz">
+								<label class="control-label">有效期止:</label>
+								<input type="text" class="form-control" placeholder="技术等级评定有效期止">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-sbdm">
+								<label class="control-label">识别代码:</label>
+								<input type="text" class="form-control" placeholder="车辆识别代码/车架号">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-rllx">
+								<label class="control-label">燃料类型:</label>
+								<input type="text" class="form-control" placeholder="燃料类型">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">道路运输证信息</div>
+						<div class="panel-body">
+							<div class="form-group form-group-sm" id="clcx-dialog-yszh">
+								<label class="control-label">道路运输证号:</label>
+								<input type="text" class="form-control" placeholder="道路运输证号">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-kssj">
+								<label class="control-label">有效开始时间:</label>
+								<input type="text" class="form-control" placeholder="有效开始时间">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-jzsj">
+								<label class="control-label">有效截止时间:</label>
+								<input type="text" class="form-control" placeholder="有效截止时间">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-nsyxq">
+								<label class="control-label">年审有效期起:</label>
+								<input type="text" class="form-control" placeholder="年审有效期起">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-ccfzsj">
+								<label class="control-label">初次发证时间:</label>
+								<input type="text" class="form-control" placeholder="初次发证时间">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-yszbz" style="width: 100%;">
+								<label class="control-label">运输证备注:</label>
+								<textarea class="form-control" name="" placeholder="道路运输证备注" rows="4"></textarea>
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+						</div>
+					</div>
+					
+					
+					<!-- 2019 2/18 	车辆查询详情中增加：驾驶员信息，投诉信息、行政处罚信息、权证信息-->
+					<div class="panel panel-default">
+						<div class="panel-heading">驾驶员信息</div>
+						<div class="panel-body">
+							<div class="form-group form-group-sm" id="clcx-dialog-jsyxm">
+								<label class="control-label">姓名:</label>
+								<input type="text" class="form-control" placeholder="姓名">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-jsysfzh">
+								<label class="control-label">身份证号:</label>
+								<input type="text" class="form-control" placeholder="身份证号">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-jsylxdh">
+								<label class="control-label">联系电话:</label>
+								<input type="text" class="form-control" placeholder="联系电话">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-jsyfwzgzh">
+								<label class="control-label">服务资格证号:</label>
+								<input type="text" class="form-control" placeholder="服务资格证号">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="clcx-dialog-jsyzgyxqz">
+								<label class="control-label">资格证有效期止:</label>
+								<input type="text" class="form-control" placeholder="资格证有效期止">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">投诉人信息</div>
+						<div class="panel-body">
+							<div id="clcxTable_1"></div>
+						</div>
+					</div>
+					<div class="panel panel-default" style="margin-bottom: 0;">
+						<div class="panel-heading">行政处罚信息</div>
+						<div class="panel-body">
+							<div id="clcxTable_2"></div>
+						</div>
+					</div>
+					
+					
+					
+					
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" id="clcx-dialog-save">提交</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+</body>
+</html>

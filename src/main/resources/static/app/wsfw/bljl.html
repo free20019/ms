@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>荣誉管理</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+	<script src="./bljlu.js"></script>
+	
+	<style>
+		.panel-queryBar {padding: 10px 10px 0;}
+		.form-inline .form-group {margin-bottom: 10px;}
+		.dataListPanel.center {height: calc(100% - 50px);padding: 10px;}
+		[type='calendar'] {width: auto;}
+
+		/* dialog style */
+		#bljl-dialog-wfnr .form-control, #bljl-dialog-jieg .form-control {width: 428px;height: 50px;}
+		.modal-body form {}
+		.modal-body .control-label {display: inline-block;width: 6em;text-align: right;}
+		.modal-body .form-control {display: inline-block;}
+		textarea.form-control {resize: none;}
+		.ip-type-input div.form-control, .ip-type-text input.form-control, .ip-type-text select.form-control, .ip-type-text textarea.form-control, .ip-type-text .select2.select2-container {display: none;}
+		.ip-type-text div.form-control {width: 168px;}
+	</style>
+
+</head>
+<body>
+<div class="panel-wrapper" style="position: relative;">
+	<div class="panel-layout" layout="center">
+		<div class="panel-queryBar">
+			<form class="form-inline">
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="iconfont icon-chepai" type="icon"></i>
+						<!--<input type="text" class="form-control input-sm" id="bljl-cphm" placeholder="车牌号">-->
+						<select type="text" class="form-control input-sm select2" autocomplete="off" id="bljl-cphm" data-placeholder="车牌号" style="width: 160px;"><option></option></select>
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="ip-iconfont ip-icon-user" type="icon"></i>
+						<input type="text" class="form-control input-sm" id="bljl-siji" placeholder="司机">
+					</div>
+					<a class="btn btn-primary btn-sm" id="bljl_select">查询</a>
+<!-- 					<a class="btn btn-primary btn-sm" id="bljl-reset">重置</a> -->
+					<a class="btn btn-primary btn-sm" id="bljl-add">添加</a>
+					<a class="btn btn-primary btn-sm" id="bljl-Export">导出</a>
+				</div>
+			</form>
+		</div>
+		<div class="dataListPanel center">
+			<div id="bljlTable"></div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="bljl-dialog" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">服务违章</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-inline ip-type-input" id="bljl-dialog-form">
+					<div class="form-group form-group-sm" id="bljl-dialog-cphm">
+						<label class="control-label">车牌号:</label>
+						<input type="text" class="form-control" placeholder="车牌号" id="bljl_CPH1" >
+						<div type="text" class="form-control" id="bljl_CPH">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="bljl-dialog-ximi">
+						<label class="control-label">姓名:</label>
+						<input type="text" class="form-control" placeholder="姓名" id="bljl_XM1">
+						<div type="text" class="form-control" id="bljl_XM">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="bljl-dialog-wfnr">
+						<label class="control-label">违反内容:</label>
+						<textarea type="text" class="form-control" placeholder="违反内容" id="bljl_WFNR1"></textarea>
+						<div type="textarea" class="form-control" id="bljl_WFNR">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="bljl-dialog-jieg">
+						<label class="control-label">结果:</label>
+						<textarea type="text" class="form-control" placeholder="结果" id="bljl_CLJG1"></textarea>
+						<div type="textarea" class="form-control" id="bljl_CLJG">&nbsp;</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" id="bljl-dialog-save">提交</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+</body>
+</html>

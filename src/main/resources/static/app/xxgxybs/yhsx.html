@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>用户上线</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+	<style>
+		.panel-queryBar {padding: 10px 10px 0;}
+		.form-inline .form-group {margin-bottom: 10px;}
+		.dataListPanel.center {height: calc(100% - 50px);padding: 10px;}
+		[type='calendar'] {width: auto;}
+
+		/* dialog style */
+		#yhsx-dialog-wfnr .form-control, #yhsx-dialog-jieg .form-control {width: 428px;height: 50px;}
+		.modal-body form {}
+		.modal-body .control-label {display: inline-block;width: 6em;text-align: right;}
+		.modal-body .form-control {display: inline-block;}
+		textarea.form-control {resize: none;}
+		.ip-type-input div.form-control, .ip-type-text input.form-control, .ip-type-text select.form-control, .ip-type-text textarea.form-control, .ip-type-text .select2.select2-container {display: none;}
+		.ip-type-text div.form-control {width: 168px;}
+		.scrollbar-macosx {
+			height: 100%;
+		}
+	</style>
+</head>
+<body>
+<div class="panel-wrapper" style="position: relative;">
+	<div class="panel-layout" layout="center">
+		<div class="panel-queryBar">
+			<form class="form-inline">
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="iconfont icon-yichangguanli" type="icon"></i>
+						<input id="yhsx-name" type="text" class="form-control" placeholder="姓名" style="width: 150px;">
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="glyphicon glyphicon-calendar" type="icon"></i>
+						<input type="text" class="form-control input-sm" id="yhsx-stateTime" placeholder="开始时间">
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="glyphicon glyphicon-calendar" type="icon"></i>
+						<input type="text" class="form-control input-sm" id="yhsx-endTime" placeholder="结束时间">
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<a class="btn btn-primary btn-sm" id="yhsx-select">查询</a>
+<!-- 					<a class="btn btn-primary btn-sm" id="yhsx-dc">导出</a> -->
+				</div>
+			</form>
+		</div>
+		<div class="dataListPanel center">
+			<div class="scrollbar-macosx">
+				<div id="yhsxTable"></div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+var yhsx=(function ($) {
+	var echart = null;
+	$(function () {
+		$('.scrollbar-macosx').scrollbar();
+		$('#yhsx-stateTime').datetimepicker(dateDefaultOption);
+		$('#yhsx-stateTime').val(new Date().Format('yyyy-MM-dd'));
+		$('#yhsx-endTime').datetimepicker(dateDefaultOption);
+		$('#yhsx-endTime').val(new Date().Format('yyyy-MM-dd'));
+		var bljlFields = [
+		                  	{name: 'ID', title: '序号', width: 60, align: 'center'},
+		                  	{name: 'USER_NAME', title: '用户', width: 100, align: 'center'},
+		                  	{name: 'TIME', title: '上线日期', width: 100, align: 'center'},
+		                  	{name: 'USER_KIND', title: '登录类型', itemTemplate:formatMalfunction, width: 100, align: 'center'}
+			    		];
+		$('#yhsx-select').on('click', function () {
+			findyhsx();
+		});
+		function findyhsx(){
+			var all = 0;
+			$('#yhsxTable').jsGrid({
+				width: '100%',
+				height: 'calc(100% - 50px)',
+				autoload: true,
+				paging: true,
+				pageLoading: true,
+				editing: true,
+				sorting: true,
+				pageSize: 15000,
+				pageIndex: 1,
+				controller: {
+					loadData: function(filter) {
+                    	var d = $.Deferred();
+                    	var a = re(filter, function(item){
+                    		d.resolve(item);
+                    	})
+                    	return d.promise();
+                    }
+                },
+                fields: bljlFields,
+				pagerContainer: null,
+			    pageButtonCount: 5,
+			    pagerFormat: "{first} {prev} {pages} {next} {last} {pageIndex} of {pageCount}",
+			    pagePrevText: "上一页",
+			    pageNextText: "下一页",
+			    pageFirstText: "第一页",
+			    pageLastText: "末页",
+			    pageNavigatorNextText: ">",
+			    pageNavigatorPrevText: "<"
+          	});
+
+		}
+		function re(filter, callback){
+            var startIndex = (filter.pageIndex - 1) * filter.pageSize;
+            jqxhr=$.ajax({
+            	type: "POST",
+				url: "../../claq/findyhsx",
+				data:{"stime":$("#yhsx-stateTime").val(),
+					"etime":$("#yhsx-endTime").val(),
+					"name":$("#yhsx-name").val(),
+					"pageIndex":filter.pageIndex,
+     				"pageSize":filter.pageSize
+					},
+				timeout : 180000,
+				dataType: 'json',
+            }).done(function(json) {          	
+            	console.log(json);
+            	if(json.code==500100){
+            		layer.msg('数据不存在',{icon:2});
+            		return callback();
+            	}
+        		all = json.data[0].count;
+ 				var re = json.data[0].datas;
+
+       			if(re.length>0){
+       				for(var i = 0; i< re.length ;i++){
+       					re[i].ID=startIndex+i+1;
+       				}
+       			}
+   				return callback({
+                    data: re,
+                    itemsCount: all
+                });
+            }).fail(function() {
+            });
+		}
+		findyhsx();
+		$('#yhsx-dc').on('click', function () {
+			layer.confirm('你确定要导出数据', {
+				btn: ['确定', '取消'],
+				offset: '100px'
+			}, function (layerIndex) {
+				window.open(basePath+"claq/findxxbsdc?stime="+$("#yhsx-stateTime").val()
+						+"&etime="+$("#yhsx-endTime").val()
+				);
+				layer.close(layerIndex);
+			}, function (layerIndex) {
+				layer.close(layerIndex);
+			});
+		});
+		function formatMalfunction (val) {
+			if (val === '1') return "司机";
+			else if (val === '2') return "企业";
+			else if (val === '3') return "管理员";
+			else if (val === '4') return "平台";
+			else return '';
+		}
+	})
+	
+})(jQuery)
+</script>
+</body>
+</html>

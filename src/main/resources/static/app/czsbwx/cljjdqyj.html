@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>车辆维修即将到期预警</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="./cljjdqyj.js"></script>
+	<style>
+		#cljjdqyjMap {
+			min-height: 340px;
+			height: 100%;
+			border: 1px solid #c4d4fb;
+			border-radius: 10px;
+		}
+		.panel-layout[layout='left'] {width: 340px;}
+		.panel-layout[layout='left'] ~ .panel-layout[layout='center'] {width: calc(100% - 355px);margin-left: 355px;}
+		.panel-layout > .panel {height: calc(100% - 30px);margin-right: 0;margin-bottom: 0;}
+
+		.list-header[type='fluid'] {
+			line-height: 47px;
+			display: flex;
+			padding: 0 10px;
+			border-bottom: 1px solid #9aa3fd;
+		}
+		.list-bodyer[type='fluid'] {
+			padding: 0 10px;
+			margin-bottom: 0;
+		}
+		.list-bodyer[type='fluid'] .listItem {
+			display: flex;
+		}
+		.list-bodyer[type='fluid'] .listItem:not(:last-child) {
+			border-bottom: 1px solid #ccd1fe;
+		}
+		.list-header[type='fluid'] .item-col,
+		.list-bodyer[type='fluid'] .item-col {
+			align-items: end;
+			display: flex;
+			flex: .65;
+			justify-content:center;
+		}
+		.list-header[type='fluid'] .item-col[type='vehicleNum'],
+		.list-bodyer[type='fluid'] .item-col[type='vehicleNum'] {
+			align-items: end;
+			display: flex;
+			flex: .35;
+			justify-content:center;
+		}
+		.list-bodyer[type='fluid'] .item-col {
+			height: 30px;
+			line-height: 30px;
+		}
+		.list-header[type='fluid'] .item-col:not(:last-child),
+		.list-bodyer[type='fluid'] .item-col:not(:last-child) {
+			position: relative;
+		}
+		.list-header[type='fluid'] .item-col:not(:last-child):after,
+		.list-bodyer[type='fluid'] .item-col:not(:last-child):after {
+			content: '';
+			position: absolute;
+			top: 50%;
+			right: 0;
+			border-right: 1px solid #9aa3fd;
+			transform: translate(-50%, -50%);
+		}
+		.list-header[type='fluid'] .item-col:not(:last-child):after {
+			top: 58%;
+			height: 40%;
+		}
+		.list-bodyer[type='fluid'] .item-col:not(:last-child):after {
+			height: 45%;
+		}
+		.list-header[type='fluid'] .item-col[type='labelName'],
+		.list-bodyer[type='fluid'] .item-col[type='labelName'] {
+			flex: 1;
+			width: 130px;
+		}
+		.list-bodyer[type='fluid'] .item-col[type='labelName'] {
+			justify-content: left;
+			overflow: hidden;
+			font-size: 14px;
+		}
+		.list-bodyer[type='fluid'] .item-col.icon-location:before {
+			margin-left: -2px;
+			margin-right: 2px;
+			font-size: 16px;
+			color: #fe5c87;
+		}
+		.list-header[type='fluid'] .item-col[type='vehicleNum'],
+		.list-bodyer[type='fluid'] .item-col[type='vehicleNum'] {
+		}
+		.list-header[type='fluid'] .item-col[type='alarmsNum'],
+		.list-bodyer[type='fluid'] .item-col[type='alarmsNum'] {
+		}
+		.scrollbar-macosx {
+			height: calc(100% - 45px);
+		}
+		.item-col{
+			overflow: hidden;
+			white-space: nowrap;
+		}
+		
+	</style>
+</head>
+<body>
+<div class="panel-wrapper" style="position: relative;">
+	<div class="panel-layout" layout="left">
+		<div class="dataListPanel" >
+			<div class="card panel-queryBar" border="left" color="red">
+				<div class="form-inline">
+					<div class="form-group form-group-sm" style="margin-bottom: 10px;">
+						<div type="calendar" style="width:120px;">
+							<i class="glyphicon glyphicon-calendar" type="icon"></i>
+							<input type="text" class="form-control input-sm" id="cljjdqyj-datetimeStart" placeholder="开始时间">
+						</div>
+						<span>-</span>
+						<div type="calendar"  style="width:120px;">
+							<i class="glyphicon glyphicon-calendar" type="icon"></i>
+							<input type="text" class="form-control input-sm" id="cljjdqyj-datetimeEnd" placeholder="结束时间">
+						</div>
+						<i class="btn btn-primary btn-sm btn-last ip-iconfont ip-icon-search" id="yjcx"></i>
+					</div>
+				</div>
+			</div>	
+			<div class="card" border="left" color="greed" style="height: calc(100% - 100px);">
+				<div type="calendar" style="width:280px;margin-left: 29px">
+					<i class="iconfont icon-car" type="icon"></i>
+					<input type="text" style="text-align:center;" class="form-control" placeholder="输入三位以上车牌号" id="cphm_value">
+				</div>
+				<div class="list list-header" type="fluid">
+					<span class="item-col" type="vehicleNum">车牌号</span>
+					<span class="item-col" type="button">操作</span>
+				</div>
+				<div class="scrollbar-macosx">
+					<ul class="list list-bodyer" id="vehi_list" type="fluid">
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="panel-layout" layout="center">
+		<table border="0" style="height: 100%;width: 100%">
+			<tr style="width: 98%;">
+				<td>
+				<font size="2" color="red">总数：<strong id="total"><strong id="onnum"></strong></font>&nbsp;
+				<font size="2" color="#ff1313" ><img src="../../resources/images/c.png"></img>主机故障：</font><font size="2" color="red"><strong id="num1"></strong></font>&nbsp;
+				<font size="2" color="#ff1313" ><img src="../../resources/images/c.png"></img>定位故障：</font><font size="2" color="red"><strong id="num2"></strong></font>&nbsp;
+				<font size="2" color="#ff1313" ><img src="../../resources/images/c.png"></img>通信故障：</font><font size="2" color="red"><strong id="num3"></strong></font>&nbsp;
+				<font size="2" color="#ff1313" ><img src="../../resources/images/c.png"></img>定位回传故障：</font><font size="2" color="red"><strong id="num4"></strong></font>&nbsp;
+				<font size="2" color="#ff1313" ><img src="../../resources/images/c.png"></img>摄像头故障：</font><font size="2" color="red"><strong id="num5"></strong></font>&nbsp;
+				<font size="2" color="#ff1313" ><img src="../../resources/images/c.png"></img>视频主机/存储故障：</font><font size="2" color="red"><strong id="num6"></strong></font>&nbsp;
+				<br/><font size="2" color="#ff1313" ><img src="../../resources/images/c.png"></img>计价器断开故障：</font><font size="2" color="red"><strong id="num7"></strong></font>&nbsp;
+				<font size="2" color="#ff1313" ><img src="../../resources/images/c.png"></img>导航屏断开故障：</font><font size="2" color="red"><strong id="num8"></strong></font>&nbsp;
+				<font size="2" color="#ff1313" ><img src="../../resources/images/c.png"></img>空车灯故障：</font><font size="2" color="red"><strong id="num9"></strong></font>&nbsp;
+				<font size="2" color="#009933" ><img src="../../resources/images/h.png"></img>多个故障：</font><font size="2" color="#009933"><strong id="num"></strong></font>
+				&nbsp;<font size="1"  style="float: right;padding-right: 20px;"><strong id="ntime"></strong></font>
+				</td>
+			</tr>
+			<tr style="width: 98%;">
+				<td style="width: 100%;height: 100%"><div id="cljjdqyjMap" style="height: 100%;width: 100%">&nbsp;</div></td>
+			</tr>
+		</table>
+		
+	</div>
+</div>
+</body>
+</html>

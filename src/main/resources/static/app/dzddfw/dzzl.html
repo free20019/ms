@@ -1,0 +1,548 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+	<title>电召总览</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/echarts-all.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+    <style>
+    	#table1{
+    		background:#ffffff;
+    		float:left
+    	}
+    	#table2{
+    		background:#ffffff;
+    		float:left;
+    	}
+    	#table3{
+    		background:#ffffff;
+    		float:left
+    	}
+    	#table4{
+    		clear:both;
+    		background:#ffffff;
+    		float:left
+    	}
+    	#table5{
+    		background:#ffffff;
+    		float:left
+    	}
+    	#table6{
+    		clear:both;
+    		background:#ffffff;
+    		float:left
+    	}
+    	#table7{
+    		background:#ffffff;
+    		float:left
+    	}
+    	#table8{
+    		background:#ffffff;
+    		float:left
+    	}
+    	.table{
+   		    height: 10%;
+		    width: 100%;
+            background: rgba(18, 119, 232, 0.34);
+			/*background: -moz-linear-gradient(top, #F6F6F6 0%, #696969 100%);*/
+		    /*background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#F6F6F6), color-stop(0%,#696969));*/
+		    /*background: -webkit-linear-gradient(top, #F6F6F6 0%,#696969 100%);*/
+		    /*background: -o-linear-gradient(top, #F6F6F6 0%,#696969 100%);*/
+		    /*background: -ms-linear-gradient(top, #F6F6F6 0%,#696969 100%);*/
+		    /*background: linear-gradient(to bottom, #F6F6F6 0%,#696969 100%);*/
+		}
+        .table a{
+            font-family: '微软雅黑';
+            font-size: 16px;
+            margin-left: 10px;
+            line-height: 39px;
+        }
+    	.table_title{
+    		height: 94%;
+    		width: 95%;
+    		margin: 8px;
+    		background:#fff;
+            box-shadow: 1px 2px 1px #696969;
+    	}
+    	#table_4{
+    		height: 90%;
+		    width: 100%;
+/* 		    background: #B34484; */
+    	}
+        #table_5{
+            height: 90%;
+            width: 100%;
+/*             background: #B34484; */
+        }
+        #table_6{
+            height: 90%;
+            width: 100%;
+            padding-bottom:30px;
+/*             background: #B34484; */
+        }
+        #table_7{
+            height: 90%;
+            width: 100%;
+            padding-bottom:10px;
+        }
+        #table_8{
+            height: 90%;
+            width: 100%;
+             padding-bottom:30px;
+/*             background: #B34484; */
+        }
+
+
+
+        #table_1 ul{
+           margin: 0;
+           padding: 0;
+        }
+        #table_1 ul li{
+            width: 100%;
+            height: 30px;
+        }
+        #table_1 ul li{
+            width: 100%;
+            height: 60px;
+            line-height: 40px;
+            font-family: '微软雅黑';
+        }
+        #table_1 ul li a{
+            width: 25%;
+            height: 100%;
+            margin-left: 25px;
+            font-size: 16px;
+        }
+        #table_1 ul li i{
+            width: 25%;
+            height: 100%;
+            border-radius: 5px;
+            border: 1px solid rgba(105, 105, 105, 0.25);
+            font-size: 16px;
+        }
+        #table_1 ul li .first{
+            background: rgba(18, 119, 232, 0.34);
+        }
+        #table_1 ul li .second{
+            background: rgb(232, 229, 1);
+        }
+        #table_1 ul li .third{
+            background: rgb(7, 200, 232);
+        }
+        #table_1 ul li .fourth{
+            background: rgb(10, 232, 123);
+        }
+
+
+
+        #table_2 ul{
+            margin: 0;
+            padding: 0;
+        }
+        #table_2 ul li{
+            width: 100%;
+            height: 26px;
+        }
+        #table_2 ul li a{
+            width: 24%;
+            height: 100%;
+            float: left;
+            border: 1px solid rgba(105, 105, 105, 0.25);
+            line-height: 32px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        #table_3 ul{
+            margin: 0;
+            padding: 0;
+        }
+        #table_3 ul li{
+            width: 100%;
+            height: 26px;
+        }
+        #table_3 ul li a{
+            width: 31%;
+            height: 100%;
+            float: left;
+            border: 1px solid rgba(105, 105, 105, 0.25);
+            line-height: 32px;
+            text-align: center;
+            font-size: 12px;
+        }
+        #table_3 ul li i{
+            width: 34%;
+            height: 100%;
+            float: left;
+            border: 1px solid rgba(105, 105, 105, 0.25);
+            line-height: 32px;
+            text-align: center;
+            font-size: 12px;
+            font-style: normal;
+        }
+    </style>
+</head>
+<body>
+    <div id="table1" style="height:50%;width:33%;">
+        <div class="table_title">
+            <div class="table"><a>今日概况</a></div>
+            <div id="table_1">
+                <ul>
+                    <li>&nbsp;&nbsp;&nbsp;&nbsp;<a>电召呼入量:</a><i class="first">3612</i>&nbsp&nbsp&nbsp<a>接听率:</a><i class="first">87.90%</i></li>
+                    <li>&nbsp;&nbsp;&nbsp;&nbsp;<a>电召调度量:</a><i class="second">3560</i>&nbsp&nbsp&nbsp<a>成功率:</a><i class="second">60.50%</i></li>
+                    <li><a>车辆在线数量:</a><i class="third">9589</i>&nbsp;&nbsp;&nbsp;<a>在线率:</a><i class="third">95.61%</i></li>
+                    <li><a>话务人员数量:</a><i class="fourth">8人</i>&nbsp;&nbsp;&nbsp;<a>现场管理:</a><i class="fourth">2人</i></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="table2" style="height:50%;width:33%;">
+        <div class="table_title">
+            <div class="table"><a>当前车辆分布</a></div>
+            <div id="table_2">
+                <ul>
+                    <li><a>区块</a><a>车辆总数</a><a>上线率</a><a>成功量</a></li>
+                    <li><a>主城区</a><a>9614</a><a>95.61%</a><a>2154</a></li>
+                    <li><a>萧山区</a><a>878</a><a>96.7%</a><a>95</a></li>
+                    <li><a>余杭区</a><a>743</a><a>95.8%</a><a>接入中</a></li>
+                    <li><a>淳安区</a><a>118</a><a>97.12%</a><a>56</a></li>
+                    <li><a>上泗区</a><a>70</a><a>90.05%</a><a>18</a></li>
+                    <li><a>富阳区</a><a>294</a><a>96.8%</a><a>5</a></li>
+                    <li><a>总计</a><a>11717</a><a>96.8%</a><a>2328</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="table3" style="height:50%;width:34%;">
+        <div class="table_title">
+            <div class="table"><a>今日重点监控区域车辆分布</a></div>
+            <div id="table_3">
+                <ul>
+                    <li><i>区块</i><a>车辆数量</a><a>空车率</a></li>
+                    <li><i>萧山机场</i><a>800</a><a>65.61%</a></li>
+                    <li><i>火车东站</i><a>652</a><a>52.63%</a></li>
+                    <li><i>城站火车站</i><a>263</a><a>49.25%</a></li>
+                    <li><i>客运中心站</i><a>152</a><a>55.04%</a></li>
+                    <li><i>汽车南站</i><a>263</a><a>42.29%</a></li>
+                    <li><i>汽车北站</i><a>350</a><a>45.18%</a></li>
+                    <li><i>汽车西站</i><a>240</a><a>30.85%</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="table4" style="height:50%;width:50%;">
+    	<div class="table_title">
+	    	<div class="table"><a>月话务比较情况</a></div>
+	    	<div id="table_4"></div>
+    	</div>
+    </div>
+    <div id="table5" style="height:50%;width:50%;">
+        <div class="table_title">
+            <div class="table"><a>月调度比较情况</a></div>
+            <div id="table_5"></div>
+        </div>
+    </div>
+    <div id="table6" style="height:50%;width:33%;">
+        <div class="table_title">
+            <div class="table"><a>月话务类型统计</a></div>
+            <div id="table_6"></div>
+        </div>
+    </div>
+    <div id="table7" style="height:50%;width:33%;">
+        <div class="table_title">
+            <div class="table"><a>月约车类型统计</a></div>
+            <div id="table_7"></div>
+        </div>
+    </div>
+    <div id="table8" style="height:50%;width:34%;">
+        <div class="table_title">
+            <div class="table"><a>司机接单后情况统计</a></div>
+            <div id="table_8"></div>
+        </div>
+    </div>
+    <script type="text/javascript">
+    	var myChart = echarts.init(document.getElementById('table_4'));
+		option = {
+    tooltip : {
+        trigger: 'axis'
+    },
+    calculable : true,
+    legend: {
+        data:['电话呼入量','人工坐席电话处理总数','人工坐席电话接听率']
+    },
+    xAxis : [
+        {
+            type : 'category',
+            data : ['1月','2月','3月','4月','5月']
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value',
+            name : '总数(条)',
+            axisLabel : {
+                formatter: '{value} '
+            }
+        },
+        {
+            type : 'value',
+            name : '接听率',
+            axisLabel : {
+                formatter: '{value} %'
+            }
+        }
+    ],
+    series : [
+
+        {
+            name:'电话呼入量',
+            type:'bar',
+            data:[31077,23470,25776,26656,23385]
+        },
+        {
+            name:'人工坐席电话处理总数',
+            type:'bar',
+            data:[30635,23586,25569,26858,23767]
+        },
+        {
+            name:'人工坐席电话接听率',
+            type:'line',
+            yAxisIndex: 1,
+            data:[87.90,89.32,88.43,89.13,89.75]
+        }
+    ]
+};
+		echarts.init(document.getElementById('table_4')).setOption(option);
+    </script>
+    <script type="text/javascript">
+        var myChart = echarts.init(document.getElementById('table_5'));
+        option = {
+            tooltip : {
+                trigger: 'axis'
+            },
+            calculable : true,
+            legend: {
+                data:['派单总数','派单成功数','派单成功率']
+            },
+            xAxis : [
+                {
+                    type : 'category',
+                    data : ['1月','2月','3月','4月','5月']
+                }
+            ],
+            yAxis : [
+                {
+                    type : 'value',
+                    name : '总数(条)',
+                    axisLabel : {
+                        formatter: '{value} '
+                    }
+                },
+                {
+                    type : 'value',
+                    name : '接听率',
+                    axisLabel : {
+                        formatter: '{value} %'
+                    }
+                }
+            ],
+            series : [
+
+                {
+                    name:'派单总数',
+                    type:'bar',
+                    data:[27084,21904,26940,25268,20119]
+                },
+                {
+                    name:'派单成功数',
+                    type:'bar',
+                    data:[11412,6330,9776,8929,8648]
+                },
+                {
+                    name:'派单成功率',
+                    type:'line',
+                    yAxisIndex: 1,
+                    data:[42.14,28.90,36.29,35.34,42.98]
+                }
+            ]
+        };
+
+        echarts.init(document.getElementById('table_5')).setOption(option);
+    </script>
+    <script type="text/javascript">
+        var myChart = echarts.init(document.getElementById('table_6'));
+        option = {
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                x : 'center',
+                y : 'bottom',
+                data:['电召调度','失物查找','咨询投诉','其他']
+            },
+
+            calculable : true,
+            series : [
+
+                {
+                    name:'面积模式',
+                    type:'pie',
+                    radius : [30, 80],
+                    center : ['50%','50%'],
+                    roseType : 'area',
+                    x: '50%',               // for funnel
+                    max: 40,                // for funnel
+                    sort : 'ascending',     // for funnel
+                    data:[
+                        {value:24800, name:'电召调度'},
+                        {value:14432, name:'咨询投诉'},
+                        {value:2325, name:'失物查找'},
+                        {value:480, name:'其他'}
+
+                    ]
+                }
+            ]
+        };
+
+        echarts.init(document.getElementById('table_6')).setOption(option);
+    </script>
+    <script type="text/javascript">
+        var myChart = echarts.init(document.getElementById('table_7'));
+        option = {
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                x : 'center',
+                y : 'bottom',
+                data:['短信约车','电话.网络约车','驻点扬招','QQ约车','手机、WEB扬招']
+            },
+
+            calculable : true,
+            series : [
+
+                {
+                    name:'面积模式',
+                    type:'pie',
+                    radius : [30, 80],
+                    center : ['50%','50%'],
+                    roseType : 'area',
+                    x: '50%',               // for funnel
+                    max: 40,                // for funnel
+                    sort : 'ascending',     // for funnel
+                    data:[
+                        {value:9336, name:'电话.网络约车'},
+                        {value:10504, name:'驻点扬招'},
+                        {value:52, name:'短信约车'},
+                        {value:189, name:'QQ约车'},
+                        {value:33, name:'手机、WEB扬招'}
+
+                    ]
+                }
+            ]
+        };
+        echarts.init(document.getElementById('table_7')).setOption(option);
+    </script>
+    <script type="text/javascript">
+        var myChart = echarts.init(document.getElementById('table_8'));
+        option = {
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                orient : 'vertical',
+                x : 'right',
+                data:['主城区','萧山区','余杭区','淳安区','上泗区','富阳区']
+            },
+            calculable : false,
+            series : [
+                {
+                    name:'接错客人',
+                    type:'pie',
+                    selectedMode: 'single',
+                    radius : [0, 60],
+
+                    // for funnel
+                    center : ['40%','60%'],
+                    x: '20%',
+                    width: '40%',
+                    funnelAlign: 'right',
+                    max: 1548,
+
+                    itemStyle : {
+                        normal : {
+                            label : {
+                                position : 'inner'
+                            },
+                            labelLine : {
+                                show : false
+                            }
+                        }
+                    },
+                    data:[
+                        {value:6, name:'主城区',hidden:true},
+                        {value:2, name:'萧山区', selected:true,hidden:true},
+                        {value:1, name:'余杭区',hidden:true},
+                        {value:1, name:'淳安区',hidden:true},
+                        {value:2, name:'上泗区',hidden:true},
+                        {value:1, name:'富阳区',hidden:true}
+
+                    ]
+                },
+                {
+                    name:'接单总数',
+                    type:'pie',
+                    radius : [65, 85],
+                    center : ['40%','60%'],
+                    // for funnel
+                    x: '80%',
+                    width: '55%',
+                    funnelAlign: 'left',
+                    max: 1048,
+
+                    data:[
+                        {value:9452, name:'主城区'},
+                        {value:118, name:'萧山区', selected:true},
+                        {value:10, name:'余杭区'},
+                        {value:20, name:'淳安区'},
+                        {value:13, name:'上泗区'},
+                        {value:10, name:'富阳区'}
+                    ]
+                }
+            ]
+        };
+
+
+
+        echarts.init(document.getElementById('table_8')).setOption(option);
+    </script>
+
+</body>
+</html>

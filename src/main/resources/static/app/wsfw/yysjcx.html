@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>营运数据查询</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+	<script src="./yysjcx.js"></script>
+	<style>
+		.panel-queryBar {padding: 10px 10px 0;}
+		.form-inline .form-group {margin-bottom: 10px;}
+		.dataListPanel.center {height: calc(100% - 50px);padding: 10px;}
+	</style>
+
+</head>
+<body>
+<div class="panel-wrapper" style="position: relative;">
+	<div class="panel-layout" layout="center">
+		<div class="panel-queryBar">
+			<form class="form-inline">
+
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="iconfont icon-chepai" type="icon"></i>
+						<!--<input type="text" class="form-control input-sm" id="yysjcx-carNumber" placeholder="车牌号码">-->
+						<select type="text" class="form-control input-sm select2" style="width: 150px;" autocomplete="off" id="yysjcx-carNumber" data-placeholder="车牌号"><option></option></select>
+					</div>
+				</div>
+
+
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="iconfont icon-qiye" type="icon"></i>
+						<select class="form-control select2" id="yysjcx-enterprise" data-placeholder="业户" style="width: 150px;">
+						<option></option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="glyphicon glyphicon-calendar" type="icon"></i>
+						<input type="text" class="form-control" id="yysjcx-datetimeStart" placeholder="开始时间">
+					</div>
+					<label class="addTimePeriod" db-control></label>
+					<div type="calendar">
+						<i class="glyphicon glyphicon-calendar" type="icon"></i>
+						<input type="text" class="form-control" id="yysjcx-datetimeEnd" placeholder="结束时间">
+					</div>
+				</div>
+					<a class="btn btn-primary btn-sm" id="select_yyscx">查询</a>
+					<a class="btn btn-primary btn-sm" id="Export_yysjcx">导出</a>
+
+			</form>
+		</div>
+		<div class="dataListPanel center">
+			<div id="yusjcxTable"></div>
+		</div>
+	</div>
+</div>
+<!-- <script>
+	(function ($) {
+		var yysjcxFields = [
+			{name: 'cheh', title: '车号', width: 120},
+			{name: 'fwzgzh', title: '服务资格证号', width: 160},
+			{name: 'scsj', title: '上车时间', width: 150},
+			{name: 'xcsj', title: '下车时间', width: 150},
+			{name: 'yysj', title: '营运时间', width: 150},
+			{name: 'zklc', title: '载客里程', width: 120},
+			{name: 'kclc', title: '空车里程', width: 120},
+			{name: 'dhsj', title: '等候时间', width: 150},
+			{name: 'jylx', title: '交易类型', width: 120},
+			{name: 'yyje', title: '营运金额', width: 120}
+		];
+		var yysjcxData = [
+			{cheh: '车号1', fwzgzh: '服务资格证号1', scsj: '上车时间1', xcsj: '下车时间1', yysj: '营运时间1', zklc: '载客里程1', kclc: '空车里程1', dhsj: '等候时间1', jylx: '交易类型1', yyje: '营运金额1'},
+			{cheh: '车号2', fwzgzh: '服务资格证号2', scsj: '上车时间2', xcsj: '下车时间2', yysj: '营运时间2', zklc: '载客里程2', kclc: '空车里程2', dhsj: '等候时间2', jylx: '交易类型2', yyje: '营运金额2'},
+			{cheh: '车号3', fwzgzh: '服务资格证号3', scsj: '上车时间3', xcsj: '下车时间3', yysj: '营运时间3', zklc: '载客里程3', kclc: '空车里程3', dhsj: '等候时间3', jylx: '交易类型3', yyje: '营运金额3'},
+			{cheh: '车号4', fwzgzh: '服务资格证号4', scsj: '上车时间4', xcsj: '下车时间4', yysj: '营运时间4', zklc: '载客里程4', kclc: '空车里程4', dhsj: '等候时间4', jylx: '交易类型4', yyje: '营运金额4'},
+			{cheh: '车号5', fwzgzh: '服务资格证号5', scsj: '上车时间5', xcsj: '下车时间5', yysj: '营运时间5', zklc: '载客里程5', kclc: '空车里程5', dhsj: '等候时间5', jylx: '交易类型5', yyje: '营运金额5'}
+		];
+		$(function () {
+			$('#yysjcx-datetimeStart').datetimepicker(dateDefaultOption);
+			$('#yysjcx-datetimeEnd').datetimepicker(dateDefaultOption);
+			$('.addTimePeriod, .period').on('click', function () {
+				if ($(this).hasClass('addTimePeriod')) $(this).addClass('period').removeClass('addTimePeriod');
+				else if ($(this).hasClass('period')) $(this).addClass('addTimePeriod').removeClass('period');
+			});
+			$('#yysjcx-enterprise').select2({
+				language: 'zh-CN',
+				width: '160',
+				minimumResultsForSearch: -1,
+				data: [
+					{id: '1', text: 'yy公司'},
+					{id: '2', text: 'zz公司'}
+				]
+			});
+			$('#yusjcxTable').jsGrid({
+				width: 'calc(100% - 2px)',
+				height: 'calc(100% - 2px)',
+				editing: true,
+				sorting: true,
+				paging: false,
+				autoload: true,
+				data: yysjcxData,
+				fields: yysjcxFields
+			});
+		})
+	})(jQuery)
+</script> -->
+</body>
+</html>

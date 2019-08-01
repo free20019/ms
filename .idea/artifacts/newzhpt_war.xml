@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="newzhpt:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>newzhpt</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="zhpt.war">
+      <element id="artifact" artifact-name="newzhpt:war exploded" />
+    </root>
+  </artifact>
+</component>

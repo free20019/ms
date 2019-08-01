@@ -1,0 +1,199 @@
+<!-- <!DOCTYPE html> -->
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>车辆分布</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<link rel="stylesheet" href="../../resources/style/css/clfb.css">
+	<script src="../../resources/script/vue.min.js"></script>
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer,AMap.OverView"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+	<!-- UI组件库 1.0 -->
+	<script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+	<script src="./clfb.js"></script>
+	<style>
+
+		/*.mapToolItem{position: relative;cursor: default;}
+		.mapToolItem[type='number'] {width: 120px;text-align: right;}
+		.mapToolItem[type='number']:hover {color: #ed6a96;}
+		.mapToolItem[title]:before{content: attr(title)'：';position: absolute;left: 0;width: 4em;text-align: right;}
+		.mapToolItem[unit]:after{content: attr(unit);display: inline-block;width: 2em;text-align: center;}
+		.mapToolTitle{position: relative;cursor: default;}
+		.mapToolTitle[type='number'] {width: 120px;text-align: right;}
+		.mapToolTitle[type='number']:hover {color: #ed6a96;}
+		.mapToolTitle[title]:before{content: attr(title)'：';position: absolute;left: 0;width: 4em;text-align: right;}
+		.mapToolTitle[unit]:after{content: attr(unit);display: inline-block;width: 2em;text-align: center;}*/
+		.scrollbar-macosx {
+			height: 100%;
+		}
+		.ip-tabBodyer {
+			height: calc(100% - 43px);
+		}
+		
+		#loadingTip {
+	        position: absolute;
+	        z-index: 9999;
+	        top: 0;
+	        left: 0;
+	        padding: 3px 10px;
+	        background: red;
+	        color: #fff;
+	        font-size: 14px;
+    	}	
+	</style>
+</head>
+<body>
+<div class="panel-wrapper">
+	<div class="panel-map">
+		<div id="clfbMap"></div>
+		<div class="map-tool-bar map-tool-left" id="leftVehiclePanel" :class="{active: display === true}">
+			<div class="ip-tabWrapper" id="clfbMapLeftPanel" type="tab">
+				<div class="ip-tabPanelItem" id="clfb-qyjk" d-title="区域监控">
+					<div v-if="!selectAreaVehicleTitle" style="height: 100%;">
+						<div class="area-item area-header">
+							<div class="area-col areaName">56区域</div>
+							<div class="area-col carNumber">车辆数</div>
+							<div class="area-col callPolice">预报警数</div>
+						</div>
+						<div class="area-list" style="height: calc(100% - 30px);">
+							<div class="scrollbar-macosx">
+								<div class="area-item" :class="{alarm: length(item.all) > defaultNumber(item.areabjs)}"
+										 v-for="item in areaList" :key="item.id" @click="handleAreaItemClick(item)">
+									<div class="area-col areaName iconfont icon-dingwei" v-text="item.areaname"></div>
+									<div class="area-col carNumber" v-text="length(item.all)"></div>
+									<div class="area-col callPolice" v-text="defaultNumber(item.areabjs)"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="area-vehicle-panel" v-else>
+						<div class="area-vehicle-header">
+							<span class="btn btn-return iconfont icon-a-left" @click="handleAreaVehicleReturnClick"></span>
+							<span v-text="selectAreaVehicleTitle"></span>
+						</div>
+						<div class="area-vehicle-body">
+							<div class="scrollbar-macosx">
+								<div class="area-vehicle-item" v-for="item in selectAreaVehicleList"  @click="handleAreaVehicleReturnSingleClick(item)">
+									<div class="col-center" v-text="item.address"></div>
+									<div class="col-right" v-text="item.vehicle"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="ip-tabPanelItem" id="clfb-cljk" d-title="车辆监控">
+					<div class="p-header">
+						<div class="searchBar">
+							<i class="icon-first iconfont icon-car"></i>
+							<input type="text" placeholder="输入车牌号码" v-model="vehicleSearch">
+							<a class="btn btn-primary btn-sm btn-last ip-iconfont ip-icon-search" @click="handleVehicleSearchClick"></a>
+						</div>
+					</div>
+					<div class="vehicle-list" v-if="!selectVehicleInfo">
+						<div class="scrollbar-macosx">
+							<div class="vehicle-item" v-for="(item,index) in filterVehile" :key="index" @click="handleVehicleItemClick(item)">
+								<div class="vehicle" v-text="item.vehino"></div>
+								<div class="compname" v-text="item.compname"></div>
+							</div>
+						</div>
+					</div>
+					<div class="vehicle-box" v-else>
+						<div class="scrollbar-macosx">
+							<div class="vehicle-item">
+								<div class="vehicle-title">所属公司：</div>
+								<div class="vehicle-center" v-text="selectVehicleInfo.compname"></div>
+							</div>
+							<div class="vehicle-item">
+								<div class="vehicle-title">车辆类型：</div>
+								<div class="vehicle-center" v-text="selectVehicleInfo.cartype"></div>
+							</div>
+							<div class="vehicle-item">
+								<div class="vehicle-title">车辆颜色：</div>
+								<div class="vehicle-center" v-text="selectVehicleInfo.color"></div>
+							</div>
+							<div class="vehicle-item">
+								<div class="vehicle-title">车辆速度：</div>
+								<div class="vehicle-center" v-text="selectVehicleInfo.speed"></div>
+							</div>
+							<div class="vehicle-item">
+								<div class="vehicle-title">车辆状态：</div>
+								<div class="vehicle-center" v-text="selectVehicleInfo.carStatus"></div>
+							</div>
+							<div class="vehicle-item">
+								<div class="vehicle-title">SIM卡：</div>
+								<div class="vehicle-center" v-text="selectVehicleInfo.vehisim"></div>
+							</div>
+							<div class="vehicle-item">
+								<div class="vehicle-title">联系人：</div>
+								<div class="vehicle-center" v-text="selectVehicleInfo.ownname"></div>
+							</div>
+							<div class="vehicle-item">
+								<div class="vehicle-title">联系电话：</div>
+								<div class="vehicle-center" v-text="selectVehicleInfo.owntel"></div>
+							</div>
+							<div class="vehicle-item">
+								<div class="vehicle-title">经度：</div>
+								<div class="vehicle-center" v-text="selectVehicleInfo.longi"></div>
+							</div>
+							<div class="vehicle-item">
+								<div class="vehicle-title">纬度：</div>
+								<div class="vehicle-center" v-text="selectVehicleInfo.lati"></div>
+							</div>
+							<div class="vehicle-item">
+								<div class="vehicle-title">GPS时间：</div>
+								<div class="vehicle-center" v-text="selectVehicleInfo.dateTime"></div>
+							</div>
+							<div class="vehicle-item">
+								<div class="vehicle-title">操作：</div>
+								<div class="vehicle-center">
+									<a class="btn btn-default btn-xs" @click="handleDwClick(selectVehicleInfo)">定位</a>
+									<a class="btn btn-default btn-xs" @click="handleGjhfClick(selectVehicleInfo)">历史轨迹</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="btn-leftVehicle" id="btnLeftVehicle"></div>
+		<!--<ul class="mapToolBar map-query-bar">
+			<li class="mapToolItem">
+				<select id="clfb-licensePlate"><option></select>
+			</li>
+			&lt;!&ndash; 		<li class="mapToolItem"> &ndash;&gt;
+			&lt;!&ndash; 			<select id="clfb-dwcx"><option></select> &ndash;&gt;
+			&lt;!&ndash; 		</li> &ndash;&gt;
+		</ul>-->
+		<ul class="mapToolBar">
+			<li class="mapToolItem all" type="number" title="总数" unit="辆">0</li>
+			<li class="mapToolItem online" type="number" title="在线" unit="辆">0</li>
+			<li class="mapToolItem busy" type="number" title="重车" unit="辆">0</li>
+			<li class="mapToolItem empty" type="number" title="空车" unit="辆">0</li>
+			<li class="mapToolItem" style="width: 140px;">
+				<a class="mapToolTitle down" type="number" title="离线" unit="辆">0</a>
+				<ul class="toolBar">
+					<li class="toolItem item down1" type="number" title="大于1天" unit="辆">1500</li>
+					<li class="toolItem item down2" type="number" title="大于3天" unit="辆">700</li>
+					<li class="toolItem item down3" type="number" title="大于7天" unit="辆">500</li>
+				</ul>
+			</li>
+			<li class="mapToolItem lk" id="lk">路况</li>
+		</ul>
+	</div>
+</div>
+</body>
+</html>

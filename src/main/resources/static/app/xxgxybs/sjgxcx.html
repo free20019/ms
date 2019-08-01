@@ -1,0 +1,451 @@
+<html>
+<head>
+<meta charset="UTF-8">
+	<title>杭州市交通运输局</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+	<script src="../../resources/script/echarts-all.js"></script>
+	<style>
+		#title-img{
+			width: 100%;
+			height: 100%;
+			background: url('../../resources/images/pt1.png')  no-repeat center;
+			zoom: 0.8;
+			position: relative;
+		}
+		
+		#title-div [id$=_1]{
+			width:170px;
+			height:130px;
+ 			/*border: 1px solid #000000;*/
+			margin-bottom: 50px;
+			cursor: pointer;
+		}
+		#title-div1 [id$=_2]{
+			width:250px;
+			height:140px;
+			/*border: 1px solid #000000;*/
+			margin-bottom: 50px;
+		}
+		#title-div{
+			width: 620px;
+			height: 140px;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			margin: -250px -100px;
+		}
+
+		#title-div1{
+			width: 620px;
+			height: 135px;
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			margin: -250px 80px;
+			font-size: 20px;
+			font-weight: bold;
+			text-align:left;
+			line-height: 65px;
+			/*color: #ffffff;*/
+			font-family: '黑体';
+		}
+		html,body{
+			background: #ffffff
+		}
+	</style>
+</head>
+<body>
+<div id="title-img">
+<div id="title-div">
+	<div id="ysb_1"></div>
+	<div id="yst_1"></div>
+	<div id="ysj_1"></div>
+</div>
+<div id="title-div1">
+	<div id="ysb_2"></div>
+	<div id="yst_2"></div>
+	<div id="ysj_2"></div>
+</div>
+</div>
+<script type="text/javascript">
+	var myChart = echarts.init(document.getElementById('ysb_2'));
+	option = {title: {
+		text: '    当前流量       今日交换量',
+		x: '0',
+		y: '1',
+		itemGap: 8,
+		textStyle : {
+			color : 'rgba(30,144,255,0.8)',
+			fontFamily : '微软雅黑',
+			fontSize : 16,
+			fontWeight : 'bolder'
+		}
+	},
+
+		series : [
+			{
+				name:'今日交换量',
+				type:'gauge',
+				center : ['65%', '55%'],
+				radius : '90%',
+				z: 3,
+				min:0,
+				max:4000,
+				splitNumber:5,
+				axisLine: {            // 坐标轴线
+					lineStyle: {       // 属性lineStyle控制线条样式
+						width: 10
+					}
+				},
+				axisTick: {            // 坐标轴小标记
+					length :15,        // 属性length控制线长
+					lineStyle: {       // 属性lineStyle控制线条样式
+						color: 'auto'
+					}
+				},
+				splitLine: {           // 分隔线
+					length :20,         // 属性length控制线长
+					lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
+						color: 'auto'
+					}
+				},
+				title : {
+					offsetCenter: ['80%', '80%'],
+					textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+						fontWeight: 'bolder',
+						fontSize: 16,
+						fontStyle: 'italic'
+					}
+				},
+				detail : {
+					textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+						fontWeight: 'bolder',
+						fontSize: 18
+					}
+				},
+				data:[{value: 0, name: '万/日'}]
+			},
+			{
+				name:'当前流量',
+				type:'gauge',
+				center : ['25%', '55%'],    // 默认全局居中
+				radius : '70%',
+				min:0,
+				max:4,
+				endAngle:45,
+				splitNumber:4,
+				axisLine: {            // 坐标轴线
+					lineStyle: {       // 属性lineStyle控制线条样式
+						width: 8
+					}
+				},
+				axisTick: {            // 坐标轴小标记
+					length :12,        // 属性length控制线长
+					lineStyle: {       // 属性lineStyle控制线条样式
+						color: 'auto'
+					}
+				},
+				splitLine: {           // 分隔线
+					length :20,         // 属性length控制线长
+					lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
+						color: 'auto'
+					}
+				},
+				pointer: {
+					width:5
+				},
+
+				title : {
+					offsetCenter: ['60%', '100%'],
+					textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+						fontWeight: 'bolder',
+						fontSize: 16,
+						fontStyle: 'italic'
+					}
+				},
+				detail : {
+					textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+						fontWeight: 'bolder',
+						fontSize: 18
+					}
+				},
+				data:[{value: 0, name: '万/分'}]
+			}
+		]
+	};
+	echarts.init(document.getElementById('ysb_2')).setOption(option);
+</script>
+<script type="text/javascript">
+(function ($) {
+	$('#title-div div').on('click',function(){
+		var id = $(this).attr("id");
+		var _parent = parent.$(window.parent.document);
+		if(id == "ysb_1"){
+			_parent.find('.ip-menuItem [data-skip="jtysb"]').trigger("click");
+		}else if(id == "yst_1"){
+			_parent.find('.ip-menuItem [data-skip="zjsjtxxzx"]').trigger("click");
+		}else if(id == "ysj_1"){
+			_parent.find('.ip-menuItem [data-skip="hzsjtxxj"]').trigger("click");
+		}
+	});
+	
+	jqxhr=$.ajax({
+		type: "POST",
+		url: "../../jyxx/findxxbs",
+		data:{},
+		timeout : 180000,
+		dataType: 'json',
+		success:function(data){
+			if(data.now.length==0){
+				tbtbtbtb(0,data.datas[0].COUNT);
+			}else{
+				tbtbtbtb(data.now[0].AVERAGE_COUNT,data.datas[0].COUNT);
+			}	
+		},
+		error: function(){
+		}         
+	});
+	function tbtbtbtb(obj,obj1){
+		var myChart = echarts.init(document.getElementById('yst_2'));
+		option = {
+			title: {
+				text: '    当前流量       今日交换量',
+				x: '0',
+				y: '1',
+				itemGap: 8,
+				textStyle : {
+					color : 'rgba(30,144,255,0.8)',
+					fontFamily : '微软雅黑',
+					fontSize : 16,
+					fontWeight : 'bolder'
+				}
+			},
+			series : [
+				{
+					name:'今日交换量',
+					type:'gauge',
+					center : ['65%', '55%'],
+					radius : '90%',
+					z: 3,
+					min:0,
+					max:4000,
+					splitNumber:5,
+					axisLine: {            // 坐标轴线
+						lineStyle: {       // 属性lineStyle控制线条样式
+							width: 10
+						}
+					},
+					axisTick: {            // 坐标轴小标记
+						length :15,        // 属性length控制线长
+						lineStyle: {       // 属性lineStyle控制线条样式
+							color: 'auto'
+						}
+					},
+					splitLine: {           // 分隔线
+						length :20,         // 属性length控制线长
+						lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
+							color: 'auto'
+						}
+					},
+					title : {
+						offsetCenter: ['80%', '80%'],
+						textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+							fontWeight: 'bolder',
+							fontSize: 16,
+							fontStyle: 'italic'
+						}
+					},
+					detail : {
+						textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+							fontWeight: 'bolder',
+							fontSize: 18
+						}
+					},
+					data:[{value: parseFloat(obj1/10000).toFixed(1), name: '万/日'}]
+				},
+				{
+					name:'当前流量',
+					type:'gauge',
+					center : ['25%', '55%'],    // 默认全局居中
+					radius : '70%',
+					min:0,
+					max:4,
+					endAngle:45,
+					splitNumber:4,
+					axisLine: {            // 坐标轴线
+						lineStyle: {       // 属性lineStyle控制线条样式
+							width: 8
+						}
+					},
+					axisTick: {            // 坐标轴小标记
+						length :12,        // 属性length控制线长
+						lineStyle: {       // 属性lineStyle控制线条样式
+							color: 'auto'
+						}
+					},
+					splitLine: {           // 分隔线
+						length :20,         // 属性length控制线长
+						lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
+							color: 'auto'
+						}
+					},
+					pointer: {
+						width:5
+					},
+
+					title : {
+						offsetCenter: ['60%', '100%'],
+						textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+							fontWeight: 'bolder',
+							fontSize: 16,
+							fontStyle: 'italic'
+						}
+					},
+					detail : {
+						textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+							fontWeight: 'bolder',
+							fontSize: 18
+						}
+					},
+					data:[{value: parseFloat(obj/10000).toFixed(1), name: '万/分'}]
+				}
+			]
+		};
+		echarts.init(document.getElementById('yst_2')).setOption(option);
+	}
+	
+})(jQuery)
+</script>
+<script type="text/javascript">
+	var myChart = echarts.init(document.getElementById('ysj_2'));
+	option = {title: {
+		text: '    当前流量       今日交换量',
+		x: '0',
+		y: '1',
+		itemGap: 8,
+		textStyle : {
+			color : 'rgba(30,144,255,0.8)',
+			fontFamily : '微软雅黑',
+			fontSize : 16,
+			fontWeight : 'bolder'
+		}
+	},
+
+		series : [
+			{
+				name:'今日交换量',
+				type:'gauge',
+				center : ['65%', '55%'],
+				radius : '90%',
+				z: 3,
+				min:0,
+				max:4000,
+				splitNumber:5,
+				axisLine: {            // 坐标轴线
+					lineStyle: {       // 属性lineStyle控制线条样式
+						width: 10
+					}
+				},
+				axisTick: {            // 坐标轴小标记
+					length :15,        // 属性length控制线长
+					lineStyle: {       // 属性lineStyle控制线条样式
+						color: 'auto'
+					}
+				},
+				splitLine: {           // 分隔线
+					length :20,         // 属性length控制线长
+					lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
+						color: 'auto'
+					}
+				},
+				title : {
+					offsetCenter: ['80%', '80%'],
+					textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+						fontWeight: 'bolder',
+						fontSize: 16,
+						fontStyle: 'italic'
+					}
+				},
+				detail : {
+					textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+						fontWeight: 'bolder',
+						fontSize: 18
+					}
+				},
+				data:[{value: 0, name: '万/日'}]
+			},
+			{
+				name:'当前流量',
+				type:'gauge',
+				center : ['25%', '55%'],    // 默认全局居中
+				radius : '70%',
+				min:0,
+				max:4,
+				endAngle:45,
+				splitNumber:4,
+				axisLine: {            // 坐标轴线
+					lineStyle: {       // 属性lineStyle控制线条样式
+						width: 8
+					}
+				},
+				axisTick: {            // 坐标轴小标记
+					length :12,        // 属性length控制线长
+					lineStyle: {       // 属性lineStyle控制线条样式
+						color: 'auto'
+					}
+				},
+				splitLine: {           // 分隔线
+					length :20,         // 属性length控制线长
+					lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
+						color: 'auto'
+					}
+				},
+				pointer: {
+					width:5
+				},
+
+				title : {
+					offsetCenter: ['60%', '100%'],
+					textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+						fontWeight: 'bolder',
+						fontSize: 16,
+						fontStyle: 'italic'
+					}
+				},
+				detail : {
+					textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+						fontWeight: 'bolder',
+						fontSize: 18
+					}
+				},
+				data:[{value: 0, name: '万/分'}]
+			}
+		]
+	};
+	echarts.init(document.getElementById('ysj_2')).setOption(option);
+</script>
+</body>
+</html>

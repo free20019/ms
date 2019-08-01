@@ -1,0 +1,164 @@
+<!-- 业户查询 -->
+<html>
+<head>
+<!-- 	<link rel="stylesheet" href="../../resources/style/reset.css"> -->
+<!-- 	<link rel="stylesheet" href="../../resources/style/iconfont.css"> -->
+<!-- 	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css"> -->
+	<link rel="stylesheet" href="../../resources/script/element-ui/lib/theme-chalk/index.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/vue.min.js"></script>
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/element-ui/lib/index.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/js/transfer.js"></script>
+    <style>
+        #wyfydiv{
+            width: 100%;
+            height: 90%;
+            background: url('../../resources/images/wyfy.png')  no-repeat center;
+            position: relative;
+        }
+        #wyfyzt{
+            text-align:center;
+            height: 5%;
+            font-size:14px;
+            margin-top:20px;
+            text-align: center;
+        }
+         html,body {
+			background: #ffffff;
+		}
+    </style>
+</head>
+<body>
+<!--<div id="wyfyzt">外语翻译功能，当外宾乘车，而司机无法清楚了解乘客需求时，可致电给电召服务系统来解决。</div>-->
+<!--<div id="wyfydiv"></div>-->
+<div id="app">
+<el-collapse v-model="activeNames" @change="handleChange" >
+<el-collapse-item title="记录编号[123006]" name="1">
+    <table border="1" cellspacing="0" cellpadding="0" style="width: 100%;">
+        <tbody>
+        <tr>
+            <td rowspan="5">&nbsp;</td>
+            <td>时间：2016-04-21 12:07:08</td>
+            <td>接待工号：528（马雷）</td>
+            <td>语种：英语</td>
+            <td rowspan="6" style="text-align: center;"><button>编辑</button> <button>删除</button></td>
+        </tr>
+        <tr>
+            <td>服务对象：司机</td>
+            <td>服务类别：翻译乘客去向</td>
+            <td>处理结果：处理完成</td>
+        </tr>
+        <tr>
+            <td>服务反馈：满意</td>
+            <td>车牌号码：</td>
+            <td>司机电话：135228183724</td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                服务内容：<br>
+                翻译乘客去向，乘客去火车站
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                备注：
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</el-collapse-item>
+<el-collapse-item title="记录编号[123004]" name="2">
+    <table border="1" cellspacing="0" cellpadding="0" style="width: 100%;">
+        <tbody>
+        <tr>
+            <td rowspan="5">&nbsp;</td>
+            <td>时间：2016-04-21 12:07:08</td>
+            <td>接待工号：528（徐琴）</td>
+            <td>语种：蒙古语</td>
+            <td rowspan="6" style="text-align: center;"><button>编辑</button> <button>删除</button></td>
+        </tr>
+        <tr>
+            <td>服务对象：司机</td>
+            <td>服务类别：翻译乘客去向</td>
+            <td>处理结果：处理完成</td>
+        </tr>
+        <tr>
+            <td>服务反馈：满意</td>
+            <td>车牌号码：</td>
+            <td>司机电话：135228183724</td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                服务内容：<br>
+                翻译乘客去向，乘客去火车站
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                备注：
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</el-collapse-item>
+<el-collapse-item title="记录编号[129345]" name="3">
+    <table border="1" cellspacing="0" cellpadding="0" style="width: 100%;">
+        <tbody>
+        <tr>
+            <td rowspan="5">&nbsp;</td>
+            <td>时间：2016-04-21 12:07:08</td>
+            <td>接待工号：528（江丽）</td>
+            <td>语种：伊拉克语</td>
+            <td rowspan="6" style="text-align: center;"><button>编辑</button> <button>删除</button></td>
+        </tr>
+        <tr>
+            <td>服务对象：司机</td>
+            <td>服务类别：翻译乘客去向</td>
+            <td>处理结果：处理完成</td>
+        </tr>
+        <tr>
+            <td>服务反馈：满意</td>
+            <td>车牌号码：</td>
+            <td>司机电话：135228183724</td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                服务内容：<br>
+                翻译乘客去向，乘客去火车站
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                备注：
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</el-collapse-item>
+</el-collapse>
+</div>
+<script>
+var Main = {
+	    data() {
+	      return {
+	        activeNames: ['1']
+	      };
+	    },
+	    methods: {
+	      handleChange(val) {
+	        console.log(val);
+	      }
+	    }
+	  }
+	var Ctor = Vue.extend(Main)
+	new Ctor().$mount('#app')
+</script>
+</body>
+</html>

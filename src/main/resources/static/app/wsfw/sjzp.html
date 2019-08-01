@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>司机招聘</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+	<script src="../../resources/script/util.js"></script>
+		<script src="../../resources/script/layer/layer.js"></script>
+	<script src="./sjzp.js"></script>
+
+	<style>
+		.panel-queryBar {padding: 10px 10px 0;}
+		.form-inline .form-group {margin-bottom: 10px;}
+		.dataListPanel.center {height: calc(100% - 50px);padding: 10px;}
+		[type='calendar'] {width: auto;}
+
+		/* dialog style */
+		#bljl-dialog-wzdd .form-control, #bljl-dialog-wfnr .form-control , #bljl-dialog-cljg .form-control {width: 442px;height: 50px;}
+		.modal-body form {}
+		.modal-body .control-label {display: inline-block;width: 7em;text-align: right;}
+		.modal-body .form-control {display: inline-block;}
+		textarea.form-control {resize: none;}
+		.ip-type-input div.form-control, .ip-type-text input.form-control, .ip-type-text select.form-control, .ip-type-text textarea.form-control, .ip-type-text .select2.select2-container {display: none;}
+		.ip-type-text div.form-control {width: 168px;}
+		#sjzp-dialog-szly .form-control {
+			width: calc(100% - 126px);
+			height: 50px;
+		}
+	</style>
+</head>
+<body>
+<div class="panel-wrapper" style="position: relative;">
+	<div class="panel-layout" layout="center">
+		<div class="panel-queryBar">
+			<form class="form-inline">
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="ip-iconfont ip-icon-user" type="icon"></i>
+						<input type="text" class="form-control input-sm" id="sjzp-ximi" placeholder="联系人">
+					</div>
+					<a class="btn btn-primary btn-sm" id="select_sjzp">查询</a>
+<!-- 					<a class="btn btn-primary btn-sm" id="sjzp-reset">重置</a> -->
+					<a class="btn btn-primary btn-sm" id="sjzp-add">添加</a>
+					<a class="btn btn-primary btn-sm" id="sjzp-Export">导出</a>
+				</div>
+			</form>
+		</div>
+		<div class="dataListPanel center">
+			<div id="sjzpTable"></div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="sjzp-dialog" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">服务违章</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-inline ip-type-input" id="sjzp-dialog-form">
+				
+				<div class="form-group form-group-sm" id="sjzp-dialog-chex1">
+					<input type="hidden" id="bianId1"/>
+					</div>
+				
+					<div class="form-group form-group-sm" id="sjzp-dialog-chex">
+						<label class="control-label">车牌号:</label>
+						<input type="text" class="form-control" placeholder="车型" id="sjzp_cx1">
+						<div type="text" class="form-control" id="sjzp_cx">&nbsp;</div>
+					</div>
+					
+					
+					<div class="form-group form-group-sm" id="sjzp-dialog-yynx">
+						<label class="control-label">车辆营运年限:</label>
+						<input type="text" class="form-control" placeholder="车辆营运年限" id="sjzp_clyynx1">
+						<div type="text" class="form-control" id="sjzp_clyynx">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="sjzp-dialog-sjnl">
+						<label class="control-label">司机年龄:</label>
+						<input type="text" class="form-control" placeholder="司机年龄" id="sjzp_sjnl1">
+						<div type="text" class="form-control" id="sjzp_sjnl">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="sjzp-dialog-xbie">
+						<label class="control-label">性别:</label>
+						<input type="text" class="form-control" placeholder="性别" id="sjzp_xb1">
+						<div type="text" class="form-control" id="sjzp_xb">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="sjzp-dialog-huji">
+						<label class="control-label">户籍:</label>
+						<input type="text" class="form-control" placeholder="户籍" id="sjzp_hj1">
+						<div type="text" class="form-control" id="sjzp_hj">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="sjzp-dialog-cynx">
+						<label class="control-label">从业年限:</label>
+						<input type="text" class="form-control" placeholder="从业年限" id="sjzp_cynx1">
+						<div type="text" class="form-control" id="sjzp_cynx">&nbsp;</div>
+					</div>
+					
+					
+						<div class="form-group form-group-sm" id="sjzp-dialog-jl">
+						<label class="control-label">驾龄:</label>
+						<input type="text" class="form-control" placeholder="驾龄" id="sjzp_jl1">
+						<div type="text" class="form-control" id="sjzp_jl">&nbsp;</div>
+					</div>
+					
+					
+					<div class="form-group form-group-sm" id="sjzp-dialog-banc">
+						<label class="control-label">班次:</label>
+						<input type="text" class="form-control" placeholder="班次" id="sjzp_bc1">
+						<div type="text" class="form-control" id="sjzp_bc">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="sjzp-dialog-xinj">
+						<label class="control-label">星级:</label>
+						<input type="text" class="form-control" placeholder="星级" id="sjzp_xj1">
+						<div type="text" class="form-control" id="sjzp_xj">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="sjzp-dialog-jbdd" style="width: 100%;">
+						<label class="control-label">交班地点:</label>
+						<textarea class="form-control" name="" placeholder="交班地点" id="sjzp_jbdd1" rows="4"></textarea>
+						<div type="text" class="form-control" id="sjzp_jbdd">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="sjzp-dialog-sjyye">
+						<label class="control-label">上交营业额:</label>
+						<input type="text" class="form-control" placeholder="上交营业额" id="sjzp_sjyye1">
+						<div type="text" class="form-control" id="sjzp_sjyye">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="sjzp-dialog-lxdh">
+						<label class="control-label">联系电话:</label>
+						<input type="text" class="form-control" placeholder="联系电话" id="sjzp_lxdh1">
+						<div type="text" class="form-control" id="sjzp_lxdh">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="sjzp-dialog-youx">
+						<label class="control-label">邮箱:</label>
+						<input type="text" class="form-control" placeholder="邮箱" id="sjzp_yx1">
+						<div type="text" class="form-control" id="sjzp_yx">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="sjzp-dialog-lxir">
+						<label class="control-label">联系人:</label>
+						<input type="text" class="form-control" placeholder="联系人" id="sjzp_lxr1">
+						<div type="text" class="form-control" id="sjzp_lxr">&nbsp;</div>
+					</div>
+					
+					
+						<div class="form-group form-group-sm" id="sjzp-dialog-djrq">
+						<label class="control-label">登记日期:</label>
+						<input type="text" class="form-control" placeholder="登记日期" id="sjzp_djrq1">
+						<div type="text" class="form-control" id="sjzp_djrq">&nbsp;</div>
+					</div>
+					
+					<div class="form-group form-group-sm" id="sjzp-dialog-bzxx" style="width: 100%;">
+						<label class="control-label">备注信息:</label>
+						<textarea class="form-control" name="" placeholder="备注信息" id="sjzp_bz1" rows="4"></textarea>
+						<div type="text" class="form-control" id="sjzp_bz">&nbsp;</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" id="sjzp-dialog-save">提交</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!-- <script>
+	(function ($) {
+		var sjzpFields = [
+			{name: 'gridId', title: '编号', width: 120},
+			{name: 'CPH', title: '车型', width: 120},
+			{name: 'CLXYNX', title: '车辆营运年限', width: 120},
+			{name: 'SJNL', title: '司机年龄', width: 120},
+			{name: 'XB', title: '性别', width: 120},
+			{name: 'JL', title: '驾龄', width: 120},
+			{name: 'BC', title: '班次', width: 120},
+			{name: 'JBDD', title: '交班地点', width: 250},
+			{name: 'LXR', title: '联系人', width: 120},
+			{name: 'DJRQ', title: '登记日期', width: 150},
+			{name: 'caozuo', title: '操作',
+				itemTemplate: function (_,item) {
+					var style = {marginRight: '4px'};
+					return [
+						$('<a>').addClass('btn btn-primary btn-xs').text('详情').css(style).on('click', function () {
+							$('#sjzp-dialog').modal('show');
+							$('#sjzp-dialog .modal-title').text('详情');
+							$('#sjzp-dialog-form').addClass('ip-type-text').removeClass('ip-type-input');
+							$('#sjzp-dialog-save').hide();
+							
+							$("#sjzp_cx").text(item.CPH);
+							$("#sjzp_clyynx").text(item.CLXYNX);
+							$("#sjzp_sjnl").text(item.SJNL);
+							$("#sjzp_xb").text(item.XB);
+							$("#sjzp_hj").text(item.HJ);
+							$("#sjzp_cynx").text(item.CYNX);
+							$("#sjzp_jl").text(item.JL),
+							$("#sjzp_bc").text(item.BC);
+							$("#sjzp_xj").text(item.XJ);
+							$("#sjzp_jbdd").text(item.JBDD);
+							$("#sjzp_sjyye").text(item.SJXYE);
+							$("#sjzp_lxdh").text(item.LXDH);
+							$("#sjzp_yx").text(item.YX);
+							$("#sjzp_lxr").text(item.LXR);
+							$("#sjzp_djrq").text(item.DJRQ),
+							$("#sjzp_bz").text(item.BZ);
+							
+							
+						}),
+						$('<a>').addClass('btn btn-primary btn-xs').text('修改').css(style).on('click', function () {
+							$('#sjzp-dialog').modal('show');
+							$('#sjzp-dialog .modal-title').text('修改');
+							$('#sjzp-dialog-form').addClass('ip-type-input').removeClass('ip-type-text');
+							$('#sjzp-dialog-save').show();
+							
+							$("#sjzp_cx1").val(item.CPH);
+							$("#sjzp_clyynx1").val(item.CLXYNX);
+							$("#sjzp_sjnl1").val(item.SJNL);
+							$("#sjzp_xb1").val(item.XB);
+							$("#sjzp_hj1").val(item.HJ);
+							$("#sjzp_cynx1").val(item.CYNX);
+							$("#sjzp_jl1").val(item.JL),
+							$("#sjzp_bc1").val(item.BC);
+							$("#sjzp_xj1").val(item.XJ);
+							$("#sjzp_jbdd1").val(item.JBDD);
+							$("#sjzp_sjyye1").val(item.SJXYE);
+							$("#sjzp_lxdh1").val(item.LXDH);
+							$("#sjzp_yx1").val(item.YX);
+							$("#sjzp_lxr1").val(item.LXR);
+							$("#sjzp_djrq1").val(item.DJRQ),
+							$("#sjzp_bz1").val(item.BZ);
+							
+							
+							$("#sjzp-dialog-save").off('click').on('click',function(){
+								$.ajax({
+								url: basePath + "getUpSjzp",
+								type:'post',
+								dataType:'json',
+								data:{
+									"bid":item.BID,
+									"cx":$("#sjzp_cx1").val(),
+									"clyynx":$("#sjzp_clyynx1").val(),
+									"sjnl":$("#sjzp_sjnl1").val(),
+									"xb":$("#sjzp_xb1").val(),
+									"hj":$("#sjzp_hj1").val(),
+									"cynx":$("#sjzp_cynx1").val(),
+									"jl":$("#sjzp_jl1").val(),
+									"bc":$("#sjzp_bc1").val(),
+									"xj":$("#sjzp_xj1").val(),
+									"jbdd":$("#sjzp_jbdd1").val(),
+									"sjxye":$("#sjzp_sjyye1").val(),
+									"lxdh":$("#sjzp_lxdh1").val(),
+									"yx":$("#sjzp_yx1").val(),
+									"lxr":$("#sjzp_lxr1").val(),
+									"djrq":$("#sjzp_djrq1").val(),
+									"bz":$("#sjzp_bz1").val(),
+								},
+								timeout:180000,
+								success:function(data){
+									if(data>0){
+										console.info(12121);
+										$('#sjzp-dialog').modal('hide');
+										hxx();
+									}else{
+										alert('修改失败');
+									}
+								}
+								
+								});
+							});
+							
+							
+							
+							$('#sjzp-dialog-fsrq input.form-control').datetimepicker(dateDefaultOption);
+							$('#sjzp-dialog-barq input.form-control').datetimepicker(dateYearDefaultOption);
+						}),
+						$('<a>').addClass('btn btn-danger btn-xs').text('删除').on('click', function () {
+							$.ajax({
+								url :basePath +"getDeleteSjzp",
+								type :'post',
+								dataType :'json',
+									data:{"bid":item.BID},
+									success:function(data){
+										hxx();
+									}
+							});
+							
+							
+						})
+					];
+				}, width: 135}
+		];
+		var sjzpData = [
+			{cphm: '车牌号1', sjmc: '姓名1', szmc: '违章时间1', yswp: '违章地点1', ccsj: '违章内容1', qsdd: '处理结果1', weiz: '扣分1', xzjg: '执法机关罚款1'},
+			{cphm: '车牌号2', sjmc: '姓名2', szmc: '违章时间2', yswp: '违章地点2', ccsj: '违章内容2', qsdd: '处理结果2', weiz: '扣分2', xzjg: '执法机关罚款2'},
+			{cphm: '车牌号3', sjmc: '姓名3', szmc: '违章时间3', yswp: '违章地点3', ccsj: '违章内容3', qsdd: '处理结果3', weiz: '扣分3', xzjg: '执法机关罚款3'},
+			{cphm: '车牌号4', sjmc: '姓名4', szmc: '违章时间4', yswp: '违章地点4', ccsj: '违章内容4', qsdd: '处理结果4', weiz: '扣分4', xzjg: '执法机关罚款4'},
+			{cphm: '车牌号5', sjmc: '姓名5', szmc: '违章时间5', yswp: '违章地点5', ccsj: '违章内容5', qsdd: '处理结果5', weiz: '扣分5', xzjg: '执法机关罚款5'},
+		];
+		var resetQueryConditions = function (e) {
+			$('.panel-queryBar .form-control').val('');
+		};
+		var addSjzp = function (e) {
+			$('#sjzp-dialog').modal('show');
+			$('#sjzp-dialog .modal-title').text('添加');
+			$('#sjzp-dialog-form').addClass('ip-type-input').removeClass('ip-type-text');
+			$('#sjzp-dialog-save').show();
+			
+			$("#sjzp-dialog-save").off('click').on('click',function(){
+				$.ajax({
+					url:basePath + "getInsertSjzp",
+					type:'post',
+					dataType:'json',
+					timeout:180000,
+					data:{
+						"cph":$("#sjzp_cx1").val(),
+						"clxynx":$("#sjzp_clyynx1").val(),
+						"sjnl":$("#sjzp_sjnl1").val(),
+						"xb":$("#sjzp_xb1").val(),
+						"hj":$("#sjzp_hj1").val(),
+						"cynx":$("#sjzp_cynx1").val(),
+						"jl":$("#sjzp_jl1").val(),
+						"bc":$("#sjzp_bc1").val(),
+						"xj":$("#sjzp_xj1").val(),
+						"jbdd":$("#sjzp_jbdd1").val(),
+						"sjxye":$("#sjzp_sjyye1").val(),
+						"lxdh":$("#sjzp_lxdh1").val(),
+						"yx":$("#sjzp_yx1").val(),
+						"lxr":$("#sjzp_lxr1").val(),
+						"djrq":$("#sjzp_djrq1").val(),
+						"bz":$("#sjzp_bz1").val(),
+					},
+					success:function(data){
+					if(data>0){
+						$('#sjzp-dialog').modal('hide');
+						hxx();
+					}else{
+						alert('添加失败');
+					}
+					}
+				});
+			});
+			
+			
+			
+		};
+		
+		function hxx(){
+			
+			//getFinaNmaeSjzp
+			url=basePath;
+			data={};
+			var xm=$("#sjzp-ximi").val();
+			if(!xm){
+				url+="getFinaAllSjzp";
+			}else{
+				url+="getFinaNmaeSjzp";
+				data.lxr=xm;
+			}
+			
+			
+			
+			$.ajax({
+				url :url,
+				type : 'post',
+					dataType : 'json',
+					data : data,
+					timeout : 180000,
+					success:function(data){
+						datas=data.data;
+						for(var i=0; i<datas.length; i++){
+							var item=datas[i];
+							item.gridId=i+1;
+						}
+						
+					$('#sjzpTable').jsGrid({
+						width: 'calc(100% - 2px)',
+						height: 'calc(100% - 2px)',
+						editing: true,
+						sorting: true,
+						paging: false,
+						autoload: true,
+					/* 	pageIndex: 1,
+					      pageSize: 4,
+					      pageButtonCount: 15,
+					      pagerFormat: "Pages: {first} {prev} {pages} {next} {last} {pageIndex} {pageCount}  共 {itemCount} 条记录" ,
+					      pagePrevText: "Prev",
+					      pageNextText: "Next",
+					      pageFirstText: "First",
+					      pageLastText: "Last", */
+						data: datas,
+						fields: sjzpFields
+					});
+					}
+			
+		
+				
+			});
+		
+		}
+		
+		$("#select_sjzp").off('click').on('click',function(){
+			hxx();
+		});
+		
+		$(function () {
+			hxx();
+			$('.addTimePeriod, .period').on('click', function () {
+				if ($(this).hasClass('addTimePeriod')) $(this).addClass('period').removeClass('addTimePeriod');
+				else if ($(this).hasClass('period')) $(this).addClass('addTimePeriod').removeClass('period');
+			});
+			$('#sjzp-wzxz').select2({
+				language: 'zh-CN',
+				width: '160',
+				minimumResultsForSearch: -1,
+				data: [
+					{id: '1', text: '违章性质1'},
+					{id: '2', text: '违章性质2'}
+				]
+			});
+			$('#sjzp-dialog-sglx select.form-control').select2({
+				language: 'zh-CN',
+				width: '168',
+				minimumResultsForSearch: -1,
+				data: [
+					{id: '1', text: '事故类别1'},
+					{id: '2', text: '事故类别2'}
+				]
+			});
+			$('#sjzp-dialog-wpzt input.form-control').datetimepicker(dateDefaultOption);
+			$('#sjzp-reset').on('click', resetQueryConditions);
+			$('#sjzp-add').on('click', addSjzp);
+			$('#sjzp-dialog').on('hidden.bs.modal', function (e) {
+				$(this).find('input[type=text].form-control, textarea.form-control').val('');
+				$(this).find('select.form-control').val('').trigger('change');
+				$(this).find('div.form-control').text('');
+			});
+			$('#sjzpTable').jsGrid({
+				width: 'calc(100% - 2px)',
+				height: 'calc(100% - 2px)',
+				editing: true,
+				sorting: true,
+				paging: false,
+				autoload: true,
+				data: [],
+				fields: sjzpFields
+			});
+			$('.scrollbar-macosx').scrollbar();
+		})
+	})(jQuery)
+</script> -->
+</body>
+</html>

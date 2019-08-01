@@ -1,0 +1,143 @@
+<!-- 业户查询 -->
+<html>
+<head>
+<meta charset="UTF-8">
+	<title>消息下发</title>
+	<style>
+		.xxxf_matter{
+			width:100%;
+			margin:0 auto;
+		}
+		.xxxf_left{
+			width:188px;
+			float:left;
+			margin-left:5px;
+		}
+		.xxxf_zzjg ul{
+			margin-left:-39px;
+			list-style: none;
+		}
+		.xxxf_zzjg{
+			width:100%;
+/* 			height:310px; */
+		}
+		.xxxf_kj{
+			height:440px;
+			border:1px solid #000;
+		}
+		.xxxf_cllb{
+			width:100%;
+/* 			height:310px; */
+			
+		}
+		.xxxf_under{
+			width:345px;
+			height:100px;
+			float:left;
+			margin-left:5px;
+		}
+		.xxxf_under table thead{
+			width:10%;
+			height:720px;
+			border:1px solid #000;
+		}
+		.xxxf_right{
+			width:227px;
+			float:left;
+			margin-left:5px;
+		}
+		html,body {
+			background: #ffffff;
+		}
+	</style>
+</head>
+<body>
+<div class="xxxf_matter">
+	<div class="xxxf_left">
+		<p>组织结构</p>
+		<div class="xxxf_kj">
+			<div class="xxxf_zzjg">
+				<p>出租车</p>
+				<ul>
+					<li>上城出租</li>
+					<li>下城出租</li>
+					<li>大川个体车辆</li>
+					<li>奔驰</li>
+					<li>拱墅出租</li>
+					<li>文明办应急车队</li>
+				</ul>
+			</div>
+			<br>
+			<div class="xxxf_cllb">
+				<p>车辆列表</p>
+				<table>
+					<tr>
+						<td>车牌号码</td>
+						<td>车牌颜色</td>
+					</tr>
+					<tr>
+						<td>浙AT3719</td>
+						<td>蓝色</td>
+					</tr>
+					<tr>
+						<td>浙AT3719</td>
+						<td>蓝色</td>
+					</tr>
+					<tr>
+						<td>浙AT3719</td>
+						<td>蓝色</td>
+					</tr>
+					<tr>
+						<td>浙AT3719</td>
+						<td>蓝色</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		<p>条件：<input type="text" style="width:100px"> 查找</p>
+	</div>
+	<div class="xxxf_under">
+		<p>发送信息车辆列表</p>
+		<div class="xxxf_kj">
+			<table>
+				<tr>
+					<td>车辆列表</td>
+					<td>发送状态</td>
+				</tr>
+			</table>
+		</div>
+		<p>自由组：<input type="text" style="width:100px">
+			<input type="text" readonly="none" value="区域选择车辆">
+		</p>
+	</div>
+	<div class="xxxf_right">
+		<p>发送消息栏</p>
+		<div style="width:225px;height:100px;border:1px solid #000">
+			<p>请速回电！</p>
+<!-- 			<p>司机你好！</p> -->
+<!-- 			<p>司机你辛苦了！</p> -->
+<!-- 			<p>我来测试了</p> -->
+		</div>
+		<p>标志：</p>
+		<input type="checkbox">紧急&nbsp;&nbsp;
+		<input type="checkbox">终端显示器显示<br>
+		<input type="checkbox">终端TTS播读
+		<input type="checkbox">广告屏显示
+		<div style="height:30px;line-height:30px;border:1px solid #ddd">
+			<input type="radio">中心导航信息
+			<input type="radio">CAN故障码信息
+		</div>
+		<div style="width:100%;height:55px;border:1px solid #ddd;clear:both">
+			<button style="width:60px;height:30px;margin-bottom: 10px;float:right; margin-top: 10px">发送</button>
+		</div>
+		<p style="clear: both">定制消息栏</p>
+		<div style="width:100%;border:1px solid #ddd">
+			<p>请速回电！</p>
+			<p>司机你好！</p>
+			<p>司机你辛苦了！</p>
+			<p>我来测试了</p>
+		</div>
+	</div>
+</div>
+</body>
+</html>

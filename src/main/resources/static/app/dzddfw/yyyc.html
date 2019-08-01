@@ -1,0 +1,329 @@
+<!-- 业户查询 -->
+<html>
+<head>
+<!-- 	<link rel="stylesheet" href="../../resources/style/reset.css"> -->
+<!-- 	<link rel="stylesheet" href="../../resources/style/iconfont.css"> -->
+<!-- 	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css"> -->
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+    <style>
+        #yyycdiv{
+            width: 100%;
+            height: 80%;
+            background: url('../../resources/images/yyyc.png')  no-repeat center;
+            position: relative;
+        }
+        #yyyczt{
+            text-align:center;
+            height: 8%;
+            font-size:14px;
+            margin-top:20px;
+            text-align: center;
+            text-indent: 2em;
+        }*{margin:0 auto ; padding:0;font-size:13px}
+        .panel-titleLine { margin-bottom: 20px; padding: .3em; border: 1px solid #eeeeee;; }
+        .panel-titleLine .panel-titleSpan { position: relative; top: -1em; left: .3em; padding: .2em .5em; background: white }
+        .panel_oneSpan > div { display: block; margin-top: .3em; margin-bottom: .3em; }
+        .panel_twoSpan > div { display: inline-block; width: 49%; margin-top: .3em; margin-bottom: .3em; }
+        html,body {
+			background: #ffffff;
+		}
+    </style>
+</head>
+<body>
+<!--<div id="yyyczt">预约车辆功能，客户可以通过互联网或电召服务系统，提前30分钟以上（时间可设置）提交预约订单，订单主要包括时间、地点、人数、车辆数、联系方法等。</div>-->
+<!--<div id="yyycdiv"></div>-->
+<div id="yyycContainer">
+    <div id="yyyc_leftCenter">
+        <div style="width: 320px; padding-top: .5em;height:400px;overflow: auto;float:left">
+            <div class="panel-titleLine" style="position: relative; ">
+                <span class="panel-titleSpan">来电显示</span>
+                <div class="panel_oneSpan">
+                    <div>
+                        <label>来电号码：</label>
+                        <select style="width:8em;">
+                            <option >13588274079</option>
+                            <option >13588274077</option>
+                            <option >13588274078</option>
+                        </select>
+<!--                         <button>选择</button> -->
+                    </div>
+<!--                     <div> -->
+<!--                         <input style="margin-left:4px"/> -->
+<!--                     </div> -->
+                </div>
+            </div>
+            <div class="panel-titleLine" style="position: relative;">
+                <span class="panel-titleSpan">预约类型</span>
+                <div class="panel_twoSpan">
+                    <div>
+                        <label>约车类型：</label>
+                        <select style="width:8em;">
+                            <option>QQ约车</option>
+                            <option>快滴约车</option>
+                            <option>神州约车</option>
+                        </select>
+<!--                         <button>选择</button> -->
+                    </div>
+                    <div>
+                        <label>QQ号码：</label>
+                        <input style="width:8em;"/>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-titleLine" style="position: relative;">
+                <span class="panel-titleSpan">来电显示</span>
+                <div class="panel_oneSpan">
+                    <div>
+                        <label>详细地点：</label>
+                        <input style="width:8em;"/>
+<!--                         <button>选择</button> -->
+                    </div>
+                    <div>
+                        <label>参考地点：</label>
+                        <input style="width:8em;"/>
+                    </div>
+                    <div>
+                        <label>乘客姓名：</label>
+                        <input style="width:8em;"/>
+                    </div>
+                    <div>
+                        <label>目的地点：</label>
+                        <input style="width:8em;"/>
+                    </div>
+                    <div>
+                        <label>附加信息：</label>
+                        <input style="width:8em;"/>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-titleLine" style="position: relative;">
+                <div class="panel_oneSpan">
+                    <div>
+                        <label><input type="radio">当前时间</label>
+                        <input style="width:8em;"/>
+                    </div>
+                    <div>
+                        <label><input type="radio">自 定 义</label>
+                        <input style="width:8em;"/>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-titleLine" style="position: relative;">
+                <span class="panel-titleSpan">补充信息</span>
+                <div class="panel_oneSpan">
+                    <div>
+                        <label>距离类型：</label>
+                        <select style="width:6em;">
+                            <option >普通1</option>
+                            <option >普通2</option>
+                            <option >普通3</option>
+                        </select>
+                        <label>约车范围(m)：</label>
+                        <input style="width:4em;"/>
+                    </div>
+                    <div>
+                        <label>用车数量：</label>
+                        <input style="width:4em;"/>
+                    </div>
+                    <div>
+                        <label>车型：</label>
+                        <select style="width:8em;">
+                            <option >所有1</option>
+                            <option >所有2</option>
+                            <option >所有3</option>
+                        </select>
+                        <label>乘车人数：</label>
+                        <input style="width:4em;"/>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top:5px;">
+                <button>固定</button>
+                <button>生成<u>D</u></button>
+                <button>回城<u>H</u></button>
+                <button>取消<u>C</u></button>
+            </div>
+        </div>
+    </div>
+    <div style="padding-top: .5em;height:400px;overflow: auto;">
+        <div class="panel-titleLine" style="position: relative;">
+            <div>
+                <button>短信接收</button>
+                <button>QQ调度</button>
+            </div>
+            <table border="1" cellspacing="0" cellpadding="0" style="width: 100%;">
+                <thead>
+                <tr>
+                    <th style="text-align: center; height: 30px;">电话</th>
+                    <th style="text-align: center;">短信内容</th>
+                    <th style="text-align: center;">状态</th>
+                    <th style="text-align: center;">时间</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td style="text-align: center;">1369123242</td>
+                    <td style="text-align: center;">QQ约车</td>
+                    <td style="text-align: center;">成功</td>
+                    <td style="text-align: center;">2016-01-10</td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">1369122311</td>
+                    <td style="text-align: center;">QQ约车</td>
+                    <td style="text-align: center;">失败</td>
+                    <td style="text-align: center;">2016-01-10</td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">1369128564</td>
+                    <td style="text-align: center;">QQ约车</td>
+                    <td style="text-align: center;">成功</td>
+                    <td style="text-align: center;">2016-01-10</td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">1369122313</td>
+                    <td style="text-align: center;">QQ约车</td>
+                    <td style="text-align: center;">成功</td>
+                    <td style="text-align: center;">2016-01-10</td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">1369128678</td>
+                    <td style="text-align: center;">QQ约车</td>
+                    <td style="text-align: center;">成功</td>
+                    <td style="text-align: center;">2016-01-10</td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">1369122343</td>
+                    <td style="text-align: center;">QQ约车</td>
+                    <td style="text-align: center;">成功</td>
+                    <td style="text-align: center;">2016-01-10</td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">1593332056</td>
+                    <td style="text-align: center;">QQ约车</td>
+                    <td style="text-align: center;">失败</td>
+                    <td style="text-align: center;">2016-01-10</td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">1369122342</td>
+                    <td style="text-align: center;">QQ约车</td>
+                    <td style="text-align: center;">成功</td>
+                    <td style="text-align: center;">2016-01-10</td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">1369126666</td>
+                    <td style="text-align: center;">QQ约车</td>
+                    <td style="text-align: center;">成功</td>
+                    <td style="text-align: center;">2016-01-10</td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">1369127765</td>
+                    <td style="text-align: center;">QQ约车</td>
+                    <td style="text-align: center;">成功</td>
+                    <td style="text-align: center;">2016-01-10</td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">1369124632</td>
+                    <td style="text-align: center;">QQ约车</td>
+                    <td style="text-align: center;">成功</td>
+                    <td style="text-align: center;">2016-01-10</td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">1369125432</td>
+                    <td style="text-align: center;">QQ约车</td>
+                    <td style="text-align: center;">失败</td>
+                    <td style="text-align: center;">2016-01-10</td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">1369128945</td>
+                    <td style="text-align: center;">QQ约车</td>
+                    <td style="text-align: center;">成功</td>
+                    <td style="text-align: center;">2016-01-10</td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">1369128943</td>
+                    <td style="text-align: center;">QQ约车</td>
+                    <td style="text-align: center;">成功</td>
+                    <td style="text-align: center;">2016-01-10</td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">1369128922</td>
+                    <td style="text-align: center;">QQ约车</td>
+                    <td style="text-align: center;">成功</td>
+                    <td style="text-align: center;">2016-01-10</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div data-dojo-type="dojox/layout/ContentPane" data-dojo-props="region:'bottom', splitter:false" id="yyyc_rightCenter">
+        <div style="height: 150px;">
+            <div>
+                
+<!--                 <button>短信约车</button> -->
+<!--                 <button>QQ约车</button> -->
+<!--                 <button>网络约车</button> -->
+<!--                 <button>扬招点约车</button> -->
+<!--                 <button>回城业务</button> -->
+            </div>
+            <div style="margin-top:5px">
+            	<button style="padding-top:3px">预约</button>
+                <button style="margin-left:7px">预约列表</button>
+                <button style="margin-left:7px">固定</button>
+            </div>
+            <table border="1" cellspacing="0" cellpadding="0" style="width: 100%;">
+                <thead>
+                <tr>
+                    <th style="text-align: center; height: 30px;">编号</th>
+                    <th style="text-align: center;">客户姓名</th>
+                    <th style="text-align: center;">客户电话</th>
+                    <th style="text-align: center;">详细地址</th>
+                    <th style="text-align: center;">目的地址</th>
+                    <th style="text-align: center;">约车类型</th>
+                    <th style="text-align: center;">QQ号码</th>
+                    <th style="text-align: center;">用车信息</th>
+                    <th style="text-align: center;">附加信息</th>
+                    <th style="text-align: center;">调度员</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td style="text-align: center;">7002341</td>
+                    <td style="text-align: center;">杨杨</td>
+                    <td style="text-align: center;">13566666029</td>
+                    <td style="text-align: center;">嘉汇大厦</td>
+                    <td style="text-align: center;">火车东站</td>
+                    <td style="text-align: center;">电话</td>
+                    <td style="text-align: center;"></td>
+                    <td style="text-align: center;">即时</td>
+                    <td style="text-align: center;">无</td>
+                    <td style="text-align: center;">8001</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

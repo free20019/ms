@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>查询与统计</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<link rel="stylesheet" href="../../resources/style/css/yjzhcz/queryStats.css">
+	<script src="../../resources/script/vue.min.js"></script>
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="../../resources/script/moment.min.js"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.min.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/echarts-all.js"></script>
+</head>
+<body>
+<div class="template-wrapper" id="root">
+	<form class="form-inline query-bar form-group-sm">
+		<div class="form-group">
+			<input type="text" v-model="query.theme" class="form-control" placeholder="主题">
+		</div>
+		<div class="form-group">
+			<button type="button" class="btn btn-primary btn-sm" @click="handleQueryClick">查询</button>
+		</div>
+	</form>
+	<div class="dataListPanel center" style="height: 220px; margin-bottom: 10px;">
+		<div id="accessTable" class="jsgrid"></div>
+	</div>
+	<div class="tw-layout" style="height: calc(100% - 280px);">
+		<div class="tw-layout-left">
+			<div class="dataListPanel center">
+				<div class="header"><i class="iconfont icon-sound"></i>&nbsp;报警内容</div>
+				<div class="content">
+					<div class="scrollbar-macosx">
+						{{selectTableItem.SJJL}}
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="tw-layout-main">
+			<div class="dataListPanel center" style="padding: 0;">
+				<div class="scrollbar-macosx">
+					<div id="echart" class="echart" style="height:100%;width:100%;"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	(function (Vue, _, $, moment) {
+		var vm = new Vue({
+			el: '#root',
+			data: function () {
+				return {
+					query: {
+						theme: ''
+					},
+					table: {
+						fields: [
+							{ name: "gId", title: "序号", width: 60 },
+							{ name: "TIME", title: "时间", itemTemplate: this.formatDate, width: 160 },
+							{ name: "SJZT", title: "主题", width: 200 },
+							{ name: "BJR", title: "报警人", width: 120 },
+							{ name: "DJDH", title: "报警人电话", width: 140 },
+							{ name: "JJR", title: "接警人", width: 120 },
+							{ name: "SJJB", title: "事件级别", width: 120 },
+							{ name: "SH", title: "状态", itemTemplate: this.formatReview, width: 120 },
+						],
+						data: []
+					},
+					selectTableItem: {},
+					sendType: []
+				}
+			},
+			mounted: function () {
+				var _this = this;
+				this.$nextTick(function () {
+					$('.scrollbar-macosx').scrollbar();
+					$("#accessTable").jsGrid({
+						height: "100%",
+						width: "100%",
+						noDataContent: '未查询到数据',
+						fields: _this.table.fields,
+						rowClick: _this.handleTableItemClick
+					});
+
+					_this.getAccess();
+					_this.getEchart();
+				})
+			},
+			methods: {
+				// 异步
+				getAccess: function () {
+					var theme = this.query.theme;
+					var fields = this.table.fields;
+					$.ajax({
+						url: '../../Yjzh/fingyjsjjr',
+						type: 'GET',
+						dataType: 'json',
+						data: {
+							sjzt: theme
+						}
+					}).then(function (res) {
+						var data = _.map(res, function (item, index) {
+							item.gId = index + 1;
+							return item;
+						})
+						console.info('getAccess:', res)
+						$("#accessTable").jsGrid({
+							data: res
+						})
+					})
+				},
+				getEchart: function () {
+						var myChart = echarts.init(document.getElementById('echart'));
+						option = {
+					    title : {
+					        text: '出租车进京上访图',
+					        subtext: '数据来自指挥中心',
+					        x:'center'
+					    },
+					    tooltip : {
+					        trigger: 'item'
+					    },
+					    legend: {
+					        x:'left',
+					        data:['车辆']
+					    },
+					    dataRange: {
+					        min : 0,
+					        max : 80,
+					        calculable : true,
+					        color: ['maroon','purple','red','orange','yellow','lightgreen']
+					    },
+					    toolbox: {
+					        show : true,
+					        orient : 'vertical',
+					        x: 'right',
+					        y: 'center',
+					        feature : {
+					            mark : {show: true},
+					            dataView : {show: true, readOnly: false},
+					            restore : {show: true},
+					            saveAsImage : {show: true}
+					        }
+					    },
+					    series : [
+					        {
+					            name: '车辆',
+					            type: 'map',
+					            mapType: 'china',
+					            hoverable: false,
+					            roam:true,
+					            data : [],
+					            markPoint : {
+					                symbolSize: 5,       // 标注大小，半宽（半径）参数，当图形为方向或菱形则总宽度为symbolSize * 2
+					                itemStyle: {
+					                    normal: {
+					                        borderColor: '#87cefa',
+					                        borderWidth: 1,            // 标注边线线宽，单位px，默认为1
+					                        label: {
+					                            show: false
+					                        }
+					                    },
+					                    emphasis: {
+					                        borderColor: '#1e90ff',
+					                        borderWidth: 5,
+					                        label: {
+					                            show: false
+					                        }
+					                    }
+					                },
+					                data : [
+					                    {name: "杭州南庄兜", value: 11},
+					                    {name: "湖州青山服务区", value: 28},
+					                    {name: "湖州太湖服务区", value: 20},
+					                    {name: "常州天目湖服务区", value: 44},
+					                    {name: "镇江荣炳服务区", value: 43},
+					                    {name: "高邮龙奔服务区", value: 40},
+					                    {name: "淮阴川星服务区", value: 40},
+					                    {name: "新沂服务区", value: 35},
+					                    {name: "临沂服务区", value: 32},
+					                    {name: "廊坊服务区",value:12}
+					                ]
+					            },
+					            geoCoord: {
+					                "杭州南庄兜":[120.1152278535,30.3829857165],
+					                "湖州青山服务区":[120.0526253716,30.6649965868],
+					                "湖州太湖服务区":[119.9417111999,31.1217188297],
+					                "常州天目湖服务区":[119.5140046095,31.3837233116],
+					                "镇江荣炳服务区":[119.3991322843,31.8429947734],
+					                "高邮龙奔服务区":[119.5118645572,32.7632090013],
+					                "淮阴川星服务区":[119.0451073403,33.7973424061],
+					                "新沂服务区":[118.5403185814,34.3278117247],
+					                "临沂服务区":[118.2521006965,35.1690596547],
+					                "廊坊服务区":[116.4807165354,39.4761904072]
+					            }
+					        }
+					        
+					    ]
+					};
+					echarts.init(document.getElementById('echart')).setOption(option);
+				},
+				// 事件
+				handleQueryClick: function () {
+					this.getAccess();
+				},
+				handleTableItemClick: function(row) {
+					console.info('handleTableItemClick:', row)
+					var item = row.item;
+					this.selectTableItem = item;
+				},
+				// 格式
+				formatDate: function(date) {
+					console.info('formatDate:', date)
+					return moment(date).format('YYYY-MM-DD');
+				},
+				formatReview: function (type) {
+					switch (type) {
+						case 0:
+							return '未核实';
+						case 1:
+							return '已核实'
+					}
+				}
+			}
+		})
+	})(Vue, _, jQuery, moment);
+</script>
+</body>
+</html>

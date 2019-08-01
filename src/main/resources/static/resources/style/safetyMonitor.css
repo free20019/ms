@@ -1,0 +1,130 @@
+html, body {
+  height: 100%;
+}
+
+.success {
+  text-shadow: 0 0 2px #28a745;
+  color: #28a745;
+}
+
+.danger {
+  text-shadow: 0 0 2px #dc3545;
+  color: #dc3545;
+}
+
+.template-wrapper {
+  height: 100%;
+}
+
+.template-title {
+  position: relative;
+  height: 50px;
+  color: #ffffff;
+  background-color: #128efa;
+}
+
+.template-title .text {
+  line-height: 50px;
+  font-size: 24px;
+  text-align: center;
+}
+
+.template-title .datetime {
+  position: absolute;
+  top: 50%;
+  right: 40px;
+  -webkit-transform: translateY(-50%);
+          transform: translateY(-50%);
+}
+
+.template-body {
+  height: calc(100% - 50px);
+}
+
+.mp-panel {
+  border: 1px solid #eeeeee;
+  border-radius: 4px;
+  -webkit-box-shadow: 2px 2px 6px #eeeeee;
+          box-shadow: 2px 2px 6px #eeeeee;
+}
+
+.mp-panel-title {
+  height: 40px;
+  border-bottom: 1px solid #eeeeee;
+  font-size: 16px;
+  line-height: 40px;
+  text-align: center;
+  color: #ffffff;
+  background-color: #128efa;
+}
+
+.mp-panel-body {
+  height: calc(100% - 40px);
+  padding: 15px;
+}
+
+.mp-panel-body.air {
+  padding: 0;
+}
+
+.mp-table {
+  width: 100%;
+}
+
+.mp-table .mp-table-th, .mp-table .mp-table-td {
+  text-align: center;
+  border-right: 1px solid #eeeeee;
+}
+
+.mp-table .mp-table-th:last-child, .mp-table .mp-table-td:last-child {
+  border-right: none;
+}
+
+.mp-table .mp-table-th {
+  border-bottom: 1px solid #eeeeee;
+  font-weight: bold;
+  line-height: 30px;
+}
+
+.mp-table .mp-table-td {
+  line-height: 28px;
+}
+
+.mp-table.last-border .mp-table-th {
+  border-bottom: none;
+}
+
+.mp-table.last-border thead tr:last-child .mp-table-th {
+  border-bottom: 1px solid #eeeeee;
+}
+
+.mp-table.size-lg .mp-table-th {
+  line-height: 40px;
+}
+
+.mp-table.size-lg .mp-table-td {
+  line-height: 35px;
+}
+
+.mp-table.border .mp-table-td {
+  border-bottom: 1px solid #eeeeee;
+}
+
+.container-fluid {
+  padding: 15px 30px;
+  height: 100%;
+}
+
+.container-fluid .row {
+  height: 50%;
+  margin-bottom: 15px;
+}
+
+.container-fluid .row > div {
+  height: 100%;
+}
+
+.container-fluid .row:last-child {
+  margin-bottom: 0;
+}
+/*# sourceMappingURL=safetyMonitor.css.map */

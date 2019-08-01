@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/vue.min.js"></script>
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<!-- UI组件库 1.0 -->
+	<script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+	<style>
+		/*#wxclyjMap {
+			height: 100%;
+			border: 1px solid #c4d4fb;
+			border-radius: 10px;
+		}*/
+		.tw-map {
+			height: 100%;
+			border: 1px solid #c4d4fb;
+			border-radius: 10px;
+		}
+		.scrollbar-macosx {
+			height: calc(100% - 176px);
+			margin-bottom: 10px;
+		}
+
+		.panel-layout[layout='left'] {width: 500px;}
+		.panel-layout[layout='left'] ~ .panel-layout[layout='center'] {position: relative;width: calc(100% - 515px);margin-left: 515px;}
+		.panel-layout > .panel {height: calc(100% - 30px);margin-right: 0;margin-bottom: 0;}
+		.panel-layout[layout='left'] > .panel-body {padding: 0;background-color: transparent;}
+
+		.button-group {overflow: hidden;height: 35px;border-radius: 10px 10px 0 0;}
+		.button {
+			float: left;
+			width: 50%;
+			height: 35px;
+			border-bottom: 1px solid #cccccc;
+			font-size: 16px;
+			line-height: 35px;
+			text-align: center;
+			color: #878787;
+			background-color: #ececec;
+			transition: background-color .5s ease-in-out, color .5s ease-in-out;
+			cursor: pointer;
+		}
+		.button.active {border-bottom-color: #ffffff;color: #333333;background-color: #ffffff;}
+		.mp-tabs-body {
+			height: calc(100% - 35px);
+			border-radius: 0 0 5px 5px;
+		}
+		.mp-tabs-panel {display: none;height: 100%;padding: 10px;}
+		.mp-tabs-panel.active {display: block;}
+	</style>
+</head>
+<body>
+<div class="panel-wrapper" id="root">
+	<div class="panel-layout" layout="left">
+		<div class="panel-title">
+			<div class="title">维修监控</div>
+			<i class="iconfont icon-arrowTria" ip-type="left"></i>
+		</div>
+		<div class="panel panel-body">
+			<div class="dataListPanel">
+				<div class="button-group">
+					<div class="button" :class="{active: tab.active === 1}" @click="handleTabItemClick(1)">重点监控</div>
+					<div class="button" :class="{active: tab.active === 2}" @click="handleTabItemClick(2)">故障监控</div>
+				</div>
+				<div class="mp-tabs-body">
+					<div class="mp-tabs-panel" :class="{active: tab.active === 1}" style="position: relative;">
+						<div class="scrollbar-macosx" style="height: 100%;">
+							<div class="tw-table" id="focusMonitorTable"></div>
+							<!--<p class="tw-list">
+								<span>浙AT2343</span>
+								<span>2019-02-27 16:30:24</span>
+								<span>杭州东站</span>
+							</p>-->
+						</div>
+					</div>
+					<div class="mp-tabs-panel" :class="{active: tab.active === 2}">
+<!-- 						<div style="margin-bottom: 10px;">
+							<div type="calendar" style="width: 140px; margin-right: 7px;">
+								<i class="glyphicon glyphicon-calendar" type="icon"></i>
+								<input type="text" class="form-control" id="datetime" placeholder="时间">
+							</div>
+							<div type="calendar" style="margin-right: 7px;">
+								<i class="icon-first iconfont icon-car" type="icon"></i>
+								<input class="form-control" type="text" placeholder="输入三位以上车牌号" v-model.trim="tab.licensePlate">
+								<a class="btn btn-primary btn-sm btn-last ip-iconfont ip-icon-search" @click="handleQueryLicensePlateClick"></a>
+							</div>
+							<div class="btn btn-primary" style="margin-right: 7px;" @click="handleQueryClick">查&emsp;询</div>
+							<div class="btn btn-primary" @click="">导&emsp;出</div>
+						</div> -->
+						<div class="tw-table" id="faultMonitorTable"></div>
+						<!--<select class="form-control input-sm" v-model="queryServiceType" style="width: 100%;" @change="handleQueryClick">
+							<option v-for="item in serviceTypeOption" :value="item.id" v-text="item.text"></option>
+						</select>
+						&lt;!&ndash; 					<div class="btn btn-primary btn-block" style="margin-bottom: 10px;" @click="handleQueryClick">查&emsp;询</div> &ndash;&gt;
+						<el-tree :default-expanded-keys="realTimeMonitorTreeKeys" v-loading="realTimeMonitorTreeLoading" @node-click="clickFind" :data="realTimeMonitorTree" node-key="id" :default-checked-keys="realTimeMonitorTreeChecked" :auto-expand-parent="true" :default-expanded-keys="realTimeMonitorTreeExpanded"
+										 :expand-on-click-node="true" :style="{height: 'calc(100% - 30px)', overflow: 'auto'}" @node-contextmenu="rightContextmenu" ref="realTimeMonitorTreeobj">
+							<div class="custom-tree-node" slot-scope="{node, data}">
+								<i :class="node.icon"></i>
+								<span v-text="node.label" class=""></span>
+							</div>
+						</el-tree>
+						<div class="rightClickMenu" v-if="rightClickMenu.display" :style="{top: rightClickMenu.top+'px', left: rightClickMenu.left+'px'}" @click="handleRightContentMenuClick" @mouseleave="handleRightContentMenuMouseLeave">
+							<el-menu class="el-menu-vertical-demo">
+								<el-menu-item v-for="item in rightClickMenu.data" :key="item.id" :index="item.id" @click="item.click">
+									<i :class="item.icon"></i>
+									<span slot="title" v-text="item.title"></span>
+								</el-menu-item>
+							</el-menu>
+						</div>-->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="panel-layout" layout="center">
+		<div class="tw-map" id="map" v-loading="map.loading"></div>
+	</div>
+	<!-- /.modal -->
+</div>
+<script src="./zpjk.js"></script>
+</body>
+</html>

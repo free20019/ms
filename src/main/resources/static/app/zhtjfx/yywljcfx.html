@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>营运围栏进出分析</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<link rel="stylesheet" href="../../resources/style/css/yywljcfx.css">
+	<script src="../../resources/script/vue.min.js"></script>
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer,AMap.MouseTool"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+	<script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+	<style></style>
+</head>
+<body>
+<div id="root">
+	<div class="panel-layout" layout="header">
+		<div class="panel-queryBar" style="padding: 10px 20px 0;">
+			<form class="form-inline">
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="glyphicon glyphicon-calendar" type="icon"></i>
+						<input type="text" class="form-control" id="yywljcfx-wlmc" placeholder="围栏名称">
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="glyphicon glyphicon-calendar" type="icon"></i>
+						<input type="text" class="form-control" id="yywljcfx-datetimeStart" placeholder="开始时间">
+					</div>
+					<label>-</label>
+					<div type="calendar">
+						<i class="glyphicon glyphicon-calendar" type="icon"></i>
+						<input type="text" class="form-control" id="yywljcfx-datetimeEnd" placeholder="结束时间">
+					</div>
+					<a class="btn btn-primary btn-sm" @click="handleQueryClick">查询</a>
+					<a class="btn btn-primary btn-sm">导出</a>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="panel-wrapper" style="position: relative;">
+		<div class="panel-layout" :class="{fullScreen: mapFullScreen}" layout="left">
+			<div class="dataListPanel">
+				<div id="yywljcfxMap"></div>
+				<ul class="mapToolBar">
+					<li id="wlinsert" class="mapToolItem glyphicon glyphicon-plus"></li>
+				</ul>
+				<ul class="mapToolBar mapFullScreen">
+					<li class="mapToolItem iconfont" :class="[mapFullScreen ? 'icon-exit-fullscreen' : 'icon-fullscreen']" @click="handleMapFullScreenClick"></li>
+				</ul>
+			</div>
+		</div>
+		<div class="panel-layout" layout="center">
+			<div class="dataListPanel" style="padding: 10px;">
+				<div id="fenceTable"></div>
+			</div>
+		</div>
+		<div class="panel-layout" layout="bottom">
+			<div class="dataListPanel" style="padding: 10px;">
+				<div id="fenceDetailsTable"></div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="yywljcfx-dialog" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title" v-text="dialog.title"></h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal">
+						<div class="form-group">
+							<label class="col-sm-2 control-label">围栏名称</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" v-model="dialog.form.wlmc" placeholder="围栏名称">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">属性</label>
+							<div class="col-sm-10">
+								<select type="password" class="form-control" v-model="dialog.form.shux" placeholder="属性">
+									<option v-for="item in dialog.shuxOption"
+													:key="item.id"
+													:value="item.value"
+													v-text="item.label"></option>
+								</select>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+					<button type="button" class="btn btn-primary" @click="insert">保存</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+</div>
+<script>
+	(function (Vue, _, $) {
+		var vm = new Vue({
+			el: '#root',
+			data: function () {
+				return {
+					query: {},
+					map: null,
+					mapFullScreen: false,
+					mouseTool:null,
+					PointSimplifier:null,
+					area:[],
+					fence: {
+						fields: [
+							{name: 'ID', title: '序号', width: 50, align: 'center'},
+							{name: 'AREANAME', title: '围栏名称', width: 100, align: 'center'},
+							{name: 'COUNT', title: '数量', width: 50, align: 'center'},
+							{name: 'TYPE', title: '禁入禁出', width: 70, align: 'center'},
+							{name: 'caozuo', title: '操作',itemTemplate: this.del, width: 40}
+						]
+					},
+					fenceDetails: {
+						fields: [
+						     	{name: 'ID', title: '序号', width: 60, align: 'center'},
+						     	{name: 'AREA_ID', title: '区域id', width: 60, align: 'center',visible: false},
+								{name: 'AREANAME', title: '围栏名称', width: 160, align: 'center'},
+								{name: 'VEHICLE_NUM', title: '车牌号', width: 100, align: 'center'},
+								{name: 'JZ_TYPE', title: '禁入禁出', width: 100, align: 'center'},
+								{name: 'DBTIME', title: '进出围栏时间', width: 140, align: 'center'}
+						]
+					},
+					dialog: {
+						title: '添加围栏',
+						form: {
+							wlmc: '',
+							shux: ''
+						},
+						shuxOption: [
+							{id: 1, label: '禁入', value: '禁入'},
+							{id: 2, label: '禁出', value: '禁出'}
+						]
+					}
+				}
+			},
+			created: function () {
+				var _this = this;
+				this.$nextTick(function () {
+					$('#yywljcfx-datetimeStart').datetimepicker(dateDefaultOption);
+					$('#yywljcfx-datetimeEnd').datetimepicker(dateDefaultOption);
+					_this.map = new AMap.Map('yywljcfxMap', {
+						zoom:11,
+						viewMode:'3D'
+					});
+					//地图绘画围栏 在地图中添加MouseTool插件
+					_this.mouseTool = new AMap.MouseTool(_this.map);
+					AMap.event.addDomListener(document.getElementById('wlinsert'), 'click', function() {
+						_this.map.clearMap();
+						_this.mouseTool.polygon();
+			 	    }, false);
+					_this.mouseTool.on('draw', function(event) {
+						$('#yywljcfx-dialog').modal('show');
+				    });
+					
+					$('#yywljcfx-dialog').on('hidden.bs.modal', function (e) {
+						_this.dialog.form.wlmc = '';
+						_this.dialog.form.shux = '';
+					})
+				});
+			},
+			mounted: function () {
+				var _this = this;
+				this.$nextTick(function () {
+					_this.init();
+				});
+			},
+			methods: {
+				handleQueryClick: function () {
+					// 查询按钮
+					var _this = this;
+					$('#fenceDetailsTable').html('');
+					_this.map.clearMap();
+					_this.init();
+				},
+				handleMapFullScreenClick() {
+					this.mapFullScreen = !this.mapFullScreen;
+				},
+				del:function(_,item){
+					var _this = this;
+  					var style = {marginRight: '4px'};
+  					return [
+  						$('<a>').addClass('btn btn-danger btn-xs').text('删除').on('click', function () {
+  							layer.confirm('确定删除吗？',{btn:['确认','取消']},function(){
+  								jqxhr=$.ajax({
+  									url:"../../tjfx/wldel",
+	   								type :'post',
+	   								dataType :'json',
+	   								timeout :180000,
+	   								data :{"id" :item.AREA_ID},
+	   								success :function(data){
+	   									if(data.code == 0){
+	   										layer.msg('删除成功',{icon:1});
+	   										_this.init();
+	   										_this.map.clearMap();
+	   									}else{
+	   										layer.msg('删除失败',{icon:1});
+	   									}
+	   								}
+	   							});
+  							});
+  						})
+  					]
+				},
+				init: function() {
+					var _this = this;
+					$('#fenceTable').jsGrid({
+						width: '100%',
+						height: 'calc(100% - 35px)',
+						controller: {
+		                    loadData: function(filter) {
+		                    	var d = $.Deferred();
+		                    	var a = _this.res(filter, function(item){
+		                    		d.resolve(item);
+		                    	})
+		                    	return d.promise();
+		                    }
+		                },
+						rowClick: function(row) {
+							var item = row.item;
+							_this.getFenceDetails(item);
+						},
+						autoload: true,
+						paging: true,
+						pageLoading: true,
+						pageSize: 10,
+						pageIndex: 1,
+						fields: _this.fence.fields,
+						pagerContainer: null,
+					    pageButtonCount: 5,
+					    pagerFormat: "{first} {prev} {pages} {next} {last} {pageIndex} of {pageCount}",
+					    pagePrevText: "上一页",
+					    pageNextText: "下一页",
+					    pageFirstText: "第一页",
+					    pageLastText: "末页",
+					    pageNavigatorNextText: ">",
+					    pageNavigatorPrevText: "<"
+					});
+					
+					jqxhr=$.ajax({
+			     		type: "POST",
+			 	        url:"../../claq/qyjk",
+			 	        data:{},
+			 	        dataType: 'json',
+			 			timeout : 3600000,
+			 			success:function(data){
+			 				console.log(data)
+			 				if(data == null){
+// 			 					console.log("数据异常");
+			 				}else{
+			 					clgzvehilist = data.vehilist;
+			 					var qyjk = data;
+			 					
+			 					var on = new Array(), 
+			 					off = new Array(),
+			 					busy = new Array(),
+			 					empty = new Array(),
+			 					
+			 					all = new Array();
+			 					
+			 					for (var i = 0; i < clgzvehilist.length; i++) {
+			 						var ve  = clgzvehilist[i];
+			 						var s = {};
+			 						if(ve.longi < 0){continue;}
+			 						s.lnglat = [ve.longi,ve.lati];
+									s.name = ve.vehino;
+									s.compname = ve.compname;
+									s.simka = ve.simka;
+									s.mdt_no=ve.mdt_no;
+									s.ownname = ve.ownname;
+									s.owntel = ve.owntel;
+									s.longi = ve.longi;
+									s.lati = ve.lati;
+									s.speed = ve.speed;
+									s.time = ve.dateTime.substring(0,19);
+									s.heading = fxzh(ve.heading);
+									s.carState = ve.carState;
+			 						if (ve.lati == null || "" == ve.lati
+			 								|| 0==ve.lati
+			 								|| ""==ve.longi
+			 								|| 0 ==ve.longi 
+			 						) {
+			 							if(ve.lati != 0|| ve.longi !=0){
+			 								s.statue = "离线";
+			 								s.groupId = _this.dirc("off",ve.heading);
+			 								off.push(s);
+			 							}
+			 						} else {
+			 							if (ve.onoffstate=="1") {
+			 								if(ve.lati != 0|| ve.longi !=0){
+			 	 								if (ve.carStatus=="0") {
+			 	 									s.statue = "空车";
+			 	 									s.groupId = _this.dirc("empty",ve.heading);
+			 	 									empty.push(s);
+			 	 								} else {
+			 	 									s.statue = "重车";
+			 	 									s.groupId = _this.dirc("busy",ve.heading);
+			 	 									busy.push(s);
+			 	 								}
+			 	 								on.push(s);
+			 								}
+			 							} else if (ve.onoffstate=="0") {
+			 								if(ve.lati != 0|| ve.longi !=0){
+			 	 								s.statue = "离线";
+			 									s.groupId = _this.dirc("off",ve.heading);
+			 									off.push(s);
+			 								}
+			 							}
+			 						}
+			 						all.push(s);
+			 					}
+			 					_this.markvehi(all);
+			 				}
+			 			}
+					});
+				},
+				markvehi:function(obj){
+					var _this = this;
+					var PointSimplifier=null;
+					var pointSimplifierIns, groupStyleMap={};
+					
+					if(pointSimplifierIns != undefined){
+						pointSimplifierIns.setData(null);
+					}
+					AMapUI.load(['ui/misc/PointSimplifier', 'lib/$'], function(PointSimplifier, $) {
+				        if (!PointSimplifier.supportCanvas) {
+				            alert('当前环境不支持 Canvas！');
+				            return;
+				        }
+				        for (var i = 0; i < 8; i++) {
+					   		groupStyleMap[(i+1)] = {
+								    pointStyle: {
+								        content: PointSimplifier.Render.Canvas.getImageContent("../../resources/images/car/z"+(i+1)+".png"),
+								        width: 20,
+								        height: 20,
+								        offset: ['-50%', '-50%'],
+								        fillStyle: null
+								    }
+								};
+					   		groupStyleMap[(i+9)] = {
+								    pointStyle: {
+								        content: PointSimplifier.Render.Canvas.getImageContent("../../resources/images/car/l"+(i+1)+".png"),
+								        width: 20,
+								        height: 20,
+								        offset: ['-50%', '-50%'],
+								        fillStyle: null
+								    }
+								};
+					   		groupStyleMap[(i+17)] = {
+								    pointStyle: {
+								        content: PointSimplifier.Render.Canvas.getImageContent("../../resources/images/car/k"+(i+1)+".png"),
+								        width: 20,
+								        height: 20,
+								        offset: ['-50%', '-50%'],
+								        fillStyle: null
+								    }
+								};
+						}
+				    	pointSimplifierIns = new PointSimplifier({
+				            zIndex: 300,
+				            map: _this.map, // 所属的地图实例
+				            autoSetFitView:false,
+				            getPosition: function(item) {
+			            		return item.lnglat;
+				            },
+				            getHoverTitle: function(dataItem, idx) {
+// 				            	_this.remark(dataItem);
+				            	return null;
+				            },
+				            // 使用GroupStyleRender
+				            renderConstructor: PointSimplifier.Render.Canvas.GroupStyleRender,
+				            renderOptions: {
+				            	pointStyle: {
+				                    width: 5,
+				                    height: 5,
+				                    fillStyle:'#A2D0FA'
+				                },
+				                getGroupId: function(item, idx) {
+				                	return item.groupId;
+				                },
+				                groupStyleOptions: function(gid) {
+				                	return groupStyleMap[gid];
+				                }
+				            }
+				        });
+				    	pointSimplifierIns.setData(obj);
+				    	_this.map.setZoomAndCenter(11,[120.209561,30.245278])
+				    	pointSimplifierIns.on("pointClick",function(e,p){
+				    		_this.remark(p.data);
+				    	});
+				    });
+				},
+				dirc:function(e,obj){
+					if(e == "busy"){
+						if(obj==0||obj==360){
+							return 1;
+						}else if(obj==90){
+							return 2;
+						}else if(obj==180){
+							return 3;
+						}else if(obj==270){
+							return 4;
+						}else if(obj>0&&obj<90){
+							return 5;
+						}else if(obj>90&&obj<180){
+							return 6;
+						}else if(obj>180&&obj<270){
+							return 7;
+						}else if(obj>270&&obj<360){
+							return 8;
+						}
+					}else if(e == "off"){
+						if(obj==0||obj==360){
+							return 9;
+						}else if(obj==90){
+							return 10;
+						}else if(obj==180){
+							return 11;
+						}else if(obj==270){
+							return 12;
+						}else if(obj>0&&obj<90){
+							return 13;
+						}else if(obj>90&&obj<180){
+							return 14;
+						}else if(obj>180&&obj<270){
+							return 15;
+						}else if(obj>270&&obj<360){
+							return 16;
+						}
+					}else{
+						if(obj==0||obj==360){
+							return 17;
+						}else if(obj==90){
+							return 18;
+						}else if(obj==180){
+							return 19;
+						}else if(obj==270){
+							return 20;
+						}else if(obj>0&&obj<90){
+							return 21;
+						}else if(obj>90&&obj<180){
+							return 22;
+						}else if(obj>180&&obj<270){
+							return 23;
+						}else if(obj>270&&obj<360){
+							return 24;
+						}
+					}
+				},
+				remark:function(obj){
+					var _this = this;
+					var inforWindow = new AMap.InfoWindow({
+					    offset:new AMap.Pixel(0,0)
+					});
+					var t = obj.carState == "0"?"":"(非精确)";
+					var txt = '<div class="mapInfo-body">'+
+									'<div class="mapInfo-title">'+obj.name+t+'</div>'+
+									'<div class="mapInfo-item" type="mapInfoItem" title="所属公司">'+obj.compname+'</div>'+
+									'<div class="mapInfo-item" type="mapInfoItem" title="SIM卡">'+obj.simka+'</div>'+
+									'<div class="mapInfo-item" type="mapInfoItem" title="终端号">'+obj.mdt_no+'</div>'+
+									'<div class="mapInfo-item" type="mapInfoItem" title="车辆所属人">'+obj.ownname+'</div>'+
+									'<div class="mapInfo-item" type="mapInfoItem" title="联系电话">'+obj.owntel+'</div>'+
+									'<div class="mapInfo-item" type="mapInfoItem" title="经度">'+obj.longi+'</div>'+
+									'<div class="mapInfo-item" type="mapInfoItem" title="纬度">'+obj.lati+'</div>'+
+									'<div class="mapInfo-item" type="mapInfoItem" title="速度">'+obj.speed+'</div>'+
+									'<div class="mapInfo-item" type="mapInfoItem" title="方向">'+obj.heading+'</div>'+
+									'<div class="mapInfo-item" type="mapInfoItem" title="状态">'+obj.statue+'</div>'+
+									'<div class="mapInfo-item" type="mapInfoItem" title="GPS时间">'+obj.time+'</div>'+
+								'</div>';
+					inforWindow.setContent(txt);
+					inforWindow.open(_this.map,new AMap.LngLat(obj.longi,obj.lati));
+				},
+				initMap:function(obj,name){
+					var _this = this;
+					var polygonArr=new Array();//多边形覆盖物节点坐标数组   
+					var zbs = obj.split(";");
+					for(var i=0;i<zbs.length;i++){
+						var zb = zbs[i].split(",");
+						polygonArr.push(new AMap.LngLat(zb[0],zb[1]));   
+					}
+					polygonarea=new AMap.Polygon({     
+						path:polygonArr,//设置多边形边界路径  
+						strokeColor:"#1390fc", //线颜色  
+						// strokeOpacity:0.2, //线透明度   
+						strokeWeight:1,    //线宽   
+						fillColor: "#1390fc", //填充色
+				        fillOpacity: 0.2//填充透明度
+					});   
+					polygonarea.setMap(_this.map);  
+				 	var markerContent = document.createElement("div");
+				    markerContent.className = "txtstyle";
+				    markerContent.style.color = "#ef2222";
+				    markerContent.style.fontSize = "16px";
+					var markerSpan = document.createElement("span");
+					markerSpan.innerHTML = name;
+					markerContent.appendChild(markerSpan);
+// 					markerContent.onmouseover=function() {markerSpan.innerHTML = "区域名:"+name;};
+// 					markerContent.onmouseout=function() {markerSpan.innerHTML = "区域名:"+name;};
+				    markerarea = new AMap.Marker({
+					    map:_this.map,
+					    zIndex:10001, 
+					    position:new AMap.LngLat( zbs[0].split(",")[0],zbs[0].split(",")[1]),     
+					    offset:new AMap.Pixel(-14,7), //相对于基点的偏移位置
+					    draggable:false,  //是否可拖动
+					    content:markerContent  //自定义点标记覆盖物内容
+					});
+				},
+				res:function(filter,callback){
+					var _this = this;
+					var startIndex = (filter.pageIndex - 1) * filter.pageSize;
+					jqxhr=$.ajax({
+		     	        url:"../../tjfx/wl",
+		     	        data:{
+		     				"wlmc" : $('#yywljcfx-wlmc').val(),
+		     				"stime":$('#yywljcfx-datetimeStart').val(),
+		     				"etime":$('#yywljcfx-datetimeEnd').val(),
+		     				"pageIndex":filter.pageIndex,
+		     				"pageSize":filter.pageSize
+		     	        },
+		     	        dataType: 'json'
+		            }).done(function(json) {
+		            	console.log(json)
+		            	var wlData = [];
+	            		all = json.data[0].datas.length;
+	     				re = json.data[0].datas;
+	         			if(json.code == 0){
+	         				for(var i = 0; i< re.length ;i++){
+	         					var rs={};
+	         					rs.ID = startIndex+i+1;
+	         					rs.AREA_ID = re[i].ID;
+	         					rs.AREANAME =  re[i].AREANAME;
+	           					rs.COUNT =  re[i].COUNT||0;
+	         					rs.TYPE =  re[i].TYPE=="1"?"禁入":"禁出";
+	         					wlData.push(rs);
+	         					
+	         					_this.initMap(re[i].AREAPOINT,re[i].AREANAME);
+	         				}
+// 	         				_this.map.setFitView();
+	         				return callback({
+	                            data: wlData,
+	                            itemsCount: all
+	                        });
+	         			}else{
+	        			}
+		            }).fail(function() {
+// 		        		alert("数据异常");
+		            });
+				},
+				getFenceDetails: function (item) {
+					var _this = this;
+					$('#fenceDetailsTable').jsGrid({
+						width: '100%',
+						height: 'calc(100% - 35px)',
+						controller: {
+		                    loadData: function(filter) {
+		                    	var d = $.Deferred();
+		                    	var a = _this.resDetail(filter,item.TYPE,item.AREANAME ,function(item){
+		                    		d.resolve(item);
+		                    	})
+		                    	return d.promise();
+		                    }
+		                },
+						autoload: true,
+						paging: true,
+						pageLoading: true,
+						pageSize: 5,
+						pageIndex: 1,
+						fields: _this.fenceDetails.fields,
+						pagerContainer: null,
+					    pageButtonCount: 5,
+					    pagerFormat: "{first} {prev} {pages} {next} {last} {pageIndex} of {pageCount}",
+					    pagePrevText: "上一页",
+					    pageNextText: "下一页",
+					    pageFirstText: "第一页",
+					    pageLastText: "末页",
+					    pageNavigatorNextText: ">",
+					    pageNavigatorPrevText: "<"
+					});
+				},
+				resDetail:function(filter,e,name,callback){
+					var _this = this;
+					var startIndex = (filter.pageIndex - 1) * filter.pageSize;
+					jqxhr=$.ajax({
+		     	        url:"../../tjfx/wlDetail",
+		     	        data:{
+		     				"type" : e=="禁入"?1:0,
+     						"name":name,
+		     				"pageIndex":filter.pageIndex,
+		     				"pageSize":filter.pageSize
+		     	        },
+		     	        dataType: 'json'
+		            }).done(function(json) {
+		            	console.log(json)
+		            	var wlDataDetail = [];
+	            		all = json.data[0].count;
+	     				re = json.data[0].datas;
+	         			if(json.code == 0){
+	         				for(var i = 0; i< re.length ;i++){
+	         					var rs={};
+	         					rs.ID = startIndex+i+1;
+	           					rs.VEHICLE_NUM =  re[i].VEHICLE_NUM;
+	           					rs.AREANAME =  re[i].AREANAME;
+	           					rs.DBTIME =  formatYYYYMMDDHHMISS(re[i].DBTIME);
+	         					rs.JZ_TYPE =  re[i].JZ_TYPE=="1"?"禁入":"禁出";
+	         					wlDataDetail.push(rs);
+	         				}
+	         				_this.map.setFitView();
+	         				return callback({
+	                            data: wlDataDetail,
+	                            itemsCount: all
+	                        });
+	         			}else{
+	        			}
+		            }).fail(function() {
+// 		        		alert("数据异常");
+		            });
+				},
+				insert:function(){
+					var _this = this;
+					var area = "";
+					var obj = _this.map.getAllOverlays()[0].Qi.path;
+					for(var i=0;i<obj.length;i++){
+						area += obj[i].lng +",";
+						area += obj[i].lat;
+						if(i != obj.length -1){
+							area += ";";
+						}
+					}
+					console.log(area)
+					console.log( _this.dialog.form.shux)
+					console.log(_this.dialog.form.wlmc)
+					jqxhr=$.ajax({
+		     	        url:"../../tjfx/insertwl",
+		     	        data:{
+		     				"type" : _this.dialog.form.shux=="禁入"?1:0,
+		     				"name" : _this.dialog.form.wlmc,
+		     				"area" : area
+		     	        },
+		     	        dataType: 'json'
+		            }).done(function(data) {
+		            	console.log(data)
+		            	$('#yywljcfx-dialog').modal('hide');
+		 				if(data.msg == "数据异常"){
+// 		 					layer.msg("数据异常");
+		 					return;
+		 				}else{
+		 					layer.msg("添加成功");
+		 					setTimeout(function(){
+			 					_this.init();
+		 					},4000);
+		 				}
+		            });
+				}
+			}
+		});
+	})(Vue, _, jQuery)
+</script>
+</body>
+</html>
