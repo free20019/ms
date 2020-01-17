@@ -1,0 +1,486 @@
+(function (Vue, _, jQuery) {
+		var vm = new Vue({
+			el: '#root',
+			data: function () {
+				return {
+					type: 1,
+					queryLicensePlate: '',
+//					queryTimeoutStart: '',
+					queryTimeoutEnd: '',
+					queryButtonChange: 0,
+					currentPage: 0,
+					visibleLength: 0,
+					vehicleList: [],
+					map: null,
+					day:9,
+					//高德地图海量点ui
+					PointSimplifier:null,
+					pointSimplifierIns:null,
+					groupStyleMap:{},
+					realTimeMonitorMapLoading:false,
+					Ydqcount:0,
+					Jjdqcount:0,
+				}
+			},
+			mounted: function () {
+				var _this = this;
+				this.$nextTick(function () {
+					$('.scrollbar-macosx').scrollbar();
+//					var datetime_s = $('#wxclyj-datetimeStart');
+					var datetime_e = $('#wxclyj-datetimeEnd');
+//					datetime_s.datetimepicker(dateDefaultOption).on('changeDate', function (event) {
+//						_this.queryTimeoutStart = event.date;
+//					});
+					datetime_e.datetimepicker(dateDefaultOption).on('changeDate', function (event) {
+						_this.queryTimeoutEnd = event.date;
+					});
+					$('#wxclyj-datetimeEnd').val(new Date().Format('yyyy-MM-dd'));
+					var position = new AMap.LngLat(120.16378, 30.25840);//创建中心点坐标
+					_this.map = new AMap.Map('wxclyjMap', {
+						center : position,
+						level : 15,
+						resizeEnable : true
+					});
+					_this.vehicleListVisibleLength();
+					_this.getVehicleList();
+				});
+			},
+			computed: {
+				/* 查询车辆 */
+				findVehile: function () {
+					var _this=this;
+					var type = _this.type;
+					var input = _this.queryLicensePlate;
+//					var timeoutStart = _this.queryTimeoutStart;
+					var timeoutEnd = _this.queryTimeoutEnd;
+					if (_this.queryButtonChange) {/*此处不做任何操作，作用是点击查询按钮时触发这个方法*/}
+					if (input.length < 3) return false;
+					return _.filter(_this.vehicleList, function (item) {
+						if (!item || !input || item.VEHICLE_NO.indexOf(input) === -1 /*|| type !== item['到期类型']*/) return false;
+						if (timeoutEnd) {
+							var date = type === 1 ? new Date(item.DB_TIME) : new Date(item.DB_TIME);
+							if (timeoutEnd <= date) return false
+						}
+						return true
+					});
+				},
+				/* 总页数 */
+				vehicleListPage: function () {
+					return Math.ceil(this.findVehile.length / this.visibleLength)
+				},
+				/* 可显示的页数 */
+				currentDisplayPages: function () {
+					return this.currentPage * this.visibleLength - 1;
+				},
+				/* 判断加载按钮是否启用 */
+				hasDisabledLoadMoreButton: function () {
+					var allPage = this.vehicleListPage;
+					if (!allPage) return true;
+					return (this.currentPage >= this.vehicleListPage);
+				}
+			},
+			methods: {
+				/* 一页可现实多少条内容 */
+				vehicleListVisibleLength: function () {
+					var _this = this;
+					var vehicleListHeight = $(_this.$refs.scrollbar).height();
+					this.visibleLength = Math.floor(vehicleListHeight / 30);
+				},
+				getVehicleList: function () {
+					var _this = this;
+					var type=_this.type;
+					_this.realTimeMonitorMapLoading=true;
+					_this.jqxhr=$.ajax('../../sbwx/findclbj',{
+						type: 'GET',
+						data:{
+			 	        	"etime" : $('#wxclyj-datetimeEnd').val(),
+			 	        	"day" : _this.day,
+			 	        	"type" :type
+			 	        },
+						dataType: 'json'
+					}).then(function (res) {
+						if(""==res){
+							_this.$message.error('无数据！');
+							_this.realTimeMonitorMapLoading=false;
+//							return false;
+						}
+						_this.vehicleList = res;
+//						_this.resetFaultStatistics();
+						var zjgzArr= new Array();
+						var dwgzArr= new Array();
+						var txgzArr= new Array();	
+						var dhhcgzArr= new Array();
+						var sxtgzArr= new Array();
+						var zjncgzArr= new Array();
+						var jjqdkgzArr= new Array();
+						var dhpdkgzArr= new Array();
+						var kcdgzArr= new Array();
+						var dggzArr= new Array();
+						var arr= new Array();
+						_.each(res, function (item, index) {
+							var s = {};
+							var flag = 0;
+		 					if(item.hasOwnProperty('PX')&&item.hasOwnProperty('PY')){	
+		 						s.lnglat = [item.PX,item.PY];
+								s.name = item.VEHI_NO;
+								//主机故障
+								if (_this.hasZjgz(item)) {
+//									_this.faultStatistics.zjgz++;
+									flag++;
+									s.groupId = 1;
+									zjgzArr.push(s);
+								}
+//								//定位故障
+//								if (_this.hasDwgz(item)) {
+////									_this.faultStatistics.dwgz++;
+//									flag++;
+//									s.groupId = 2;
+//									dwgzArr.push(s);
+//								}
+//								//通信故障
+//								if (_this.hasTxgz(item)) {
+////									_this.faultStatistics.txgz++;
+//									flag++;
+//									s.groupId = 3;
+//									txgzArr.push(s);
+//								}
+//								//定位回传故障
+//								if (_this.hasDhhcgz(item)) {
+////									_this.faultStatistics.dhhcgz++;
+//									flag++;
+//									s.groupId = 4;
+//									dhhcgzArr.push(s);
+//								}
+								//摄像头故障
+								if (_this.hasSxtgz(item)) {
+//									_this.faultStatistics.sxtgz++;
+									flag++;
+									s.groupId = 5;
+									sxtgzArr.push(s);
+								}
+//								//视频主机/存储故障
+//								if (_this.hasZjncgz(item)) {
+////									_this.faultStatistics.zjncgz++;
+//									flag++;
+//									s.groupId = 6;
+//									zjncgzArr.push(s);
+//								}
+								//计价器断开故障
+								if (_this.hasJjqdkgz(item)) {
+//									_this.faultStatistics.jjqdkgz++;
+									flag++;
+									s.groupId = 7;
+									jjqdkgzArr.push(s);
+								}
+//								//导航屏断开故障
+//								if (_this.hasDhpdkgz(item)) {
+////									_this.faultStatistics.dhpdkgz++;
+//									flag++;
+//									s.groupId = 8;
+//									dhpdkgzArr.push(s);
+//								}
+//								//空车灯故障
+//								if (_this.hasKcdgz(item)) {
+////									_this.faultStatistics.kcdgz++;
+//									flag++;
+//									s.groupId = 9;
+//									kcdgzArr.push(s);
+//								}
+								// 多车故障
+								if(flag >= 1){									
+									arr.push(s);
+									if(flag > 1) {
+//									_this.faultStatistics.dggz++;
+										s.groupId = 10;
+										dggzArr.push(s);
+									}
+								}
+		 					}
+						});
+						if(type==1){
+							_this.Ydqcount=arr.length;
+							_this.Jjdqcount=0;
+						}else if(type==2){
+							_this.Jjdqcount=arr.length;
+							_this.Ydqcount=0
+						}
+//						_this.faultStatistics.total = res.length;
+						_this.markvehi(arr);
+						_this.realTimeMonitorMapLoading=false;
+					})
+				},
+				//打印
+				markvehi: function (obj){
+					var _this = this;
+					if(_this.pointSimplifierIns){
+						_this.pointSimplifierIns.setData(null);
+					}
+					AMapUI.load(['ui/misc/PointSimplifier', 'lib/$'], function(PointSimplifier, $) {
+				        if (!PointSimplifier.supportCanvas) {
+				            alert('当前环境不支持 Canvas！');
+				            return;
+				        }
+				        for (var i = 1; i <= 10; i++) {
+				        	_this.groupStyleMap[i] = {
+								    pointStyle: {
+								        content: PointSimplifier.Render.Canvas.getImageContent("../../resources/images/"+(i+400)+".png"),
+								        width: 16,
+								        height: 16,
+								        offset: ['-50%', '-50%'],
+								        fillStyle: null
+								    }
+								};
+						}
+				        _this.pointSimplifierIns = new PointSimplifier({
+				            zIndex: 40,
+				            map: _this.map, // 所属的地图实例
+				            getPosition: function(item) {
+			            		return item.lnglat;
+				            },
+				            getHoverTitle: function(dataItem, idx) {
+				                return '车牌: ' + dataItem.name;
+				            },
+				            // 使用GroupStyleRender
+				            renderConstructor: PointSimplifier.Render.Canvas.GroupStyleRender,
+				            renderOptions: {
+				            	pointStyle: {
+				            		width: 5,
+				                    height: 5,
+							        fillStyle: null
+				                },
+				                //鼠标hover时的title信息
+				                hoverTitleStyle: {
+				                	
+				                },
+				                getGroupId: function(item, idx) {
+				                	return item.groupId;
+				                },
+				                groupStyleOptions: function(gid) {
+				                	return _this.groupStyleMap[gid];
+				                }
+				            }
+				        });
+				    	//监听事件
+				        _this.pointSimplifierIns.on('pointClick', function(e, record) {
+				        	_this.vehicleMarker(record.data.name);
+				        });
+				        _this.pointSimplifierIns.setData(obj);
+				        _this.map.setZoomAndCenter(13,[120.209561,30.245278])
+				    });
+								
+				},
+				/* 将单个车辆的位置信息显示在地图上 */
+				addMapMarker: function(item) {
+					var _this = this;
+					if(!(item.hasOwnProperty('PX')&&item.hasOwnProperty('PY'))){	
+						_this.$message.error('该车辆无定位！');
+						return false;
+					}
+					if(this.mapMarker) this.mapMarker.setMap(null);
+					var markerContent = document.createElement('div');
+					markerContent.className = 'txtstyle';
+					//点标记中的图标
+					var markerImg = document.createElement('img');
+					markerImg.className = 'markerlnglat';
+					var count = 0;
+					var gz = '';
+//					//主机故障
+//					if (this.hasZjgz(item)){
+//						count++;
+//						gz +='主机故障(';
+//						if(parseInt(item.LOW_VOLTAGE)!==0) gz +='终端主电源欠压,';
+//						if(parseInt(item.NO_POWER)!==0) gz +='主电源掉电,';
+//						if(parseInt(item.NO_GPS)!==0) gz +='无定位数据,';
+//						if(parseInt(item.NO_UPLOAD)!==0) gz +='无数据上传,';
+//						gz +='),';
+//						markerImg.src='../../resources/images/401.png';
+//					}
+					//主机故障
+					if (this.hasZjgz(item)){
+						count++;
+						gz +='无定位数据(';
+						if(parseInt(item.NO_GPS)!==0) gz +='无定位数据';
+						gz +='),';
+						markerImg.src='../../resources/images/401.png';
+					}
+//					//定位故障
+//					if (this.hasDwgz(item)) {
+//						count++;
+//						gz += '定位故障(';
+//						if (parseInt(item.MOD_FAULT) !== 0) gz += '定位模块故障,';
+//						if (parseInt(item.ANT_FAULT) !== 0) gz += '天线短路,';
+//						if (parseInt(item.INEXACT) !== 0) gz += '非精确定位,';
+//						gz += '),';
+//						markerImg.src = '../../resources/images/402.png';
+//					}
+//					//通信故障
+//					if (this.hasTxgz(item)) {
+//						count++;
+//						gz += '通信故障(通讯故障),';
+//						markerImg.src = '../../resources/images/403.png';
+//					}
+					//定位回传故障
+					if (this.hasDhhcgz(item)) {
+						count++;
+						gz += '定位回传故障(';
+						if (parseInt(item.GPS_OVER_BACK) !== 0) gz += '定位回传过密,';
+						if (parseInt(item.GPS_NO_BACK) !== 0) gz += '回传数据丢失,';
+						gz += '),';
+						markerImg.src = '../../resources/images/404.png';
+					}
+					//摄像头故障
+					if (this.hasSxtgz(item)) {
+						count++;
+						gz += '摄像头故障(';
+						if (parseInt(item.CAM_OCCLUSION) !== 0) gz += '摄像头遮挡,';
+						if (parseInt(item.CAM_NOSIGN) !== 0) gz += '摄像头信号丢失,';
+						gz += '),';
+						markerImg.src = '../../resources/images/405.png';
+					}
+//					//视频主机/存储故障
+//					if (this.hasZjncgz(item)) {
+//						count++;
+//						gz += '视频主机/存储故障(';
+//						if (parseInt(item.HD_FAULT) !== 0) gz += '硬盘故障,';
+//						if (parseInt(item.SD_FAULT) !== 0) gz += 'SD卡故障,';
+//						if (parseInt(item.VD_FAULT) !== 0) gz += '视频主机故障,';
+//						if (parseInt(item.VD_EX_FAULT) !== 0) gz += '视频扩展故障,';
+//						gz += '),';
+//						markerImg.src = '../../resources/images/406.png';
+//					}
+					//计价器断开故障
+					if (this.hasJjqdkgz(item)) {
+						count++;
+						gz += '计价器断开故障(计价器连接断开),';
+						markerImg.src = '../../resources/images/407.png';
+					}
+//					//导航屏断开故障
+//					if (this.hasDhpdkgz(item)) {
+//						count++;
+//						gz += '导航屏断开故障(导航屏断开),';
+//						markerImg.src = '../../resources/images/408.png';
+//					}
+//					//空车灯故障
+//					if (this.hasKcdgz(item)) {
+//						count++;
+//						gz += '空车灯故障(';
+//						if (parseInt(item.ST_NO_CHG) !== 0) gz += '空重车不变化,';
+//						if (parseInt(item.ST_OVER_CHG) !== 0) gz += '空重车切换频繁,';
+//						gz += '),';
+//						markerImg.src = '../../resources/images/409.png';
+//					}
+					if(count>1) markerImg.src='../../resources/images/410.png';
+					markerContent.appendChild(markerImg);
+					this.mapMarker = new AMap.Marker({
+						map: this.map,
+						position: new AMap.LngLat(item.PX, item.PY),
+						offset: new AMap.Pixel(-7,-10), //相对于基点的偏移位置
+						draggable: false,  //是否可拖动
+						content: markerContent   //自定义点标记覆盖物内容
+					});
+					this.map.setCenter(new AMap.LngLat(item.PX,item.PY));
+					var txt = "<table><tr><td><b style='color:#3399FF'>"+item.VEHI_NO+"</b></td>" +
+						"<td></td></tr><tr><td><b>[所属业户]</b>："+item.COMP_NAME+"</td></tr>" +
+						"<tr><td><b>[车辆商标]</b>："+item.VT_NAME+"</td></tr>" +
+						"<tr><td><b>[车辆颜色]</b>："+item.VC_NAME+"</td></tr>" +
+						"<tr><td><b>[SIM卡]</b>："+item.SIM_NUM+"</td></tr>" +
+						"<tr><td><b>[车辆所属人]</b>："+(item.OWN_NAME==null?"":item.OWN_NAME)+"</td></tr>" +
+						"<tr><td><b>[联系电话]</b>："+(item.OWN_TEL==null?"":item.OWN_TEL)+"</td></tr>" +
+						"<tr><td><b>[经度]</b>："+item.PX+"</td></tr><tr><td><b>[纬度]</b>："+item.PY+"</td></tr>" +
+						"<tr><td><b>[故障类型]</b>："+gz+"</td></tr>" +
+						"<tr><td><b>[故障上传时间]</b>："+(item.DB_TIME==null?"":(new Date(item.DB_TIME)).Format("yyyy-MM-dd hh:mm:ss"))+"</td></tr>" +
+						"<tr><td><b>[故障地点]</b>："+item.ADDRESS+"</td></tr>" +
+						//			"<tr><td><b>[维修人员]</b>："+(item.WXRY==null?"":item.WXRY)+"</td></tr>" +
+						//			"<tr><td><b>[维修地点]</b>："+(item.RA_ADDR==null?"":item.RA_ADDR)+"</td></tr>" +
+						//			"<tr><td><b>[维修类型]</b>："+(item.RT_TYPE==null?"":item.RT_TYPE)+"</td></tr>" +
+						"<tr><td><b>[经纬度上传时间]</b>："+(item.STIME==null?"":(new Date(item.STIME)).Format("yyyy-MM-dd hh:mm:ss"))+"</td></tr>" +
+						//			"<tr><td><b>[维修完成时间]</b>："+(item.RR_TIME_END==null?"":(new Date(item.RR_TIME_END)).Format("yyyy-MM-dd hh:mm:ss"))+"</td></tr>" +
+						"";
+					if(item.OWN_TEL!=null){
+						txt +="<tr><td><a href='javascript:void(0);' onclick='findjgtz(\""+item.OWN_TEL+"\");'>警告通知</a></td></tr>";
+					}
+					var info = [];
+					info.push(txt);
+					var inforWindowone = new AMap.InfoWindow({
+						offset: new AMap.Pixel(3, 0),
+						content: info.join("</table>")
+					});
+					inforWindowone.open(this.map, this.mapMarker.getPosition());
+					AMap.event.addListener(this.mapMarker, "click", function (e) {
+						inforWindowone.open(_this.map, _this.mapMarker.getPosition());
+					});
+				},
+				/* 点击车辆图标,在地图上显示该车辆的当前信息 */
+				vehicleMarker: function (vehicle) {
+					var _this = this;
+					jqxhr=$.ajax({
+						type: 'POST',
+						url: '../../sbwx/vhicmarker2',
+						data: {
+							vehi_no: vehicle
+						},
+						dataType: 'json',
+						timeout: 180000,
+						success: function (res) {
+							_.each(res, function (item) {
+								_this.addMapMarker(item)
+							});
+						},
+						error: function () {
+						}
+					});
+				},
+				handleYdqiClick: function() {
+					this.type = 1;
+				},
+				handleJjdqClick: function() {
+					this.type = 2;
+				},
+				handleQueryClick: function () {
+					this.getVehicleList();
+				},
+				/* 故障车辆-跳转对应地图的车辆位置 */
+				handleJumpVehicleClick: function (item) {
+					this.addMapMarker(item);
+				},
+				/* 故障车辆-加载更多按钮 */
+				handleVehicleLoadMoreClick: function() {
+					this.currentPage++;
+				},
+				hasZjgz: function(item) {
+					return parseInt(item.NO_GPS) !== 0 
+				},
+				hasDwgz: function (item) {
+					return parseInt(item.MOD_FAULT) !== 0 || parseInt(item.ANT_FAULT) !== 0 ||
+						parseInt(item.INEXACT) !== 0
+				},
+				hasTxgz: function (item) {
+					return parseInt(item.COMM_FAULT) !== 0
+				},
+				hasDhhcgz: function (item) {
+					return parseInt(item.GPS_OVER_BACK) !== 0 || parseInt(item.GPS_NO_BACK) !== 0
+				},
+				hasSxtgz: function(item) {
+					return parseInt(item.CAM_OCCLUSION) !== 0 || parseInt(item.CAM_NOSIGN) !== 0
+				},
+				hasZjncgz: function(item) {
+					return parseInt(item.HD_FAULT) !== 0 || parseInt(item.SD_FAULT) !== 0||
+						parseInt(item.VD_FAULT) !== 0|| parseInt(item.VD_EX_FAULT) !== 0
+				},
+				hasJjqdkgz: function(item) {
+					return parseInt(item.METER_DISCONN) !== 0
+				},
+				hasDhpdkgz: function (item) {
+					return parseInt(item.NAV_DISCONN) !== 0
+				},
+				hasKcdgz: function (item) {
+					return parseInt(item.ST_NO_CHG) !== 0 || parseInt(item.ST_OVER_CHG) !== 0
+				}
+			},
+			watch: {
+				queryLicensePlate: function () {
+					this.currentPage = 1
+				}
+			}
+		})
+	})(Vue, _, jQuery);

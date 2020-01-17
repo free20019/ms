@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>接入</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<link rel="stylesheet" href="../../resources/style/css/yjzhcz/access.css">
+	<script src="../../resources/script/vue.min.js"></script>
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="../../resources/script/moment.min.js"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.min.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer,AMap.OverView"></script>
+</head>
+<body>
+<div class="template-wrapper" id="root">
+	<form class="form-inline query-bar form-group-sm">
+		<div class="form-group">
+			<input type="text" v-model="query.theme" class="form-control" placeholder="主题">
+		</div>
+		<div class="form-group">
+			<button type="button" class="btn btn-primary btn-sm" @click="handleQueryClick">查询</button>
+			<button type="button" class="btn btn-primary btn-sm" @click="handleAddClick">添加</button>
+		</div>
+	</form>
+	<div class="dataListPanel center" style="height: 220px; margin-bottom: 10px;">
+		<div id="accessTable" class="jsgrid"></div>
+	</div>
+	<div class="tw-layout" style="height: calc(100% - 280px);">
+		<div class="tw-layout-left">
+			<div class="dataListPanel center">
+				<div class="header"><i class="iconfont icon-sound"></i>&nbsp;报警内容</div>
+				<div class="content">
+					<div class="scrollbar-macosx">
+						{{selectTableItem.SJJL}}
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="tw-layout-main">
+			<div class="dataListPanel center" style="padding: 0;">
+				<div id="amap" class="template-map"></div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="accessDialog" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title" v-text="dialog.title"></h4>
+				</div>
+				<div class="modal-body">
+					<div class="tw-layout" style="height: 400px;">
+						<div class="tw-layout-left">
+							<div class="scrollbar-macosx">
+								<form class="form-group-sm">
+									<div class="form-group">
+										<label class="form-label">事件编号</label>
+										<input v-model="dialogForm.sjbh" class="form-control" placeholder="事件编号">
+									</div>
+									<div class="form-group">
+										<label class="form-label">事件主题</label>
+										<input v-model="dialogForm.sjzt" class="form-control" placeholder="事件主题">
+									</div>
+									<div class="form-group">
+										<label class="form-label">发生地址</label>
+										<input v-model="dialogForm.fsdz" class="form-control" id="fsdz" placeholder="发生地址" disabled>
+									</div>
+									<div class="form-group">
+										<label class="form-label">经纬度</label>
+										<input v-model="dialogForm.jwdxx" class="form-control" placeholder="经纬度" disabled>
+									</div>
+									<div class="form-group">
+										<label class="form-label">报警人</label>
+										<input v-model="dialogForm.bjr" class="form-control" placeholder="报警人">
+									</div>
+									<div class="form-group">
+										<label class="form-label">报警电话</label>
+										<input v-model="dialogForm.bjdh" class="form-control" placeholder="报警电话">
+									</div>
+									<div class="form-group">
+										<label class="form-label">接警人</label>
+										<input v-model="dialogForm.jjr" class="form-control" placeholder="接警人">
+									</div>
+									<div class="form-group">
+										<label class="form-label">事件级别</label>
+										<select v-model="dialogForm.sjjb" class="form-control" placeholder="事件级别">
+											<option v-for="item in eventLevelOption" :key="item.id" v-text="item.value"
+															:value="item.value"></option>
+										</select>
+									</div>
+									<div class="form-group">
+										<label class="form-label">接警方式</label>
+										<select v-model="dialogForm.bjfs" class="form-control" placeholder="接警方式">
+											<option v-for="item in alarmModeOption" :key="item.id" v-text="item.value"
+															:value="item.value"></option>
+										</select>
+									</div>
+									<div class="form-group" style="position: relative;">
+										<label class="form-label" style="position: absolute; top: 5px; left: 0;">报警内容</label>
+										<textarea v-model="dialogForm.bjnr" class="form-control" placeholder="报警内容"
+															style="margin-left: 75px;"></textarea>
+									</div>
+									<div class="form-group" style="position: relative;">
+										<label class="form-label" style="position: absolute; top: 5px; left: 0;">事件记录</label>
+										<textarea v-model="dialogForm.sjjl" class="form-control" placeholder="事件记录"
+															style="margin-left: 75px;"></textarea>
+									</div>
+								</form>
+							</div>
+						</div>
+						<div class="tw-layout-main">
+							<div class="dataListPanel center" style="padding: 0;">
+								<div id="dialog-amap" class="template-map"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+					<button type="button" class="btn btn-primary"  @click="handleCommitClick">保存</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+</div>
+<script>
+	(function (Vue, _, $, moment) {
+		var vm = new Vue({
+			el: '#root',
+			data: function () {
+				return {
+					query: {
+						theme: ''
+					},
+					table: {
+						fields: [
+							{ name: "gId", title: "序号", width: 60 },
+							{ name: "TIME", title: "时间", itemTemplate: this.formatDate, width: 160 },
+							{ name: "SJZT", title: "主题", width: 200 },
+							{ name: "BJR", title: "报警人", width: 120 },
+							{ name: "DJDH", title: "报警人电话", width: 140 },
+							{ name: "JJR", title: "接警人", width: 120 },
+							{ name: "SJJB", title: "事件级别", width: 120 },
+							{ name: "SH", title: "状态", itemTemplate: this.formatReview, width: 120 },
+							{ title: "操作", itemTemplate: this.tableItemHtml, width: 120 }
+						],
+						data: []
+					},
+					selectTableItem: {},
+					map: null,
+					mapMarker: '',
+					itemXY: {},
+					geocoder:null,
+					eventLevelOption: [
+						{id: 1, value: '一级'},
+						{id: 2, value: '二级'},
+						{id: 3, value: '三级'}
+					],
+					alarmModeOption: [
+						{id: 1, value: '电话报警'},
+						{id: 2, value: '短信报警'},
+						{id: 3, value: '110联动'},
+						{id: 4, value: '12328转入'},
+						{id: 5, value: '12345转入'},
+						{id: 6, value: '领导指定'},
+						{id: 7, value: '相关部门指定'},
+						{id: 8, value: '系统预警'}
+					],
+					dialog: {
+						title: '',
+						map: null
+					},
+					dialogForm: {
+						id: '',
+						sjbh: '',
+						sjzt: '',
+						fsdz: '',
+						jwdxx: '',
+						bjr: '',
+						bjdh: '',
+						jjr: '',
+						sjjb: '',
+						bjfs: '',
+						bjnr: '',
+						sjjl: ''
+					}
+				}
+			},
+			mounted: function () {
+				var _this = this;
+				this.$nextTick(function () {
+					$('.scrollbar-macosx').scrollbar();
+					$("#accessTable").jsGrid({
+						height: "100%",
+						width: "100%",
+						noDataContent: '未查询到数据',
+						fields: _this.table.fields,
+						rowClick: _this.handleTableItemClick
+					});
+
+					$('#accessDialog').on('hidden.bs.modal', function () {
+						_this.dialogForm.id = '';
+						_this.dialogForm.sjbh = '';
+						_this.dialogForm.sjzt = '';
+						_this.dialogForm.fsdz = '';
+						_this.dialogForm.jwdxx = '';
+						_this.dialogForm.bjr = '';
+						_this.dialogForm.bjdh = '';
+						_this.dialogForm.jjr = '';
+						_this.dialogForm.sjjb = '';
+						_this.dialogForm.bjfs = '';
+						_this.dialogForm.bjnr = '';
+						_this.dialogForm.sjjl = '';
+					})
+
+					_this.map = new AMap.Map('amap', {
+						zoom:14,
+						center: [120.209561,30.245278],
+						resizeEnable: true,
+						mapStyle: 'amap://styles/normal'
+					});
+					_this.dialog.map = new AMap.Map('dialog-amap', {
+						zoom:14,
+						center: [120.209561,30.245278],
+						resizeEnable: true,
+						mapStyle: 'amap://styles/normal'
+					});
+
+					_this.getAccess();
+				})
+			},
+			methods: {
+				// 异步
+				getAccess: function () {
+					var theme = this.query.theme;
+					var fields = this.table.fields;
+					$.ajax({
+						url: '../../Yjzh/fingyjsjjr',
+						type: 'GET',
+						dataType: 'json',
+						data: {
+							sjzt: theme
+						}
+					}).then(function (res) {
+						var data = _.map(res, function (item, index) {
+							item.gId = index + 1;
+							return item;
+						})
+						console.info('getAccess:', res)
+						$("#accessTable").jsGrid({
+							data: res
+						})
+					})
+				},
+				addAccess: function() {	
+					var _this=this;
+					if(this.dialogForm.jwdxx==''){
+						layer.msg('经纬度必须填写');
+						return false;
+					}
+					if(this.dialogForm.sjbh==''){
+						layer.msg('编号必须填写');
+						return false;
+					}
+					if(this.dialogForm.sjzt==''){
+						layer.msg('主题必须填写');
+						return false;
+					}
+					if(this.dialogForm.bjnr==''){
+						layer.msg('内容必须填写');
+						return false;
+					}
+					if(this.dialogForm.sjjl==''){
+						layer.msg('记录必须填写');
+						return false;
+					}
+					if(this.dialog.title=='添加'){
+						$.ajax({
+							url: '../../Yjzh/jrsave',
+							type: 'POST',
+							dataType: 'json',
+							data: {
+								postData: JSON.stringify({
+									sjbh: this.dialogForm.sjbh,
+									sjzt: this.dialogForm.sjzt,
+									fsdz: this.dialogForm.fsdz,
+									jwdxx:this.dialogForm.jwdxx,
+									bjr: this.dialogForm.bjr,
+									bjdh: this.dialogForm.bjdh,
+									jjr: this.dialogForm.jjr,
+									sjjb: this.dialogForm.sjjb,
+									bjfs: this.dialogForm.bjfs,
+									bjnr: this.dialogForm.bjnr,
+									sjjl: this.dialogForm.sjjl
+								})
+							}
+						}).then(function (res) {
+							if(res>0){
+	  							layer.msg('添加成功',{icon:1});
+	  							$('#accessDialog').modal('hide');
+	  							_this.handleQueryClick();
+	  						}else{
+	                            layer.msg('添加失败',{icon:1});
+							}
+						})
+					}else if(this.dialog.title=='修改'){
+						$.ajax({
+							url: '../../Yjzh/jrUpdate',
+							type: 'POST',
+							dataType: 'json',
+							data: {
+								postData: JSON.stringify({
+									sjbh: this.dialogForm.sjbh,
+									sjzt: this.dialogForm.sjzt,
+									fsdz: this.dialogForm.fsdz,
+									jwdxx:this.dialogForm.jwdxx,
+									bjr: this.dialogForm.bjr,
+									bjdh: this.dialogForm.bjdh,
+									jjr: this.dialogForm.jjr,
+									sjjb: this.dialogForm.sjjb,
+									bjfs: this.dialogForm.bjfs,
+									bjnr: this.dialogForm.bjnr,
+									sjjl: this.dialogForm.sjjl,
+									id: this.dialogForm.id
+								})
+							}
+						}).then(function (res) {
+							if(res>0){
+	  							layer.msg('修改成功',{icon:1});
+	  							$('#accessDialog').modal('hide');
+	  							_this.handleQueryClick();
+	  						}else{
+	                            layer.msg('修改失败',{icon:1});
+							}
+						})
+					}
+					
+				},
+				// 事件
+				handleQueryClick: function () {
+					this.getAccess();
+				},
+				handleAddClick: function() {
+					var _this=this;
+					_this.dialog.title = '添加';
+					$('#accessDialog').modal('show');
+					//点击地图获取坐标
+					var map=_this.dialog.map;
+					map.on('click', function(e) {
+						_this.dialogForm.jwdxx = e.lnglat.getLng() + ',' + e.lnglat.getLat();
+						_this.itemXY.PX=e.lnglat.getLng();
+						_this.itemXY.PY=e.lnglat.getLat();
+						_this.addMapMarker(_this.itemXY,map);
+						var lnglat=[];
+						lnglat.push(_this.itemXY.PX);
+						lnglat.push(_this.itemXY.PY);
+						_this.regeoCode(lnglat);
+				    });
+				},
+				handleEditClick: function(item) {
+					this.dialog.title = '修改';
+					$('#accessDialog').modal('show');
+					var _this=this;
+					_this.dialogForm.id = item.ID;
+					_this.dialogForm.sjbh = item.SJBH;
+					_this.dialogForm.sjzt = item.SJZT;
+					_this.dialogForm.fsdz = item.ADDRESS;
+					_this.dialogForm.jwdxx = item.PX + ',' + item.PY;
+					_this.dialogForm.bjr = item.BJR;
+					_this.dialogForm.bjdh = item.DJDH;
+					_this.dialogForm.jjr = item.JJR;
+					_this.dialogForm.sjjb = item.SJJB;
+					_this.dialogForm.bjfs = item.BJFS;
+					_this.dialogForm.bjnr = item.SJNR;
+					_this.dialogForm.sjjl = item.SJJL;
+					var map=_this.dialog.map;
+					//将位置信息显示在地图上
+					_this.addMapMarker(item,map);
+					//点击地图获取坐标
+					map.on('click', function(e) {
+						_this.dialogForm.jwdxx = e.lnglat.getLng() + ',' + e.lnglat.getLat();
+						_this.itemXY.PX=e.lnglat.getLng();
+						_this.itemXY.PY=e.lnglat.getLat();
+						_this.addMapMarker(_this.itemXY,map);
+						var lnglat=[];
+						lnglat.push(_this.itemXY.PX);
+						lnglat.push(_this.itemXY.PY);
+						_this.regeoCode(lnglat);
+				    });
+				},
+				handleRzshClick: function(item) {
+					var _this=this;
+					layer.confirm('确认审核吗 ？',{btn:['确认','取消']
+						},function(){
+						$.ajax({
+							url: '../../Yjzh/jrRzsh',
+							type: 'POST',
+							dataType: 'json',
+							data: {
+								id:item.ID
+							}
+						}).then(function (res) {
+							if(res>0){
+	  							layer.msg('审核成功',{icon:1});
+	  							_this.handleQueryClick();
+	  						}else{
+	                            layer.msg('审核失败',{icon:1});
+							}
+						})
+					},function(){
+					})
+				},
+				handleDeleteClick: function(item) {
+					var _this=this;
+					layer.confirm('确认删除吗 ？',{btn:['确认','取消']
+					},function(){
+						$.ajax({
+							url: '../../Yjzh/jrDelete',
+							type: 'POST',
+							dataType: 'json',
+							data: {
+								id:item.ID
+							}
+						}).then(function (res) {
+							if(res>0){
+	  							layer.msg('删除成功',{icon:1});
+	                            _this.handleQueryClick();
+	  						}else{
+	                            layer.msg('删除失败',{icon:1});
+							}
+						})
+					},function(){
+					})
+				},
+				handleTableItemClick: function(row) {
+					console.info('handleTableItemClick:', row)
+					var item = row.item;
+					this.selectTableItem = item;//.SJJL;
+					var map=this.map;
+					this.addMapMarker(item,map);
+				},
+				handleCommitClick: function() {
+					this.addAccess();
+				},
+				/* 将位置信息显示在地图上 */
+				addMapMarker: function(item,map) {
+					if(this.mapMarker) this.mapMarker.setMap(null);
+					this.mapMarker = new AMap.Marker({
+						map: map,
+						position: new AMap.LngLat(item.PX, item.PY),
+					});
+					map.setCenter(new AMap.LngLat(item.PX,item.PY));
+				},
+				/* 返回地理位置 */
+				regeoCode: function (lnglat) {
+					var _this=this;
+			        if(!_this.geocoder){
+			        	_this.geocoder = new AMap.Geocoder({
+			                city: "010", //城市设为北京，默认：“全国”
+			                radius: 1000 //范围，默认：500
+			            });
+			        }
+			        _this.geocoder.getAddress(lnglat, function(status, result) {
+			            if (status === 'complete'&&result.regeocode) {
+			            	document.getElementById('fsdz').value=result.regeocode.formattedAddress;
+			            	_this.dialogForm.fsdz=document.getElementById('fsdz').value;
+			            }else{
+			            }
+			        });
+			    },
+				mapToPosition: function() {
+				   this.map.on('click', function(e) {
+				        document.getElementById("lnglat").value = e.lnglat.getLng() + ',' + e.lnglat.getLat()
+				    });
+				},
+				// 格式
+				tableItemHtml: function(_, item) {
+					var _this = this;
+					var verify = $('<a>').addClass('btn btn-link btn-xs iconfont icon-rzsh').attr('title', '核实').on('click', function (e) {
+						e.stopPropagation();
+						_this.handleRzshClick(item);
+					});
+					var edit = $('<a>').addClass('btn btn-link btn-xs iconfont icon-edit').attr('title', '修改').on('click', function (e) {
+						e.stopPropagation();
+						_this.handleEditClick(item);
+					});
+					var remove = $('<a>').addClass('btn btn-link btn-xs iconfont icon-delete').attr('title', '删除').on('click', function (e) {
+						e.stopPropagation();
+						_this.handleDeleteClick(item);
+					});
+					return $('<span>').append(verify).append(edit).append(remove);
+				},
+				formatDate: function(date) {
+					console.info('formatDate:', date)
+					return moment(date).format('YYYY-MM-DD');
+				},
+				formatReview: function (type) {
+					switch (type) {
+						case 0:
+							return '未核实';
+						case 1:
+							return '已核实'
+					}
+				}
+			}
+		})
+	})(Vue, _, jQuery, moment);
+</script>
+</body>
+</html>

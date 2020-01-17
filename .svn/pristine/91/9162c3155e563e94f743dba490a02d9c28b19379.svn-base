@@ -1,0 +1,593 @@
+var clfb_map;
+(function (Vue, _, $) {
+	$(function () {
+		var vm = new Vue({
+			el: '#leftVehiclePanel',
+			data: function () {
+				return {
+					display: true,
+					areaList: [],
+					vehicleList: [],
+					selectAreaVehicleTitle: '',
+					selectAreaVehicleList: [],
+					vehicleSearch: '',
+					selectVehicleInfo: null
+				}
+			},
+			mounted: function() {
+				var _this = this;
+				this.$nextTick(function() {
+					_this.getQyjk();
+				})
+			},
+			computed: {
+				filterVehile: function() {
+					var vehicle = this.vehicleSearch;
+					return _.filter(this.vehicleList, function (item) {
+						return item.vehino.indexOf(vehicle) >= 0 && vehicle.length > 0;
+					})
+				}
+			},
+			methods: {
+				getQyjk: function () {
+					var _this = this;
+					$.ajax({
+						type: "POST",
+						url: "../../claq/qyjk",
+						data: {},
+						dataType: 'json',
+						timeout: 3600000
+					}).then(function (res) {
+						console.log('getQyjk:', res);
+						_this.areaList = res.arealist;
+						_this.vehicleList = res.vehilist;
+						init();
+					});
+				},
+				handleAreaItemClick: function (item) {
+					this.selectAreaVehicleTitle = item.areaname;
+					this.selectAreaVehicleList = _.map(item.all, function (item, index) {
+						var _item = item.split(';');
+						return {vehicle: _item[0], address: _item[1]};
+					});
+					polygon(item);
+				},
+				handleAreaVehicleReturnClick: function () {
+					this.selectAreaVehicleTitle = '';
+					this.selectAreaVehicleList = [];
+				},
+				handleVehicleSearchClick: function () {
+					this.selectVehicleInfo = null;
+				},
+				handleVehicleItemClick: function (item) {
+					this.selectVehicleInfo = item;
+				},
+				handleAreaVehicleReturnSingleClick:function(item){
+					var _this = this;
+					var a=_this.vehicleList;
+					var s = {},b='';
+					console.log(item)
+					for(var i=0;i<a.length;i++){
+						if(item.vehicle == a[i].vehino){
+							console.log(b)
+							b=a[i];
+							s.name = b.vehino;
+							s.compname = b.compname;
+							s.simka = b.simka;
+							s.mdt_no=b.mdt_no;
+							s.ownname = b.ownname;
+							s.owntel = b.owntel;
+							s.longi = b.longi;
+							s.lati = b.lati;
+							s.speed = b.speed;
+							s.time = b.dateTime.substring(0,19);
+							s.heading = fxzh(b.heading);
+							
+							if (b.lati == null || "" == b.lati
+									|| 0==b.lati
+									|| ""==b.longi
+									|| 0 ==b.longi 
+							) {
+								if(b.lati != 0|| b.longi !=0){
+									s.statue = "离线";
+								}
+							} else {
+								if (b.onoffstate=="1") {
+									if(b.lati != 0|| b.longi !=0){
+		 								if (b.carStatus=="0") {
+		 									s.statue = "空车";
+		 								} else {
+		 									s.statue = "重车";
+		 								}
+									}
+								} else if (b.onoffstate=="0") {
+									if(b.lati != 0|| b.longi !=0){
+		 								s.statue = "离线";
+									}
+								}
+							}
+							remark(s);
+						}
+					}
+				},
+				handleDwClick: function (item) {
+					// 定位
+					var s = {};
+					s.name = item.vehino;
+					s.compname = item.compname;
+					s.simka = item.simka;
+					s.mdt_no=item.mdt_no;
+					s.ownname = item.ownname;
+					s.owntel = item.owntel;
+					s.longi = item.longi;
+					s.lati = item.lati;
+					s.speed = item.speed;
+					s.time = item.dateTime.substring(0,19);
+					s.heading = fxzh(item.heading);
+					
+					if (item.lati == null || "" == item.lati
+								|| 0==item.lati
+								|| ""==item.longi
+								|| 0 ==item.longi 
+					) {
+						if(item.lati != 0|| item.longi !=0){
+							s.statue = "离线";
+						}
+					} else {
+						if (item.onoffstate=="1") {
+							if(item.lati != 0|| item.longi !=0){
+ 								if (item.carStatus=="0") {
+ 									s.statue = "空车";
+ 								} else {
+ 									s.statue = "重车";
+ 								}
+							}
+						} else if (item.onoffstate=="0") {
+							if(item.lati != 0|| item.longi !=0){
+ 								s.statue = "离线";
+							}
+						}
+					}
+					remark(s);
+				},
+				handleGjhfClick: function (item) {
+					// 历史轨迹
+					var vehi = item.vehino;
+					var _parent = parent.$(window.parent.document);
+					if (_parent.find('.ip-tabBarItem[data-name="gjhfgz"]').length > 0) {
+						_parent.find('.ip-tabBarItem[data-name="gjhfgz"]').trigger('click');
+						_parent.find('#gjhfgz').get(0).contentWindow.location.reload(true);
+					}
+					_parent.find('#defaultVehi').val(vehi);
+					_parent.find('.ip-menuItem [data-skip="gjhfgz"]').trigger("click");
+				},
+				switchDisplay: function() {
+					this.display = !this.display;
+				},
+				defaultNumber: function (num) {
+					return parseInt(num) || 0;
+				},
+				length: function (list, split) {
+					if (split) return list.split(split).length;
+					else return list.length;
+				}
+			},
+			watch: {
+				vehicleSearch: function () {
+					this.selectVehicleInfo = null;
+				}
+			}
+		});
+		$('#clfbMapLeftPanel').Tab({},{});
+		$('#btnLeftVehicle').on('click', function () {
+			vm.switchDisplay();
+		})
+		$('.scrollbar-macosx').scrollbar();
+		
+		$('.mapToolBar .mapToolTitle').on('click', function () {
+			var mapToolItem = $(this).parent();
+			if (mapToolItem.hasClass('active')) {
+				mapToolItem.removeClass('active');
+			} else {
+				mapToolItem.addClass('active').siblings('.active').removeClass('active');
+			}
+		});
+
+		clfb_map = new AMap.Map('clfbMap', {
+			zoom:14,
+			center: [120.209561,30.245278],
+			resizeEnable: true,
+			mapStyle: 'amap://styles/normal',
+//			viewMode:'3D'
+		});
+		
+		var trafficLayer = new AMap.TileLayer.Traffic({
+			'autoRefresh': true,     //是否自动刷新，默认为false
+			'interval': 180,         //刷新间隔，默认180s
+	    });
+
+		clfb_map.add(trafficLayer); //通过add方法添加图层
+		trafficLayer.hide();
+		
+		//实时路况
+		var lkpd = false;
+		AMap.event.addDomListener(document.getElementById('lk'), 'click', function() {
+		  if (lkpd) {
+		      trafficLayer.hide();
+		      lkpd = false;
+		  } else {
+		      trafficLayer.show();
+		      lkpd = true;
+		  }
+		}, false);
+		
+		var overView = new AMap.OverView({
+	        visible: false
+	    });
+	    clfb_map.addControl(overView);
+	    overView.show();
+		
+		var PointSimplifier=null;
+		var pointSimplifierIns, groupStyleMap={};
+		var polygonarea=null;
+		
+//		jqxhr=$.ajax({
+//     		type: "POST",
+// 	        url:"../../claq/qyjk",
+// 	        data:{},
+// 	        dataType: 'json',
+// 			timeout : 3600000,
+// 			success:function(data){
+// 				console.log(data)
+// 				if(data == null){
+//// 					console.log("数据异常");
+// 				}else{
+		function init(){
+ 					clgzvehilist = vm.vehicleList;
+ 					
+ 					var ons=0,offs=0,busys=0,emptys=0,off1s=0,off2s=0,off3s=0;
+ 					var on = new Array(), 
+ 					off = new Array(),
+ 					busy = new Array(),
+ 					empty = new Array(),
+ 					
+ 					off1 = new Array(),
+ 					off2 = new Array(),
+ 					off3 = new Array(),
+ 					
+ 					all = new Array();
+ 					
+ 					for (var i = 0; i < clgzvehilist.length; i++) {
+ 						var ve  = clgzvehilist[i];
+ 						var s = {};
+ 						if(ve.longi < 0){continue;}
+ 						s.lnglat = [ve.longi,ve.lati];
+						s.name = ve.vehino;
+						s.compname = ve.compname;
+						s.simka = ve.simka;
+						s.mdt_no=ve.mdt_no;
+						s.ownname = ve.ownname;
+						s.owntel = ve.owntel;
+						s.longi = ve.longi;
+						s.lati = ve.lati;
+						s.speed = ve.speed;
+						s.time = ve.dateTime.substring(0,19);
+						s.heading = fxzh(ve.heading);
+ 						if (ve.lati == null || "" == ve.lati
+ 								|| 0==ve.lati
+ 								|| ""==ve.longi
+ 								|| 0 ==ve.longi 
+ 						) {
+ 							offs++;
+ 							if(ve.lati != 0|| ve.longi !=0){
+ 								
+ 								s.statue = "离线";
+ 								s.groupId = dirc("off",ve.heading);
+ 								off.push(s);
+ 								if(!check(ve.dateTime,1)){
+ 									off1.push(s);
+ 									if(!check(ve.dateTime,3)){
+ 	 									off2.push(s);
+ 	 									if(!check(ve.dateTime,7)){
+ 	 	 									off3.push(s);
+ 	 									}
+ 									}
+ 								}
+ 							}
+ 						} else {
+ 							if (ve.onoffstate=="1") {
+ 								if (ve.carStatus=="0") {
+ 									emptys++;
+ 								} else {
+ 									busys++;
+ 								}
+ 								if(ve.lati != 0|| ve.longi !=0){
+ 	 								if (ve.carStatus=="0") {
+ 	 									s.statue = "空车";
+ 	 									s.groupId = dirc("empty",ve.heading);
+ 	 									empty.push(s);
+ 	 								} else {
+ 	 									s.statue = "重车";
+ 	 									s.groupId = dirc("busy",ve.heading);
+ 	 									busy.push(s);
+ 	 								}
+ 	 								on.push(s);
+ 								}
+ 								ons++;
+ 							} else if (ve.onoffstate=="0") {
+ 								if(!check(ve.dateTime,1)){
+ 									off1s++;
+ 									if(!check(ve.dateTime,3)){
+ 										off2s++;
+ 	 									if(!check(ve.dateTime,7)){
+ 	 										off3s++;
+ 	 									}
+ 									}
+ 								}
+ 								if(ve.lati != 0|| ve.longi !=0){
+ 	 								s.statue = "离线";
+ 									s.groupId = dirc("off",ve.heading);
+ 									off.push(s);
+ 									if(!check(ve.dateTime,1)){
+ 	 									off1.push(s);
+ 	 									if(!check(ve.dateTime,3)){
+ 	 	 									off2.push(s);
+ 	 	 									if(!check(ve.dateTime,7)){
+ 	 	 	 									off3.push(s);
+ 	 	 									}
+ 	 									}
+ 	 								}
+ 								}
+ 								offs++;
+ 							}
+ 						}
+ 						all.push(s);
+ 					}
+ 					
+// 					console.log("all:"+all.length)
+ 					markvehi(on);
+ 					
+ 					$('.all').html(clgzvehilist.length);
+ 					$('.online').html(ons);
+ 					$('.busy').html(busys);
+ 					$('.empty').html(emptys);
+ 					$('.down').html(offs);
+ 					$('.down1').html(off1s);
+ 					$('.down2').html(off2s);
+ 					$('.down3').html(off3s);
+ 					
+ 					$('.online').on('click',function(){
+ 						markvehi(on);
+ 					});
+ 					$('.busy').on('click',function(){
+ 						markvehi(busy);
+ 					});
+ 					$('.empty').on('click',function(){
+ 						markvehi(empty);
+ 					});
+ 					$('.down').on('click',function(){
+ 						markvehi(off);
+ 					});
+ 					$('.down1').on('click',function(){
+ 						markvehi(off1);
+ 					});
+ 					$('.down2').on('click',function(){
+ 						markvehi(off2);
+ 					});
+ 					$('.down3').on('click',function(){
+ 						markvehi(off3);
+ 					});
+ 					
+ 					
+ 					$('#clfb-licensePlate').on('change',function(){
+ 						var n = $('#clfb-licensePlate option:selected').html();
+ 						for (var i = 0; i < all.length; i++) {
+ 							if(all[i].name == n){
+ 								remark(all[i]);
+ 							}
+ 						}
+ 					});
+		}	
+// 				}
+// 			}
+//		});
+		
+		
+		//打印
+		function markvehi(obj){
+			if(pointSimplifierIns != undefined){
+				pointSimplifierIns.setData(null);
+			}
+			AMapUI.load(['ui/misc/PointSimplifier', 'lib/$'], function(PointSimplifier, $) {
+		        if (!PointSimplifier.supportCanvas) {
+		            alert('当前环境不支持 Canvas！');
+		            return;
+		        }
+		        for (var i = 0; i < 8; i++) {
+			   		groupStyleMap[(i+1)] = {
+						    pointStyle: {
+						        content: PointSimplifier.Render.Canvas.getImageContent("../../resources/images/car/z"+(i+1)+".png"),
+						        width: 20,
+						        height: 20,
+						        offset: ['-50%', '-50%'],
+						        fillStyle: null
+						    }
+						};
+			   		groupStyleMap[(i+9)] = {
+						    pointStyle: {
+						        content: PointSimplifier.Render.Canvas.getImageContent("../../resources/images/car/l"+(i+1)+".png"),
+						        width: 20,
+						        height: 20,
+						        offset: ['-50%', '-50%'],
+						        fillStyle: null
+						    }
+						};
+			   		groupStyleMap[(i+17)] = {
+						    pointStyle: {
+						        content: PointSimplifier.Render.Canvas.getImageContent("../../resources/images/car/k"+(i+1)+".png"),
+						        width: 20,
+						        height: 20,
+						        offset: ['-50%', '-50%'],
+						        fillStyle: null
+						    }
+						};
+				}
+		    	pointSimplifierIns = new PointSimplifier({
+		            zIndex: 300,
+		            map: clfb_map, // 所属的地图实例
+		            getPosition: function(item) {
+	            		return item.lnglat;
+		            },
+		            getHoverTitle: function(dataItem, idx) {
+//		            	remark(dataItem);
+//		            	return null;
+		            },
+		            // 使用GroupStyleRender
+		            renderConstructor: PointSimplifier.Render.Canvas.GroupStyleRender,
+		            renderOptions: {
+		            	pointStyle: {
+		                    width: 5,
+		                    height: 5,
+		                    fillStyle:'#A2D0FA'
+		                },
+		                getGroupId: function(item, idx) {
+		                	return item.groupId;
+		                },
+		                groupStyleOptions: function(gid) {
+		                	return groupStyleMap[gid];
+		                }
+		            }
+		        });
+		    	pointSimplifierIns.setData(obj);
+		    	clfb_map.setZoomAndCenter(13,[120.209561,30.245278])
+		    	
+		    	pointSimplifierIns.on("pointClick",function(e,p){
+		    		remark(p.data);
+		    	});
+		    	
+		    });
+		}
+		
+		//区域
+		function polygon(obj){
+			if(polygonarea!=null){
+				polygonarea.setMap(null);
+			}
+			console.log(obj)
+			var polygonArr=new Array();//多边形覆盖物节点坐标数组   
+			var zbs = obj.areazbs.split(";");
+			for(var i=0;i<zbs.length;i++){
+				var zb = zbs[i].split(",");
+				polygonArr.push(new AMap.LngLat(zb[0],zb[1]));   
+			}
+			polygonarea=new AMap.Polygon({     
+				path:polygonArr,//设置多边形边界路径  
+				strokeColor:"#57a993", //线颜色  
+				// strokeOpacity:0.2, //线透明度   
+				strokeWeight:1,    //线宽   
+				fillColor: "#5f5757", //填充色
+		        fillOpacity: 0.35//填充透明度
+			});   
+			polygonarea.setMap(clfb_map);  
+			clfb_map.setCenter(polygonArr[0]);
+		}
+ 					
+		
+		function remark(obj){
+			var inforWindow = new AMap.InfoWindow({
+			    offset:new AMap.Pixel(0,0)
+			});
+			var txt = '<div class="mapInfo-body">'+
+							'<div class="mapInfo-title">'+obj.name+'</div>'+
+							'<div class="mapInfo-item" type="mapInfoItem" title="所属公司">'+obj.compname+'</div>'+
+							'<div class="mapInfo-item" type="mapInfoItem" title="SIM卡">'+obj.simka+'</div>'+
+							'<div class="mapInfo-item" type="mapInfoItem" title="终端号">'+obj.mdt_no+'</div>'+
+							'<div class="mapInfo-item" type="mapInfoItem" title="车辆所属人">'+obj.ownname+'</div>'+
+							'<div class="mapInfo-item" type="mapInfoItem" title="联系电话">'+obj.owntel+'</div>'+
+							'<div class="mapInfo-item" type="mapInfoItem" title="经度">'+obj.longi+'</div>'+
+							'<div class="mapInfo-item" type="mapInfoItem" title="纬度">'+obj.lati+'</div>'+
+							'<div class="mapInfo-item" type="mapInfoItem" title="速度">'+obj.speed+'</div>'+
+							'<div class="mapInfo-item" type="mapInfoItem" title="方向">'+obj.heading+'</div>'+
+							'<div class="mapInfo-item" type="mapInfoItem" title="状态">'+obj.statue+'</div>'+
+							'<div class="mapInfo-item" type="mapInfoItem" title="GPS时间">'+obj.time+'</div>'+
+						'</div>';
+			inforWindow.setContent(txt);
+			inforWindow.open(clfb_map,new AMap.LngLat(obj.longi,obj.lati));
+			clfb_map.setCenter(new AMap.LngLat(obj.longi,obj.lati));
+		}
+		
+		
+		//判断方向
+		function dirc(e,obj){
+			if(e == "busy"){
+				if(obj==0||obj==360){
+					return 1;
+				}else if(obj==90){
+					return 2;
+				}else if(obj==180){
+					return 3;
+				}else if(obj==270){
+					return 4;
+				}else if(obj>0&&obj<90){
+					return 5;
+				}else if(obj>90&&obj<180){
+					return 6;
+				}else if(obj>180&&obj<270){
+					return 7;
+				}else if(obj>270&&obj<360){
+					return 8;
+				}
+			}else if(e == "off"){
+				if(obj==0||obj==360){
+					return 9;
+				}else if(obj==90){
+					return 10;
+				}else if(obj==180){
+					return 11;
+				}else if(obj==270){
+					return 12;
+				}else if(obj>0&&obj<90){
+					return 13;
+				}else if(obj>90&&obj<180){
+					return 14;
+				}else if(obj>180&&obj<270){
+					return 15;
+				}else if(obj>270&&obj<360){
+					return 16;
+				}
+			}else{
+				if(obj==0||obj==360){
+					return 17;
+				}else if(obj==90){
+					return 18;
+				}else if(obj==180){
+					return 19;
+				}else if(obj==270){
+					return 20;
+				}else if(obj>0&&obj<90){
+					return 21;
+				}else if(obj>90&&obj<180){
+					return 22;
+				}else if(obj>180&&obj<270){
+					return 23;
+				}else if(obj>270&&obj<360){
+					return 24;
+				}
+			}
+		}
+		
+		//判断时间大于多少天
+		function check(e ,d){
+			var date = e;
+			date = date.substring(0,19);    
+			date = date.replace(/-/g,'/'); 
+			var timestamp = new Date(date).getTime();
+			var now = new Date().getTime();
+			if(timestamp > (now- d*24*3600*1000)){
+				return true;
+			}else{
+				return false;
+			}
+		}
+	})
+})(Vue, _, jQuery)

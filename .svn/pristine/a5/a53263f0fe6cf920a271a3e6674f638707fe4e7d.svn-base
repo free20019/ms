@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>滞留车辆监控</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer,AMap.MouseTool"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+
+<!-- 	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script> -->
+<!-- 	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script> -->
+    <script src="../../resources/script/jsgrid/jsgrid.core.js"></script>
+    <script src="../../resources/script/jsgrid/jsgrid.load-indicator.js"></script>
+    <script src="../../resources/script/jsgrid/jsgrid.load-strategies.js"></script>
+    <script src="../../resources/script/jsgrid/jsgrid.sort-strategies.js"></script>
+    <script src="../../resources/script/jsgrid/jsgrid.field.js"></script>
+
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="./wzcx.js"></script>
+
+	<style>
+		.panel-layout[layout='left'] {
+			width: 100%;
+		}
+		.panel-layout[layout='left'] ~ .panel-layout[layout='center'] {
+			width: calc(100% - 500px);
+			margin-left: 500px;
+		}
+
+		.panel-title {
+			height: calc(100% - 20px);
+		}
+
+		.list-header[type='fluid'] {
+			line-height: 47px;
+			display: flex;
+			padding: 0 10px;
+			border-bottom: 1px solid #9aa3fd;
+		}
+		.list-bodyer[type='fluid'] {
+			padding: 0 10px;
+			margin-bottom: 0;
+		}
+		.list-bodyer[type='fluid'] .listItem {
+			display: flex;
+		}
+		.list-bodyer[type='fluid'] .listItem:not(:last-child) {
+			border-bottom: 1px solid #ccd1fe;
+		}
+		.list-header[type='fluid'] .item-col,
+		.list-bodyer[type='fluid'] .item-col {
+			align-items: end;
+			display: flex;
+			flex: .65;
+			justify-content:center;
+		}
+		.list-header[type='fluid'] .item-col[type='vehicleNum'],
+		.list-bodyer[type='fluid'] .item-col[type='vehicleNum'] {
+			align-items: end;
+			display: flex;
+			flex: .35;
+			justify-content:center;
+		}
+		.list-bodyer[type='fluid'] .item-col {
+			height: 30px;
+			line-height: 30px;
+		}
+		.list-header[type='fluid'] .item-col:not(:last-child),
+		.list-bodyer[type='fluid'] .item-col:not(:last-child) {
+			position: relative;
+		}
+		.list-header[type='fluid'] .item-col:not(:last-child):after,
+		.list-bodyer[type='fluid'] .item-col:not(:last-child):after {
+			content: '';
+			position: absolute;
+			top: 50%;
+			right: 0;
+			border-right: 1px solid #9aa3fd;
+			transform: translate(-50%, -50%);
+		}
+		.list-header[type='fluid'] .item-col:not(:last-child):after {
+			top: 58%;
+			height: 40%;
+		}
+		.list-bodyer[type='fluid'] .item-col:not(:last-child):after {
+			height: 45%;
+		}
+		.list-header[type='fluid'] .item-col[type='labelName'],
+		.list-bodyer[type='fluid'] .item-col[type='labelName'] {
+			flex: 1;
+			width: 130px;
+		}
+		.list-bodyer[type='fluid'] .item-col[type='labelName'] {
+			justify-content: left;
+			overflow: hidden;
+			font-size: 14px;
+		}
+		.list-bodyer[type='fluid'] .item-col.icon-location:before {
+			margin-left: -2px;
+			margin-right: 2px;
+			font-size: 16px;
+			color: #fe5c87;
+		}
+		.list-header[type='fluid'] .item-col[type='vehicleNum'],
+		.list-bodyer[type='fluid'] .item-col[type='vehicleNum'] {
+		}
+		.list-header[type='fluid'] .item-col[type='alarmsNum'],
+		.list-bodyer[type='fluid'] .item-col[type='alarmsNum'] {
+		}
+		.scrollbar-macosx {
+			height: calc(100% - 45px);
+		}
+		.item-col{
+			overflow: hidden;
+			white-space: nowrap;
+		}
+		#wzcxTable {margin-top: 10px;}
+
+		/* dialog style */
+		#wzcx-dialog .modal-dialog {width: 900px;}
+		.modal-body form {}
+		.modal-body .panel-heading + .panel-body {padding-bottom: 0;}
+		.modal-body .control-label {display: inline-block;width: 7em;text-align: right;}
+		.modal-body .control-label, .modal-body .form-control {display: inline-block;margin-bottom: 15px;}
+		textarea.form-control {resize: none;}
+		.ip-type-input div.form-control, .ip-type-text input.form-control, .ip-type-text select.form-control, .ip-type-text textarea.form-control, .ip-type-text .select2.select2-container {display: none;}
+		.ip-type-text div.form-control {width: 168px;}
+		#wzcx-dialog textarea.form-control, #wzcx-dialog textarea.form-control + div.form-control {
+			width: calc(100% - 104px);
+			height: 50px;
+		}
+	</style>
+</head>
+<body>
+<div class="panel-wrapper" id="wzcxPanel" style="position: relative;">
+	<div class="panel-layout" layout="center">
+		<div class="dataListPanel" style="padding: 15px;">
+			<div class="card panel-queryBar" border="left" color="red">
+				<div class="form-inline">
+					<div class="form-group form-group-sm">
+						<select id="wzcx_cph" class="select2" style="width: 150px;" data-placeholder="车牌号"><option/></select>
+<!-- 						<input type="text" class="form-control" style="width: 150px;" placeholder="车牌号" id="wzcx_cph"> -->
+						<input type="text" class="form-control" style="width: 150px;" placeholder="当事人姓名" id="wzcx_xm">
+						<input type="text" class="form-control" style="width: 150px;" placeholder="从业资格证号" id="wzcx_cyzgz">
+						<input type="text" class="form-control" style="width: 150px;" placeholder="经营许可证号" id="wzcx_jyxkzh">
+						<input type="text" class="form-control" style="width: 150px;" placeholder="执法区域" id="wzcx_area">
+						<input type="text" class="form-control" style="width: 150px;" placeholder="执法部门" id="wzcx_part">
+						<input type="text" class="form-control" id="wzcx_datetimeStart" placeholder="违章开始时间">
+						<input type="text" class="form-control" id="wzcx_datetimeEnd" placeholder="违章结束时间">
+<!-- 						<select class="form-control" id="wzcx_area" data-placeholder="执法区域"><option></select> -->
+<!-- 						<select class="form-control" id="wzcx_part" data-placeholder="执法部门"><option></select> -->
+						<a class="btn btn-primary btn-sm" id="wzcx_cx">查询</a>
+						<a class="btn btn-primary btn-sm" id="wzcx_dc">导出</a>
+<!-- 						<a class="btn btn-primary btn-sm" id="wzcx-add">添加</a> -->
+					</div>
+				</div>
+			</div>
+			<div id="wzcxTable"></div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="wzcx-dialog" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">服务违章</h4>
+			</div>
+			<div class="modal-body" style="height: 400px; overflow-y: auto;">
+				<form class="form-inline ip-type-input" id="wzcx-dialog-form">
+					<div class="panel panel-default">
+						<div class="panel-heading">当事人基本信息</div>
+						<div class="panel-body">
+							<div class="form-group form-group-sm" id="wzcx-dialog-ximi">
+								<label class="control-label">姓名:</label>
+								<input type="text" class="form-control" placeholder="姓名">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="wzcx-dialog-zjhm">
+								<label class="control-label">证件号码:</label>
+								<input type="text" class="form-control" placeholder="证件号码">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="wzcx-dialog-jyfw">
+								<label class="control-label">出生日期:</label>
+								<input type="text" class="form-control" placeholder="出生日期">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="wzcx-dialog-lxdh">
+								<label class="control-label">联系电话:</label>
+								<input type="text" class="form-control" placeholder="联系电话">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="wzcx-dialog-txdz">
+								<label class="control-label">通讯地址:</label>
+								<input type="text" class="form-control" placeholder="通讯地址">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="wzcx-dialog-yhmc">
+								<label class="control-label">业户名称:</label>
+								<input type="text" class="form-control" placeholder="业户名称">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="wzcx-dialog-yhdz">
+								<label class="control-label">业户地址:</label>
+								<input type="text" class="form-control" placeholder="业户地址">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="wzcx-dialog-yyxk">
+								<label class="control-label">营运许可证:</label>
+								<input type="text" class="form-control" placeholder="营运许可证">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="wzcx-dialog-cyzg">
+								<label class="control-label">从业资格证:</label>
+								<input type="text" class="form-control" placeholder="从业资格证">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="wzcx-dialog-icka">
+								<label class="control-label">IC卡分值:</label>
+								<input type="text" class="form-control" placeholder="IC卡分值">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+						</div>
+					</div>
+					<div class="panel panel-default" style="margin-bottom: 0;">
+						<div class="panel-heading">违章信息</div>
+						<div class="panel-body">
+							<div class="form-group form-group-sm" id="wzcx-dialog-zfjg">
+								<label class="control-label">执法机构:</label>
+								<input type="text" class="form-control" placeholder="执法机构">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="wzcx-dialog-zfbm">
+								<label class="control-label">执法部门:</label>
+								<input type="text" class="form-control" placeholder="执法部门">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="wzcx-dialog-zfre">
+								<label class="control-label">执法人:</label>
+								<input type="text" class="form-control" placeholder="执法人">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="wzcx-dialog-ajlb">
+								<label class="control-label">案件类别:</label>
+								<input type="text" class="form-control" placeholder="案件类别">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="wzcx-dialog-ajzt">
+								<label class="control-label">案件状态:</label>
+								<input type="text" class="form-control" placeholder="案件状态">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="wzcx-dialog-ajyy" style="width: 100%;">
+								<label class="control-label">案件原由:</label>
+								<textarea type="text" class="form-control" placeholder="案件原由"></textarea>
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="wzcx-dialog-kouf">
+								<label class="control-label">扣分:</label>
+								<input type="text" class="form-control" placeholder="扣分">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="wzcx-dialog-fkje">
+								<label class="control-label">罚款金额:</label>
+								<input type="text" class="form-control" placeholder="罚款金额">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="wzcx-dialog-zfsj">
+								<label class="control-label">执法时间:</label>
+								<input type="text" class="form-control" placeholder="执法时间">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="wzcx-dialog-wzsj">
+								<label class="control-label">违章时间:</label>
+								<input type="text" class="form-control" placeholder="违章时间">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="wzcx-dialog-clys">
+								<label class="control-label">更新时间:</label>
+								<input type="text" class="form-control" placeholder="更新时间">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+							<div class="form-group form-group-sm" id="wzcx-dialog-clda">
+								<label class="control-label">更新人:</label>
+								<input type="text" class="form-control" placeholder="更新人">
+								<div type="text" class="form-control">&nbsp;</div>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" id="wzcx-dialog-save">提交</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+</body>
+</html>

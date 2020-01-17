@@ -1,0 +1,264 @@
+;(function($) {
+	var all = 0,re;
+
+    var ycclcxTable = [
+        {name: 'gridId', title: '序号', width: 120, align: 'center'},
+        {name: 'COMP_NAME', title: '公司', width: 160,align:'center'},
+        {name: 'VEHI_NO', title: '车号', width: 120,align:'center'},
+        {name: 'VEHI_SIM', title: 'SIM卡号', width: 150,align:'center'},
+        {name: 'OWN_NAME', title: '联系人', width: 150,align:'center'},
+        {name: 'HOME_TEL', title: '联系电话', width: 150,align:'center'}
+    ];
+    var wsxclFields = [
+        {name: 'gridId', title: '序号', width: 120, align: 'center'},
+        {name: 'COMP_NAME', title: '公司', width: 160,align:'center'},
+        {name: 'VEHI_NO', title: '车号', width: 120,align:'center'},
+        {name: 'VEHI_SIM', title: 'SIM卡号', width: 140,align:'center'},
+        {name: 'OWN_NAME', title: '联系人', width: 120,align:'center'},
+        {name: 'HOME_TEL', title: '联系电话', width: 140,align:'center'},
+        {name: 'TIM', title: '最后汇报时间', width: 150,align:'center'}
+    ];
+
+
+    function hxx(){
+        $('#ycclcxTable').jsGrid({
+            width: '100%',
+            height: 'calc(100% - 55px)',
+            autoload: true,
+            paging: true,
+            pageLoading: true,
+            pageSize: 15,
+            pageIndex: 1,
+            controller: {
+                loadData: function(filter) {
+                    var d = $.Deferred();
+                    var a = res(filter, function(item){
+                        d.resolve(item);
+                    })
+                    return d.promise();
+                }
+            },
+
+            pagerContainer: null,
+            pageButtonCount: 5,
+            pagerFormat: "{first} {prev} {pages} {next} {last} {pageIndex} of {pageCount}",
+            pagePrevText: "上一页",
+            pageNextText: "下一页",
+            pageFirstText: "第一页",
+            pageLastText: "末页",
+            pageNavigatorNextText: ">",
+            pageNavigatorPrevText: "<"
+        });
+    }
+
+    function res(filter, callback){
+    	if($("#ycclcx-exceptionType").val()=='2'&&( $("#ycclcx-datetimeStart").val()==""||$("#ycclcx-datetimeEnd").val()=="")){
+    		layer.msg("请输入日期");
+    		return ;
+    	}
+        console.log(filter)
+        var startIndex = (filter.pageIndex - 1) * filter.pageSize;
+        jqxhr=$.ajax({
+            url:"../../getFindycclcxs",
+            data:{
+                "start" : $("#ycclcx-datetimeStart").val(),
+                "stop" : $("#ycclcx-datetimeEnd").val(),
+                "yhmc" : $("#ycclcx-carNumber").val(),
+                "id":$("#ycclcx-exceptionType").val(),
+                "pageIndex":filter.pageIndex,
+                "pageSize":filter.pageSize
+            },
+            dataType: 'json'
+        }).done(function(json) {
+            var xxfbData = [];
+
+            all = json.data[0].count;
+            re = json.data[0].datas;
+
+            for(var i=0;i<re.length;i++){
+                var iterm=re[i];
+                iterm.gridId=startIndex+i+1;
+
+            }
+
+            if(json.code == 0){
+                /*for(var i = 0; i< re.length ;i++){
+                    var rs={};
+                    rs.title =  re[i].BT;
+                    rs.content =  re[i].NR;
+                      rs.datetime =  re[i].FBRQ;
+                    rs.type =  re[i].LB;
+                    xxfbData.push(rs);
+                }*/
+                return callback({
+                    data: re,
+                    itemsCount: all
+                });
+            }else{
+            }
+        }).fail(function() {
+//            alert("数据异常");
+        });
+    }
+
+
+    
+    $(function () {
+    	$(".select2").select2({  
+		  	language: "zh-CN",  //设置 提示语言
+	        tags:true,  
+	        createTag:function (decorated, params) {  
+	            return null;  
+	        },  
+	    });
+    	var startDate = $('#ycclcx-datetimeStart');
+    	startDate.datetimepicker({
+    		language:  'zh-CN',
+    		format: 'yyyy-mm-dd',
+    		autoclose: 1,
+    		startView: 2,
+    		minView: 2,
+            endDate:new Date(new Date()-24*60*60*1000),
+        });
+    	startDate.val(new Date(new Date()-24*60*60*1000).Format('yyyy-MM-dd'));
+        $('#ycclcx-datetimeEnd').datetimepicker({
+        	language:  'zh-CN',
+        	format: 'yyyy-mm-dd',
+        	autoclose: 1,
+            startView: 2,
+        	minView: 2,
+            endDate:new Date(new Date()-24*60*60*1000),
+        });
+        $('#ycclcx-datetimeEnd').val(new Date(new Date()-24*60*60*1000).Format('yyyy-MM-dd'));
+        $('.addTimePeriod, .period').on('click', function () {
+            if ($(this).hasClass('addTimePeriod')) $(this).addClass('period').removeClass('addTimePeriod');
+            else if ($(this).hasClass('period')) $(this).addClass('addTimePeriod').removeClass('period');
+        });
+        $('#ycclcx-exceptionType').select2({
+            language: 'zh-CN',
+            width: '160',
+            minimumResultsForSearch: -1,
+            data: [
+                {id: '1', text: '无营运数据车辆'},
+                {id: '2', text: '未上线车辆'}
+            ]
+        });
+
+
+
+
+
+//        jqxhr=$.ajax({
+//            type:'post',
+//            url:basePath+ "getFindycclcxsName",
+//            data:{"name":$("#ycclcx-carNumber").val()},
+//            dataType:'json',
+//            timeout:3600000,
+//            success:function (json) {
+//                var data=json.data;
+//                for(var i=0;i<data.length;i++){
+//                    data[i].id=data[i].COMP_NAME;
+//                    data[i].text=data[i].COMP_NAME;
+//
+//                }
+//                var fh={};
+//                fh.id="filter";
+//                fh.text="全部";
+//                data.unshift(fh);
+//                $('#ycclcx-carNumber').select2({
+//                    language:'zh-CN',
+//                    width: '160',
+//                    allowClear:true,
+//                    data:data
+//                });
+//
+//            }
+//
+//        })
+        jqxhr=$.ajax({
+			type: "POST",
+			url:"../../wsfw/qycomp",
+			data:{},
+			dataType: 'json',
+			timeout : 3600000,
+			success:function(json){
+				var data= json.datacomp;
+				for (var i = 0; i < data.length; i++) {
+					data[i].id=data[i].FGS;
+					data[i].text=data[i].FGS;
+				}
+				var qb={};
+				qb.id='null';
+				qb.text='全部';
+				data.unshift(qb);
+				$('#ycclcx-carNumber').select2({
+					data: data,
+					allowClear: true
+					});
+			}
+		});
+        /*  $("#ycclcx-carNumber").select2({
+
+              language: 'zh-CN',
+              width: '160',
+              ajax:{
+                  url:basePath + "getFindycclcxsName",
+                  data :function (params) {
+                      var query={ name:params.term };
+                      return query;
+                  },
+                  processResults : function (res) {
+                      var data =_.map(res.data,function (item) {
+                          dats={id:item.COMP_NAME, text:item.COMP_NAME}
+                          return dats
+                      });
+                      return{
+                          results:data
+                      }
+                  }
+              }
+          })*/
+
+
+        $('#ycclcx-exceptionType').on('change', function () {
+            if ($(this).val() == 1){
+                $('#ycclcxTable').jsGrid({fields: ycclcxTable})
+            } else if ($(this).val() == 2){
+                $('#ycclcxTable').jsGrid({fields: wsxclFields})
+            }
+        });
+        $('#ycclcxTable').jsGrid({
+            width: 'calc(100% - 2px)',
+            height: 'calc(100% - 2px)',
+            editing: true,
+            sorting: true,
+            paging: false,
+            autoload: true,
+            data: [],
+            fields: ycclcxTable
+        });
+
+        $("#ycclcx_select").off('click').on('click',function(){
+        	  hxx();
+        });
+        
+        $("#ExportFindAll").off('click').on('click',function(){
+        	if($("#ycclcx-exceptionType").val()=='2'&&( $("#ycclcx-datetimeStart").val()==""||$("#ycclcx-datetimeEnd").val()=="")){
+        		layer.msg("请输入日期");
+        		return ;
+        	}
+
+            layer.confirm('需要导出吗？',{btn:['确认','取消']
+                },function () {
+                    layer.msg('导出成功',{icon:1});
+                window.open(basePath + "getExportFinds?start="+$("#ycclcx-datetimeStart").val()+"&stop="+
+                    $("#ycclcx-datetimeEnd").val()+"&yhmc="+$("#ycclcx-carNumber").val()+"&id="+$("#ycclcx-exceptionType").val())
+                },function () {
+                    layer.msg('已取消导出',{icon:2});
+                }
+            )
+        });
+
+        hxx();
+    })
+})(jQuery);

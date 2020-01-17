@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>目标车辆查询</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.PolyEditor,AMap.CircleEditor,AMap.Geocoder"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../config.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="./tscljk.js"></script>
+	<style>
+		#tsclcxMap {
+			height: 100%;
+			border: 1px solid #c4d4fb;
+			border-radius: 10px;
+		}
+		.panel-layout[layout='left'] {
+			width: 360px;
+		}
+		.panel-layout[layout='left'] ~ .panel-layout[layout='center'] {width: calc(100% - 375px);margin-left: 375px;}
+
+		.scrollbar-macosx {
+			/*height: calc(100% - 268px);*/
+			height: 100%;
+			margin-bottom: 10px;
+		}
+		.scrollbar-macosx + .btn-clear {
+			margin: 0;
+		}
+
+		.dataListPanel {width: 360px;padding: 10px;}
+
+		.table {
+			table-layout: auto;
+		}
+		thead .t_vehicle {width: 50px;text-align: center;}
+		.t_latAndLon {width: 100px;text-align: right;}
+		.t_datetime {width: 150px;text-align: center;}
+		.t_operate {width: 60px;text-align: center;}
+
+
+		.mp-tabs {
+			height: calc(100% - 220px);
+		}
+		.mp-tabs-header {
+		}
+		.mp-tabs .mp-tabs-item {
+			float: left;
+			width: 33.333333%;
+			height: 30px;
+			box-sizing: border-box;
+			border-radius: 6px 6px 0 0;
+			line-height: 30px;
+			text-align: center;
+			color: #ffffff;
+			cursor: pointer;
+		}
+		.mp-tabs .mp-tabs-item:nth-of-type(1) {
+			background-color: #00b0ff;
+		}
+		.mp-tabs .mp-tabs-item:nth-of-type(2) {
+			background-color: #ff5c87;
+		}
+		.mp-tabs .mp-tabs-item:nth-of-type(3) {
+			background-color: #41da93;
+		}
+		.mp-tabs .mp-tabs-item.active {
+			border: 1px solid #eeeeee;
+			border-bottom: none;
+			color: #333333;
+			background-color: #ffffff;
+		}
+		.mp-tabs-body {
+			height: calc(100% - 30px);
+			border: 1px solid #eeeeee;
+			border-top: none;
+			border-radius: 0 0 5px 5px;
+		}
+		.mp-tabs-panel {
+			display: none;
+			height: 100%;
+			padding: 10px;
+		}
+		.mp-tabs-panel.active {
+			display: block;
+		}
+	</style>
+</head>
+<body>
+<div class="panel-wrapper" id="tsclcxPanel" style="position: relative;">
+	<div class="panel-layout" layout="left">
+		<div class="panel-title" ip-type="attach-left">
+			<div class="title">目标车辆查询</div>
+			<i class="iconfont icon-arrowTria" ip-type="left"></i>
+		</div>
+		<div class="dataListPanel">
+			<div class="card panel-queryBar" border="left" color="red">
+				<span class="title">起点时间</span>
+				<div type="calendar">
+					<i class="glyphicon glyphicon-calendar" type="icon"></i>
+					<input type="text" class="form-control input-sm" id="tsclcx-datetimeStart">
+				</div>
+				<span>前后</span>
+				<input type="text" class="form-control input-sm" value="30" id="qd_etime" number>
+				<span>分钟</span>
+				<a class="btn btn-primary btn-xs btn-position" id="dwqdfw">定位</a>
+			</div>
+			<div class="card panel-queryBar" border="left" color="greed">
+				<span class="title">终点时间</span>
+				<div type="calendar">
+					<i class="glyphicon glyphicon-calendar" type="icon"></i>
+					<input type="text" class="form-control input-sm" id="tsclcx-datetimeEnd">
+				</div>
+				<span>前后</span>
+				<input type="text" class="form-control input-sm" value="30" id="zd_etime" number>
+				<span>分钟</span>
+				<a class="btn btn-primary btn-xs btn-position" id="dwzdfw">定位</a>
+			</div>
+			<div class="panel-buttonBar" layout="center">
+				<a class="btn btn-primary" id="swcz_cx">查找</a>
+				<a class="btn btn-primary" id="swcz_dc">导出</a>
+				<a class="btn btn-primary" id="clearMap">清空地图</a>
+			</div>
+			<div class="mp-tabs" id="tsclcxTab">
+				<div class="mp-tabs-header clearfix">
+					<div class="mp-tabs-item active" skip="clxxPanel">目标车辆</div>
+					<div class="mp-tabs-item" skip="qdfwPanel">起点车辆</div>
+					<div class="mp-tabs-item" skip="zdfwPanel">终点车辆</div>
+				</div>
+				<div class="mp-tabs-body">
+					<div class="mp-tabs-panel active" id="clxxPanel">
+						<div class="scrollbar-macosx">
+							<table class="table" style="margin-bottom: 0;">
+								<thead>
+								<th class="t_vehicle">车牌号</th>
+								<th class="t_operate">操作</th>
+								</thead>
+								<tbody>
+<!-- 								<tr><td class="t_vehicle">浙A2345</td><td class="t_operate"><button class="btn btn-primary btn-xs guijichaxun">轨迹</button></td></tr> -->
+<!-- 								<tr><td class="t_vehicle">浙A2345</td><td class="t_operate"><button class="btn btn-primary btn-xs guijichaxun">轨迹</button></td></tr> -->
+<!-- 								<tr><td class="t_vehicle">浙A2347</td><td class="t_operate"><button class="btn btn-primary btn-xs guijichaxun">轨迹</button></td></tr> -->
+<!-- 								<tr><td class="t_vehicle">浙A2348</td><td class="t_operate"><button class="btn btn-primary btn-xs guijichaxun">轨迹</button></td></tr> -->
+<!-- 								<tr><td class="t_vehicle">浙A2349</td><td class="t_operate"><button class="btn btn-primary btn-xs guijichaxun">轨迹</button></td></tr> -->
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<div class="mp-tabs-panel" id="qdfwPanel">
+						<div class="scrollbar-macosx">
+							<table class="table" style="margin-bottom: 0;">
+								<thead>
+								<th class="t_vehicle">车牌号</th>
+								<th class="t_datetime">时间</th>
+								</thead>
+								<tbody>
+<!-- 								<tr><td class="t_vehicle">浙A2345</td><td class="t_datetime">2018-07-09 12:35:00</td></tr> -->
+<!-- 								<tr><td class="t_vehicle">浙A2345</td><td class="t_datetime">2018-07-09 12:35:00</td></tr> -->
+<!-- 								<tr><td class="t_vehicle">浙A2347</td><td class="t_datetime">2018-07-09 12:35:00</td></tr> -->
+<!-- 								<tr><td class="t_vehicle">浙A2348</td><td class="t_datetime">2018-07-09 12:35:00</td></tr> -->
+<!-- 								<tr><td class="t_vehicle">浙A2349</td><td class="t_datetime">2018-07-09 12:35:00</td></tr> -->
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<div class="mp-tabs-panel" id="zdfwPanel">
+						<div class="scrollbar-macosx">
+							<table class="table" style="margin-bottom: 0;">
+								<thead>
+								<th class="t_vehicle">车牌号</th>
+								<th class="t_datetime">时间</th>
+								</thead>
+								<tbody>
+<!-- 								<tr><td class="t_vehicle">浙A2345</td><td class="t_datetime">2018-07-09 12:35:00</td></tr> -->
+<!-- 								<tr><td class="t_vehicle">浙A2345</td><td class="t_datetime">2018-07-09 12:35:00</td></tr> -->
+<!-- 								<tr><td class="t_vehicle">浙A2347</td><td class="t_datetime">2018-07-09 12:35:00</td></tr> -->
+<!-- 								<tr><td class="t_vehicle">浙A2348</td><td class="t_datetime">2018-07-09 12:35:00</td></tr> -->
+<!-- 								<tr><td class="t_vehicle">浙A2349</td><td class="t_datetime">2018-07-09 12:35:00</td></tr> -->
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--<div class="scrollbar-macosx">
+				&lt;!&ndash;<div class="card" border="left" color="red" id="qdfwPanel">
+					<span class="title">起点车辆</span>
+
+				</div>
+				<div class="card" border="left" color="greed" id="zdfwPanel">
+					<span class="title">终点车辆</span>
+					<table class="table" style="margin-bottom: 0;">
+						<thead>
+						<th class="t_vehicle">车牌号</th>
+						<th class="t_datetime">时间</th>
+						</thead>
+						<tbody>
+ 						&lt;!&ndash;<tr><td class="t_vehicle">浙A2345</td><td class="t_datetime">2018-07-09 12:35:00</td></tr>&ndash;&gt;
+ 						&lt;!&ndash;<tr><td class="t_vehicle">浙A2345</td><td class="t_datetime">2018-07-09 12:35:00</td></tr>&ndash;&gt;
+ 						&lt;!&ndash;<tr><td class="t_vehicle">浙A2347</td><td class="t_datetime">2018-07-09 12:35:00</td></tr>&ndash;&gt;
+ 						&lt;!&ndash;<tr><td class="t_vehicle">浙A2348</td><td class="t_datetime">2018-07-09 12:35:00</td></tr>&ndash;&gt;
+ 						&lt;!&ndash;<tr><td class="t_vehicle">浙A2349</td><td class="t_datetime">2018-07-09 12:35:00</td></tr>&ndash;&gt;
+						</tbody>
+					</table>
+				</div>
+				<div class="card" border="left" color="blue" style="margin-bottom: 1px;" id="clxxPanel">
+					<span class="title">目标车辆</span>
+
+				</div>&ndash;&gt;
+			</div>-->
+<!-- 			<a class="btn btn-primary btn-clear" id="clearMap">清除</a> -->
+		</div>
+	</div>
+	<div class="panel-layout" layout="center">
+		<div id="tsclcxMap"></div>
+	</div>
+</div>
+</body>
+</html>

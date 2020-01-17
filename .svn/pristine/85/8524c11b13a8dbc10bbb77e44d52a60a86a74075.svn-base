@@ -1,0 +1,134 @@
+@import "iconfont.css";
+/************************基础样式************************/
+/*布局*/
+.panel-wrapper, .template-wrapper__full {height: 100%;padding: 5px 15px 15px;}
+.panel-content {margin: 0 auto;}
+
+/*行内元素分割*/
+.ip-item {float: left;margin-right: 15px;}
+.ip-item.ip-item-c2 {width: calc(50% - 7.5px);}
+.ip-item.ip-item-c2:nth-child(2n) {margin-right: 0;}
+.ip-item.ip-item-c2:nth-last-child(1),
+.ip-item.ip-item-c2:nth-last-child(2) {margin-bottom: 0;}
+.ip-item.ip-item-c3 {width: calc(33.33% - 12px);}
+.ip-item.ip-item-c3:nth-child(3n) {margin-right: 0;}
+.ip-item.ip-item-c3:nth-last-child(1),
+.ip-item.ip-item-c3:nth-last-child(2),
+.ip-item.ip-item-c3:nth-last-child(3) {margin-bottom: 0;}
+
+/*按钮*/
+.btnBox-center {text-align: center;}
+.btnBox-right {text-align: right;}
+.btn-details {color: #fff;border-color: #6a77e2;background-color: #7685fc;}
+.btn-details:hover {color: #fff;border-color: #0062cc;background-color: #0069d9;}
+
+/*标题文字*/
+.panel-heading .title {font-size: 16px;font-weight: bold;}
+.col-itemTitle {height: 20px;line-height: 20px;text-align: center;border-right: 1px solid #dddddd;}
+.col-itemTitle:last-child {text-align: center;border-right: none;}
+
+/*文字重点提示*/
+.ip-highlight, [class^='ip-highlight-'] {font-size: 140%;}
+.ip-highlight-red {color: #fb5d8e;}
+.ip-highlight-orange {color: #fc9c3c;}
+a.ip-highlight-orange {color: #fc9c3c;}
+.ip-highlight-green {color: #03ce8f;}
+a.ip-highlight-green {color: #03ce8f;}
+a.ip-highlight-green:hover,
+a.ip-highlight-orange:hover {text-decoration: underline;}
+
+
+/************************菜单样式************************/
+/*菜单-基础样式*/
+.ip-menu {position: relative;margin: 0;}
+.ip-menuItem {position: relative;}
+.ip-menuLabel {position: relative;}
+
+/*菜单-水平排列*/
+.ip-menu.ip-horizontal {height: 100%;line-height: 30px;}
+.ip-menu.ip-horizontal .ip-menuItem {float: left;height: 100%;}
+.ip-menu.ip-horizontal .ip-menuItem:after, .ip-menu.ip-horizontal .ip-menuItem:after {content: '';position: absolute;left: 0;bottom: -3px;width: 100%;height: 0;background-color: #1492ff;z-index: 0;-webkit-transition: height .3s ease-in-out;-o-transition: height .3s ease-in-out;transition: height .3s ease-in-out;}
+.ip-menu.ip-horizontal .ip-menuItem.active:after, .ip-menu.ip-horizontal .ip-menuItem:hover:after {height: calc(100% + 10px);}
+.ip-menu.ip-horizontal .ip-menuTitle {position: relative;display: inline-block;height: 100%;padding: 1px 18px 0;font-size: 16px;color: #3f4251;cursor: pointer;z-index: 1;-webkit-transition: color .3s ease-in-out;-o-transition: color .3s ease-in-out;transition: color .3s ease-in-out;}
+.ip-menu.ip-horizontal .ip-menuTitle:hover, .ip-menu.ip-horizontal .ip-menuTitle:active, .ip-menu.ip-horizontal .ip-menuTitle:focus {text-decoration: none;}
+.ip-menu.ip-horizontal .ip-menuTitle i.iconfont {display: block;font-size: 35px;text-align: center;}
+.ip-menu.ip-horizontal .ip-menuItem.active .ip-menuTitle, .ip-menu.ip-horizontal .ip-menuItem:hover .ip-menuTitle {color: #ffffff;}
+
+/*菜单-垂直排列*/
+.ip-menu.ip-vertical {}
+.ip-menu.ip-vertical .ip-menuItem {}
+.ip-menu.ip-vertical .ip-menuTitle {position: relative;display: inline-block;width: 100%;height: 40px;line-height: 40px;padding: 1px 18px 0;font-size: 14px;text-decoration: none;color: #559ffa;cursor: pointer;}
+.ip-menu.ip-vertical .ip-menuTitle i.iconfont {margin-right: 5px;}
+.ip-menu.ip-vertical .ip-menuTitle .ip-menuLabel {}
+.ip-menu.ip-vertical .ip-menuTitle .ip-fontArrow {position: absolute;top: 50%;right: 10px;margin-top: -6px;}
+
+/*菜单-图标排列*/
+.ip-menu.ip-typeIcon > .ip-menuItem > .ip-menuTitle {display: block;font-size: 12px;text-align: center;text-decoration: none;color: #cacce0;cursor: pointer;}
+.ip-menu.ip-typeIcon > .ip-menuItem.active .ip-menuTitle, .ip-menu.ip-typeIcon .ip-menuTitle:hover {color: #568af8;}
+.ip-menu.ip-typeIcon > .ip-menuItem > .ip-menuTitle i.iconfont, .ip-menu.ip-typeIcon > .ip-menuItem > .ip-menuTitle i.glyphicon {display: block;width: 50px;height: 50px;line-height: 50px;margin: 7px auto;border-radius: 4px;}
+.ip-menu.ip-typeIcon > .ip-menuItem > .ip-menuTitle i.iconfont, .ip-menu.ip-typeIcon > .ip-menuItem > .ip-menuTitle i.glyphicon {font-size: 38px;}
+.ip-menu.ip-typeIcon > .ip-menuItem > .ip-menuTitle i.glyphicon {top: 0;font-size: 28px;}
+
+.ip-menu.ip-typeIcon > .ip-menuItem.active i.iconfont, .ip-menu.ip-typeIcon > .ip-menuItem.active .ip-menuLabel, .ip-menu.ip-typeIcon .ip-menuTitle:hover i.iconfont, .ip-menu.ip-typeIcon .ip-menuTitle:hover .ip-menuLabel, .ip-menu.ip-typeIcon > .ip-menuItem.active i.glyphicon, .ip-menu.ip-typeIcon .ip-menuTitle:hover i.glyphicon {-webkit-transform: translateY(5px);-ms-transform: translateY(5px);transform: translateY(5px);}
+.ip-menu.ip-typeIcon .ip-menuChildrenPanel .ip-menuTitle:hover i.glyphicon {-webkit-transform: translateY(3px);-ms-transform: translateY(3px);transform: translateY(3px);}
+.ip-menu.ip-typeIcon > .ip-menuItem.active > .ip-menuTitle i.iconfont, .ip-menu.ip-typeIcon > .ip-menuItem > .ip-menuTitle:hover > i.iconfont, .ip-menu.ip-typeIcon > .ip-menuItem.active > .ip-menuTitle i.glyphicon, .ip-menu.ip-typeIcon > .ip-menuItem > .ip-menuTitle:hover > i.glyphicon {-webkit-box-shadow: 0 6px 28px rgba(84, 131, 249, 0.41);box-shadow: 0 6px 28px rgba(84, 131, 249, 0.41);}
+.ip-menu.ip-typeIcon > .ip-menuItem > .ip-menuTitle .ip-menuLabel {display: block;opacity: 0;margin-left: -120px;-webkit-transition: opacity .4s ease-in, margin-left .4s ease-in;-o-transition: opacity .4s ease-in, margin-left .4s ease-in;transition: opacity .4s ease-in, margin-left .4s ease-in;}
+.ip-menu.ip-typeIcon:hover > .ip-menuItem > .ip-menuTitle .ip-menuLabel, .ip-menu.ip-typeIcon > .ip-menuItem.active > .ip-menuTitle .ip-menuLabel {opacity: 1;margin-left: 0;font-weight: bold;}
+.ip-menu.ip-typeIcon > .ip-menuItem.active > .ip-menuTitle .ip-menuLabel, .ip-menu.ip-typeIcon > .ip-menuItem > .ip-menuTitle:hover > .ip-menuLabel {text-shadow: 0 0 6px rgba(84, 131, 249, 0.41);}
+.ip-menu.ip-typeIcon > .ip-menuItem > .ip-menuTitle .ip-fontArrow {display: none;}
+
+/*菜单-二三*级菜单_大图标*/
+.ip-menu.ip-typeIcon > .ip-menuItem .ip-menuChildrenPanel {display: none;position: fixed;left: 105px;width: 200px;margin-top: -69px;-webkit-box-shadow: 0 0 8px 0 rgba(202, 207, 220, 0.6), 0 2px 4px 0 rgba(202, 207, 220, 0.5);box-shadow: 0 0 8px 0 rgba(202, 207, 220, 0.6), 0 2px 4px 0 rgba(202, 207, 220, 0.5);border-radius: 4px;background: #fff;}
+.ip-menu.ip-typeIcon > .ip-menuItem .ip-menuChildrenPanel .ip-menuChildrenPanel {display: none;position: absolute;top: 0;left: calc(100% + 5px);width: 100%;margin-top: 0;}
+.ip-menu.ip-typeIcon > .ip-menuItem .ip-menuChildrenPanel:before {content: '';position: absolute;top: -10px;left: -6px;width: calc(100% + 25px);height: calc(100% + 20px);}
+.ip-menu.ip-typeIcon .ip-menuItem.active:hover > .ip-menuChildrenPanel {display: block;}
+.ip-menu.ip-typeIcon > .ip-menuItem .ip-menuChildrenPanel .ip-menuItem {position: relative;border-bottom: 1px solid #dadfe9;}
+.ip-menu.ip-typeIcon > .ip-menuItem .ip-menuChildrenPanel .ip-menuItem:last-child {border-bottom: none;}
+.ip-menu.ip-typeIcon > .ip-menuItem .ip-menuChildrenPanel .ip-menuTitle {display: block;padding: 6px 10px;text-decoration: none;cursor: pointer;}
+.ip-menu.ip-typeIcon > .ip-menuItem .ip-menuChildrenPanel .ip-menuItem .ip-fontArrow {position: absolute;top: 50%;right: 10px;margin-top: -6px;}
+.ip-menu.ip-typeIcon .ip-menuItem.active > .ip-menuChildrenPanel > .ip-menuItem.active > .ip-menuTitle, .ip-menu.ip-typeIcon .ip-menuItem > .ip-menuChildrenPanel > .ip-menuItem > .ip-menuTitle:hover {color: #ffffff;background-color: #559ffa;}
+.ip-menu.ip-typeIcon .ip-menuItem > .ip-menuChildrenPanel > .ip-menuItem:first-child > .ip-menuTitle, .ip-menu.ip-typeIcon .ip-menuItem > .ip-menuChildrenPanel > .ip-menuItem:first-child:hover > .ip-menuTitle {border-top-left-radius: 4px;border-top-right-radius: 4px;}
+.ip-menu.ip-typeIcon .ip-menuItem > .ip-menuChildrenPanel > .ip-menuItem:last-child > .ip-menuTitle, .ip-menu.ip-typeIcon .ip-menuItem > .ip-menuChildrenPanel > .ip-menuItem:last-child:hover > .ip-menuTitle {border-bottom-left-radius: 4px;border-bottom-right-radius: 4px;}
+.ip-menu.ip-typeIcon > .ip-menuItem .ip-menuChildrenPanel .ip-menuTitle i.iconfont,
+.ip-menu.ip-typeIcon > .ip-menuItem .ip-menuChildrenPanel .ip-menuTitle i.glyphicon {
+	margin-right: 5px;
+}
+
+/*菜单-二三*级菜单_垂直排列*/
+.ip-menu.ip-vertical .ip-menuItem .ip-menuChildrenPanel {}
+.ip-menu.ip-vertical .ip-menuItem .ip-menuChildrenPanel .ip-menuItem {}
+.ip-menu.ip-vertical .ip-menuItem .ip-menuChildrenPanel .ip-menuTitle {display: block;text-indent: 1.2em;cursor: pointer;}
+.ip-menu.ip-vertical .ip-menuItem .ip-menuChildrenPanel .ip-menuChildrenPanel .ip-menuTitle {display: block;text-indent: 2.4em;cursor: pointer;}
+
+
+/************************选项卡样式************************/
+/*选项卡基础样式*/
+.ip-tabWrapper {width: 100%;height: 100%;}
+.ip-tabHeader {position: relative;overflow-y: hidden;min-height: 30px;margin-bottom: 0;padding: 0 0 0 1px;border-top: 1px solid #e7eaec;border-bottom: solid 1px #dadfe9;}
+.ip-tabWrapper[type='menuTab'] .ip-tabHeader {height: 34px;}
+.ip-tabBarWrapper {position: relative;overflow-x: auto;width: 100%;background: #ffffff;}
+.ip-tabScrollBar {float: left;min-width: 100%;margin-bottom: 0;}
+.ip-tabBarItem {position: relative;display: block;float: left;padding: 6px 15px 5px;-webkit-box-sizing: border-box;box-sizing: border-box;text-align: center;text-decoration: none;color: #999999;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;-webkit-transition: all .3s ease-out 0s;-o-transition: all .3s ease-out 0s;transition: all .3s ease-out 0s;cursor: pointer;}
+.ip-tabWrapper[type='tab'] .ip-tabBarItem {padding-left: 5px;padding-right: 5px;}
+.ip-tabWrapper[type='tab'] .ip-tabBarItem.active {color: #7da3ff;}
+.ip-tabWrapper[type='tab'] .ip-tabBarItem[type='active'] {position: absolute;bottom: 0;width: 4em !important;height: 2px;padding: 0;background-color: #7da3ff;-webkit-transform: translateX(-50%);-ms-transform: translateX(-50%);transform: translateX(-50%);-webkit-transition: left .4s ease-in-out, color .3s ease-in-out;-o-transition: left .4s ease-in-out, color .3s ease-in-out;transition: left .4s ease-in-out, color .3s ease-in-out;}
+.ip-tabWrapper[type='tab'] .ip-tabItemIcon + .ip-tabItemLabel {font-size: 14px;margin-left: 0;}
+.ip-tabItemIcon {position: absolute;top: 50%;left: 12px;margin: -14px 0;font-size: 20px;}
+.ip-tabItemIcon + .ip-tabItemLabel {font-size: 16px;margin-left: 21px;}
+.ip-tabItemLabel {display: inline-block;margin: 0;font-size: 16px;user-select: none;cursor: pointer;}
+.ip-tabItemRemove {margin-left: 5px;font-size: 14px;}
+.ip-tabButton {position: absolute;top: 0;width: 20px;line-height: 32px;text-align: center;color: #999;background: #ffffff;}
+.ip-tabButton.icon-chevron-left {left: 0;border-right: 1px solid rgb(238, 238, 238);}
+.ip-tabButton.icon-chevron-left + .ip-tabScrollBar {margin-left: 20px;}
+.ip-tabButton.icon-chevron-right {right: 0;border-left: 1px solid rgb(238, 238, 238);}
+.ip-tabBodyer {width: 100%;height: calc(100% - 34px);}
+.ip-tabPanelItem {display: none;width: 100%;height: 100%;}
+
+/*选项卡显示模式*/
+.ip-noTabHeader .ip-tabHeader {display: none;}
+.ip-noTabHeader .ip-tabBodyer {height: 100%;}
+
+
+/************************reset bootstrap style************************/
+.panel {margin-bottom: 15px;}
+.panel-default > .panel-heading {background-color: #fff;}

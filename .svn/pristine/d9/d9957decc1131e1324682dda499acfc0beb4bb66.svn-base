@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>值班</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+	<style>	
+		.beonduty_Box {width: 370px; height: 556px; margin-left: 25%; font-family: '黑体'; background: #7db2df;float:left;margin-top: 20px;}
+		[class$='_Box'] {background: url('../../resources/images/zbb.jpg') no-repeat!important;}
+		[class$='_Box'] > div {text-align: center;  color: #4976b9;}
+		[class$='_Box'] .title {padding: 23px 0px 45px; font-size: 30px; text-align: center; text-shadow: 2px 2px 2px #000; color: #ff0000;}
+		.currentDate { margin-bottom: 30px; padding-top: 10px; font-size: 18px; font-weight: bold;}
+		.currentDate iii{margin-left: 2px;}
+		.currentDate .month, .currentDate .week {margin-left: 17px;}
+		.zhiban {margin-top: 20px; font-size: 20px; font-weight: bold;}
+		.beonduty_Box .name {width: 160px; height: 35px; line-height: 35px; margin: 10px auto; font-size: 24px; color: #000000; background: #d0ecf8;}
+		.beonduty_Box .phone { width: 240px; margin: 0px auto; margin-top: 25px; font-size: 18px; text-align: left; color: #000000;}
+		.beonduty_Box .phone > div {margin: 15px 0px;}
+		.beonduty_Box .phone > div ._tel {width: 150px; height: 30px; line-height: 30px; padding-left: 10px; display: inline-block; background: #cfecf8;}
+		
+		.body_Box {width: 370px; height: 556px; position: relative; font-family: '黑体';float:left;margin-left: 50px;margin-top: 20px;}
+		.body_Box > div {text-align: center;  color: #4976b9;}
+		.body {height: 30px; margin: 0px -150px; position: absolute; left: 50%;}
+		.body > span {width: 100px;height: 30px; border-bottom: 2px solid #fa0202;  display: block;  float: left; }
+		.body { margin-bottom: 30px; padding-top: 10px; font-size: 18px; font-weight: bold;}
+		.form{position: relative;  top: 50px;}
+		.form ul, .form ul li {list-style-type: none; margin: 0px; padding: 0px;}
+		.form ul li{  margin: 18px 0;}
+		.form ul li span{  width:100px;height: 20px;display:inline-block;text-align:center; font-size: 14px;font-family: '黑体';}
+		.form ul li span.name1 {text-align: center;}
+		html,body {
+			background: #ffffff;
+		}
+	</style>
+</head>
+<body>
+		<div>
+				<div class="beonduty_Box">
+				<h3 class="title">今日值班</h3>
+				<div class="currentDate">
+					<span class="year">2016</span><iii>年</iii>
+					<span class="month">1</span><iii>月</iii>
+					<span class="date">14</span><iii>日</iii>
+					<span class="week">星期一</span>
+				</div>
+				<div class="zhiban">值班长</div>
+				<div class="name zongzhibanStaff"></div>
+				<div class="zhiban">早班 晚班</div>
+				<div class="name zhibanStaff" style="width:280px;"></div>
+				<div class="zhiban">白班电话</div>
+				<div class="phone">
+					<div class="tel">
+						<span>电话：</span>
+						<span class="_tel dh_tel"></span>
+					</div>
+					<!--<div class="mobilephoneb">-->
+						<!--<span>电话：</span>-->
+						<!--<span class="_tel dh_phone"></span>-->
+					<!--</div>-->
+				</div>
+			</div>
+				
+			<div class="body_Box">
+				<h3 class="title">本周值班</h3>
+				<div class="body">
+					<span class="time">时间</span>
+					<span class="person">早班</span>
+					<span class="telephone">晚班</span>
+				</div>
+				<div class="form" >
+					<ul>
+						<li><span class="data1">  星期一</span><span class="name1"></span><span class="telephone1"></span></li>
+						<li><span class="data1">  星期二</span><span class="name1"></span><span class="telephone1"></span></li>
+						<li><span class="data1">  星期三</span><span class="name1"></span><span class="telephone1"></span></li>
+						<li><span class="data1">  星期四</span><span class="name1"></span><span class="telephone1"></span></li>
+						<li><span class="data1">  星期五</span><span class="name1"></span><span class="telephone1"></span></li>
+						<li><span class="data1">  星期六</span><span class="name1"></span><span class="telephone1"></span></li>
+						<li><span class="data1">  星期天</span><span class="name1"></span><span class="telephone1"></span></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+<script>
+(function ($) {
+	$(function () {
+		jqxhr=$.ajax({
+			type: "POST",
+			url: "../../Yjzh/findzbb",
+			data:{},
+			timeout : 180000,
+			dataType: 'json',
+			success:function(data){
+				newDate();
+				$('.zongzhibanStaff').html("金俊");
+				$('.zhibanStaff').html(data.NOW[0].WBNAME+" "+data.NOW[0].WEEK);
+				$('.dh_tel').html( "0571-86445781");
+				//本周值班
+				var week=data.WEEK;
+				for (var i = 0; i < week.length; i++) {
+					document.getElementsByClassName("name1")[i].innerText=week[i].WBNAME;
+					document.getElementsByClassName("telephone1")[i].innerText=week[i].WEEK;
+				}
+			},
+			error: function(){
+			}         
+		});
+	})
+	function newDate() {
+		var _date = new Date();
+		var week = ['星期天', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+		var year = _date.getFullYear();
+		var month = _date.getMonth()+1;
+		var date = _date.getDate();
+		var xq = _date.getDay();
+		$(".year").html(year);
+		$('.month').html(month);
+		$('.date').html(date);
+		$('.week').html(week[xq]);
+	}
+})(jQuery)
+</script>
+</body>
+</html>

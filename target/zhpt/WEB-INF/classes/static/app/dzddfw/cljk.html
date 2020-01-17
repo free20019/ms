@@ -1,0 +1,178 @@
+<!-- 业户查询 -->
+<html>
+	<head>
+		<meta charset="UTF-8">
+	<title>车辆监控</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+	<style>
+		.cljk_mater{
+			width:100%;
+			margin:0 auto;
+		}
+		#cljkdiv{
+			width: 85%;
+			height: 700px;
+			position: relative;
+			zoom:0.8;
+			float:left;
+		}
+		.cljk_right{
+				width: 10%;
+/* 			width:auto; */
+			height:560px;
+/* 			overflow-y: scroll; */
+			float:left;
+			margin-left: 5px;
+		}
+		.cljk_right input{
+			width:auto;
+			margin-top:5px;
+		}
+		.cljk_clxx{
+			width:100%;
+			clear: both;
+		}
+		.cljk_clxx table tr td{
+			width:auto;
+			text-align: center;
+			height:40px;
+			border:1px solid #ddd;
+		}
+		.cljk_sl td{
+			font-weight:bold;
+		}
+		html,body {
+			background: #ffffff;
+		}
+	</style>
+	</head>
+	<body>
+		<div class="cljk_mater">
+			<div id="cljkdiv"></div>
+			<div class="cljk_right">
+				<input type="text" value="车牌号码">
+				<hr>
+				<input type="checkbox"> 车牌<br>
+				<input type="checkbox">浙AT2365<br>
+				<input type="checkbox">浙AT1235<br>
+				<input type="checkbox">浙AT1125<br>
+				<input type="checkbox">浙AT2236<br>
+				<input type="checkbox">浙AT2141<br>
+				<input type="checkbox">浙AT5552<br>
+				<input type="checkbox">浙AT6856<br>
+				<input type="checkbox">浙AT1123<br>
+				<input type="checkbox">浙AT2231<br>
+				<input type="checkbox">浙AT2256<br>
+				<input type="checkbox">浙AT2365<br>
+				<input type="checkbox">浙AT1235<br>
+				<input type="checkbox">浙AT1125<br>
+				<input type="checkbox">浙AT2236<br>
+				<input type="checkbox">浙AT2141<br>
+				<input type="checkbox">浙AT5552<br>
+				<input type="checkbox">浙AT6856<br>
+				<input type="checkbox">浙AT1123<br>
+				<input type="checkbox">浙AT2231<br>
+<!-- 				<input type="checkbox">浙AT2256<br> -->
+<!-- 				<input type="checkbox">浙AT2365<br> -->
+<!-- 				<input type="checkbox">浙AT1235<br> -->
+<!-- 				<input type="checkbox">浙AT1125<br> -->
+<!-- 				<input type="checkbox">浙AT2236<br> -->
+<!-- 				<input type="checkbox">浙AT2141<br> -->
+<!-- 				<input type="checkbox">浙AT5552<br> -->
+<!-- 				<input type="checkbox">浙AT6856<br> -->
+<!-- 				<input type="checkbox">浙AT1123<br> -->
+<!-- 				<input type="checkbox">浙AT2231<br> -->
+<!-- 				<input type="checkbox">浙AT2256<br> -->
+<!-- 				<input type="checkbox">浙AT2365<br> -->
+<!-- 				<input type="checkbox">浙AT1235<br> -->
+<!-- 				<input type="checkbox">浙AT1125<br> -->
+<!-- 				<input type="checkbox">浙AT2236<br> -->
+<!-- 				<input type="checkbox">浙AT2141<br> -->
+<!-- 				<input type="checkbox">浙AT5552<br> -->
+<!-- 				<input type="checkbox">浙AT6856<br> -->
+<!-- 				<input type="checkbox">浙AT1123<br> -->
+<!-- 				<input type="checkbox">浙AT2231<br> -->
+<!-- 				<input type="checkbox">浙AT2256<br> -->
+<!-- 				<input type="checkbox">浙AT2365<br> -->
+<!-- 				<input type="checkbox">浙AT1235<br> -->
+<!-- 				<input type="checkbox">浙AT1125<br> -->
+<!-- 				<input type="checkbox">浙AT2236<br> -->
+<!-- 				<input type="checkbox">浙AT2141<br> -->
+<!-- 				<input type="checkbox">浙AT5552<br> -->
+<!-- 				<input type="checkbox">浙AT6856<br> -->
+<!-- 				<input type="checkbox">浙AT1123<br> -->
+<!-- 				<input type="checkbox">浙AT2231<br> -->
+<!-- 				<input type="checkbox">浙AT2256<br> -->
+			</div>
+			<div class="cljk_clxx">
+<!-- 				<p>车辆信息</p> -->
+				<table cellspacing="0px" style="width:100%">
+					<tr class="sl">
+						<td>车辆</td>
+						<td>车辆颜色</td>
+						<td>Sim卡号</td>
+						<td>车速（km/h）</td>
+						<td>状态</td>
+						<td>汇报时间</td>
+						<td>当前定位</td>
+						<td>终端类型</td>
+						<td>车辆类型</td>
+					</tr>
+					<tr>
+						<td>浙AT0032</td>
+						<td>薄荷青</td>
+						<td>15024423362</td>
+						<td>15</td>
+						<td>重车</td>
+						<td>2016-12-06 05:30:00</td>
+						<td>浙江省杭州市西湖区蒋村街道西溪国家湿地公园云起路</td>
+						<td>飞田GPRS</td>
+						<td>索拉塔</td>
+					</tr>
+					<tr>
+						<td>浙AT0032</td>
+						<td>薄荷青</td>
+						<td>15024423362</td>
+						<td>15</td>
+						<td>重车</td>
+						<td>2016-12-06 05:30:00</td>
+						<td>浙江省杭州市西湖区蒋村街道西溪国家湿地公园云起路</td>
+						<td>飞田GPRS</td>
+						<td>索拉塔</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+		var map = new AMap.Map('cljkdiv', {
+			resizeEnable: true,
+			zoom:13
+		});
+	</script>
+</html>

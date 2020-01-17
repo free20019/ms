@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ECharts</title>
+    <script src="../../resources/script/echarts.min.js"></script>
+    <link rel="stylesheet" href="../../resources/style/reset.css">
+    <link rel="stylesheet" href="../../resources/style/iconfont.css">
+    <link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+    <link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+    <link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+    <link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+    <link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+    <link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+    <link rel="stylesheet" href="../../resources/style/main.css">
+    <script src="../../resources/script/jquery-1.12.1.min.js"></script>
+    <script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+    <script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+    <script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+    <script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+    <script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+    <script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+    <script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+    <script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+    <script src="../../resources/script/echarts.min.js"></script>
+    <script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+    <script src="../../resources/script/util.js"></script>
+    <script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+    <script src="dcsdqylctj.js"></script>
+</head>
+<body>
+<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+<div id="main" style="width: 600px;height:400px;"></div>
+
+<script type="text/javascript">
+
+
+
+var init = echarts.init(document.getElementById('main'));
+// 指定图表的配置项和数据
+    var option= {
+        title : {
+            text: 'Echarts入门实例'
+        },
+
+        tooltip: {
+            trigger: 'axis',
+        },
+        legend: {
+            data:['销量','纬度','经度']
+        },
+
+
+
+
+
+
+        xAxis:{
+            name:'样式',
+            boundaryGap:false,
+            data:["毛衣","羊毛衫","皮鞋","干跟鞋","棉衣","棉裤",],
+            type : 'category',
+            axisLabel : {
+
+            }
+
+        },
+        yAxis: {
+            type : 'value',
+            axisLabel : {
+
+            }
+
+        },
+        series: [{
+
+                name:'邮件营销',
+                type:'line',
+                stack: '总量',
+                areaStyle: {},
+                data:[120, 132, 101, 134, 90, 230, 210]
+
+        },
+
+            {
+                name:'联盟广告',
+                type:'line',
+                stack: '总量',
+                areaStyle: {},
+                data:[220, 182, 191, 234, 290, 330, 310]
+            },
+
+            {
+                name:'视频广告',
+                type:'line',
+                stack: '总量',
+                areaStyle: {},
+                data:[150, 232, 201, 154, 190, 330, 410]
+            },
+            {
+                name:'直接访问',
+                type:'line',
+                stack: '总量',
+                areaStyle: {normal: {}},
+                data:[320, 332, 301, 334, 390, 330, 320]
+            },
+        ]
+
+
+
+    };
+init.setOption(option);
+
+
+
+
+</script>
+
+<input type="button" id="sub" value="提交">
+
+
+<script>
+
+
+    $("#sub").off('click').on('click',function () {
+
+        $.ajax({
+            url: basePath + "getYdcsdqxjlctjFindAlls",
+            type: 'post',
+            dataType: 'json',
+            data:{},
+            timeout:18000,
+            success:function (data) {
+              for(var i =0;i<data[0].datas.len();i++){
+                  console.info(data[0].datas[i]);
+
+              }
+
+            }
+        })
+    })
+
+
+</script>
+</body>
+</html>

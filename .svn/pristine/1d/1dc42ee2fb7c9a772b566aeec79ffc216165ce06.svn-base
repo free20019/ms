@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>营运信息监测总览</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+	<style>
+		.scrollbar-macosx {
+			height: 100%;
+		}
+		.panel-wrapper {height: 100%;padding: 5px 15px 15px;}
+		.mp-collapse {border-top: 1px solid #ebeef5;border-bottom: 1px solid #ebeef5;}
+		.mp-collapse-item__header {height: 48px;padding-left: 15px;padding-right: 15px;border-bottom: 1px solid #ebeef5;line-height: 48px;font-size: 13px;font-weight: 500;color: #303133;background-color: #fff;cursor: pointer;transition: border-bottom-color .3s;outline: none;}
+		.mp-collapse-item__wrap {will-change: height;background-color: #fff;overflow: hidden;box-sizing: border-box;border-bottom: 1px solid #ebeef5;}
+		.mp-collapse-item__content {font-size: 13px;color: #303133;line-height: 1.769230769230769;}
+		.mp-collapse-item__content .scrollbar-macosx {width: 100%;height: 100%;overflow-x: auto;overflow-y: hidden;white-space: nowrap;}
+		.mp-collapse-item__content .scrollbar-macosx .scroll-content {padding: 15px;}
+
+		.mp-card {display: inline-block;margin-right: 10px;border-radius: 4px;border: 1px solid #ebeef5;background-color: #fff;overflow: hidden;color: #303133;transition: .3s;}
+		.mp-card:last-child {margin-right: 0;}
+		.mp-card__body {padding: 20px;}
+		.mp-card-lable {display: inline-block;padding-right: 10px;}
+		.mp-card-value {display: inline-block;font-size: 18px;color: #fb5d8e;}
+		.mp-card-value[unit]:after {content: attr(unit);font-size: 12px;color: #000;}
+
+		.panel-overview {display: inline-block;width: 400px;margin-right: 10px;margin-bottom: 0;}
+		.panel-overview:last-child {margin-right: 0;}
+		.panel-overview .panel-body {height: 240px;overflow: hidden;}
+		.panel-overview .panel-body table {margin-bottom: 0;}
+
+		.mp-btn-link {cursor: pointer;}
+		.mp-btn-link:hover {text-decoration: underline;}
+		tr .ip-datetime {width: 140px;}
+	</style>
+</head>
+<body>
+<div class="scrollbar-macosx">
+	<div class="panel-wrapper">
+		<div class="mp-collapse">
+			<div class="mp-collapse-item">
+				<div class="mp-collapse-item__header">企业信息监测总览</div>
+				<div class="mp-collapse-item__wrap">
+					<div class="mp-collapse-item__content">
+						<div class="scrollbar-macosx">
+							<div class="mp-card">
+								<div class="mp-card__body">
+									<div class="mp-card-lable">营业执照到期</div>
+									<div class="mp-card-value" unit="家">8</div>
+								</div>
+							</div>
+							<div class="mp-card">
+								<div class="mp-card__body">
+									<div class="mp-card-lable">投诉数量</div>
+									<div class="mp-card-value" unit="条">100</div>
+								</div>
+							</div>
+							<div class="mp-card">
+								<div class="mp-card__body">
+									<div class="mp-card-lable">故障车辆数量</div>
+									<div class="mp-card-value" unit="辆">80</div>
+								</div>
+							</div>
+							<div class="mp-card">
+								<div class="mp-card__body">
+									<div class="mp-card-lable">违章车辆数量</div>
+									<div class="mp-card-value" unit="辆">8</div>
+								</div>
+							</div>
+							<div class="mp-card">
+								<div class="mp-card__body">
+									<div class="mp-card-lable">服务质量扣分企业数量</div>
+									<div class="mp-card-value" unit="家">8</div>
+								</div>
+							</div>
+							<div class="mp-card">
+								<div class="mp-card__body">
+									<div class="mp-card-lable">未处理工单</div>
+									<div class="mp-card-value" unit="单">8</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="mp-collapse-item__header">车辆信息监测总览</div>
+				<div class="mp-collapse-item__wrap">
+					<div class="mp-collapse-item__content">
+						<div class="scrollbar-macosx">
+							<div class="panel panel-default panel-overview">
+								<div class="panel-heading clearfix" style="padding: 6px 15px;">
+									<div class="ip-item ip-item-c2 col-itemTitle">监测车辆年审到期</div>
+									<div class="ip-item ip-item-c2 col-itemTitle">
+										<span class="ip-highlight-red mp-btn-link" id="yyxxjczl-clcsdq">50</span>&nbsp;辆
+									</div>
+								</div>
+								<div class="panel-body">
+									<table class="table" id=yyxxjczl-table-clcsdq>
+										<thead>
+										<tr>
+											<th>所属企业</th>
+											<th>时间</th>
+										</tr>
+										</thead>
+										<tbody>
+										<tr>
+											<th>杭州市通悟科技有限公司</th>
+											<td class="ip-datetime">2018-08-09 12:30:00</td>
+										</tr>
+										<tr>
+											<th>杭州市通悟科技有限公司</th>
+											<td class="ip-datetime">2018-08-09 12:30:00</td>
+										</tr>
+										<tr>
+											<th>杭州市通悟科技有限公司</th>
+											<td class="ip-datetime">2018-08-09 12:30:00</td>
+										</tr>
+										<tr>
+											<th>杭州市通悟科技有限公司</th>
+											<td class="ip-datetime">2018-08-09 12:30:00</td>
+										</tr>
+										<tr>
+											<th>杭州市通悟科技有限公司</th>
+											<td class="ip-datetime">2018-08-09 12:30:00</td>
+										</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<div class="panel panel-default panel-overview">
+								<div class="panel-heading clearfix" style="padding: 6px 15px;">
+									<div class="ip-item ip-item-c2 col-itemTitle">车辆营运证到期</div>
+									<div class="ip-item ip-item-c2 col-itemTitle">
+										<span class="ip-highlight-red mp-btn-link" id="yyxxjczl-clyyzdq">50</span>&nbsp;辆
+									</div>
+								</div>
+								<div class="panel-body">
+									<table class="table" id="yyxxjczl-table-clyyzdq">
+										<thead>
+										<tr>
+											<th>所属企业</th>
+											<th>时间</th>
+										</tr>
+										</thead>
+										<tbody>
+										<tr>
+											<th>杭州市通悟科技有限公司</th>
+											<td class="ip-datetime">2018-08-09 12:30:00</td>
+										</tr>
+										<tr>
+											<th>杭州市通悟科技有限公司</th>
+											<td class="ip-datetime">2018-08-09 12:30:00</td>
+										</tr>
+										<tr>
+											<th>杭州市通悟科技有限公司</th>
+											<td class="ip-datetime">2018-08-09 12:30:00</td>
+										</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<div class="panel panel-default panel-overview">
+								<div class="panel-heading clearfix" style="padding: 6px 15px;">
+									<div class="ip-item ip-item-c2 col-itemTitle">车辆计价器到期</div>
+									<div class="ip-item ip-item-c2 col-itemTitle">
+										<span class="ip-highlight-red mp-btn-link" id="yyxxjczl-cljjqdq">50</span>&nbsp;辆
+									</div>
+								</div>
+								<div class="panel-body">
+									<table class="table" id="yyxxjczl-table-cljjqdq">
+										<thead>
+										<tr>
+											<th>所属企业</th>
+											<th>时间</th>
+										</tr>
+										</thead>
+										<tbody>
+										<tr>
+											<th>杭州市通悟科技有限公司</th>
+											<td class="ip-datetime">2018-08-09 12:30:00</td>
+										</tr>
+										<tr>
+											<th>杭州市通悟科技有限公司</th>
+											<td class="ip-datetime">2018-08-09 12:30:00</td>
+										</tr>
+										<tr>
+											<th>杭州市通悟科技有限公司</th>
+											<td class="ip-datetime">2018-08-09 12:30:00</td>
+										</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="mp-collapse-item__header">驾驶员信息监测总览</div>
+				<div class="mp-collapse-item__wrap">
+					<div class="mp-collapse-item__content">
+						<div class="scrollbar-macosx">
+							<div class="panel panel-default panel-overview">
+								<div class="panel-heading clearfix" style="padding: 6px 15px;">
+									<div class="ip-item ip-item-c2 col-itemTitle">驾驶员从业资格证到期</div>
+									<div class="ip-item ip-item-c2 col-itemTitle">
+										<span class="ip-highlight-red mp-btn-link" id="yyxxjczl-jsycyzgzdq">50</span>&nbsp;人
+									</div>
+								</div>
+								<div class="panel-body">
+									<table class="table" id="yyxxjczl-table-jsycyzgzdq">
+										<thead>
+										<tr>
+											<th>所属企业</th>
+											<th>时间</th>
+										</tr>
+										</thead>
+										<tbody>
+										<tr>
+											<th>杭州市通悟科技有限公司</th>
+											<td class="ip-datetime">2018-08-09 12:30:00</td>
+										</tr>
+										<tr>
+											<th>杭州市通悟科技有限公司</th>
+											<td class="ip-datetime">2018-08-09 12:30:00</td>
+										</tr>
+										<tr>
+											<th>杭州市通悟科技有限公司</th>
+											<td class="ip-datetime">2018-08-09 12:30:00</td>
+										</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<div class="panel panel-default panel-overview">
+								<div class="panel-heading clearfix" style="padding: 6px 15px;">
+									<div class="ip-item ip-item-c2 col-itemTitle">再教育驾驶员数量</div>
+									<div class="ip-item ip-item-c2 col-itemTitle">
+										<span class="ip-highlight-red mp-btn-link" id="yyxxjczl-zjyjsysl">80</span>&nbsp;人
+									</div>
+								</div>
+								<div class="panel-body">
+									<table class="table" id="yyxxjczl-table-zjyjsysl">
+										<thead>
+										<tr>
+											<th>驾驶员姓名</th>
+											<th>再教育结果</th>
+										</tr>
+										</thead>
+										<tbody>
+										<tr>
+											<th>张三</th>
+											<td>不合格</td>
+										</tr>
+										<tr>
+											<th>张三</th>
+											<td>不合格</td>
+										</tr>
+										<tr>
+											<th>张三</th>
+											<td>不合格</td>
+										</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<div class="panel panel-default panel-overview">
+								<div class="panel-heading clearfix" style="padding: 6px 15px;">
+									<div class="ip-item ip-item-c2 col-itemTitle">培训考核未通过</div>
+									<div class="ip-item ip-item-c2 col-itemTitle">
+										<span class="ip-highlight-red mp-btn-link" id="yyxxjczl-pxkhwtg">80</span>&nbsp;人
+									</div>
+								</div>
+								<div class="panel-body">
+									<table class="table" id="yyxxjczl-table-pxkhwtg">
+										<thead>
+										<tr>
+											<th>驾驶员姓名</th>
+											<th>培训考核结果</th>
+										</tr>
+										</thead>
+										<tbody>
+										<tr>
+											<th>张三</th>
+											<td>不合格</td>
+										</tr>
+										<tr>
+											<th>张三</th>
+											<td>不合格</td>
+										</tr>
+										<tr>
+											<th>张三</th>
+											<td>不合格</td>
+										</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	(function ($) {
+		$(function () {
+			$('.scrollbar-macosx').scrollbar();
+		})
+	})(jQuery)
+</script>
+</body>
+</html>

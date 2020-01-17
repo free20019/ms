@@ -1,0 +1,259 @@
+package com.erxi.ms.controller;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.erxi.ms.result.DownloadAct;
+import com.erxi.ms.service.YcyyclService;
+/**
+ * 异常营运车辆
+ * @author xianlehuang
+ * @date : 2018年10月15日 上午9:41:00
+ */
+@Controller
+@RequestMapping(value = "/ycyy")
+public class YcyyclAction {
+	@Autowired
+	private YcyyclService ycyyclService;
+
+	private DownloadAct downloadAct = new DownloadAct();
+	
+	/**
+	 * 下拉栏
+	 * @param request
+	 * @param table
+	 * @return
+	 */
+	@RequestMapping("/xll")
+	@ResponseBody
+	public String findxll(HttpServletRequest request,@RequestParam("field") String field,@RequestParam("table") String table) {
+		String msg = ycyyclService.findxll(field,table);
+		return msg;
+	}
+	/**
+	 * 下拉栏
+	 * @param request
+	 * @param table
+	 * @return
+	 */
+	@RequestMapping("/tsxll")
+	@ResponseBody
+	public String tsxll(HttpServletRequest request,@RequestParam("field") String field,@RequestParam("table") String table) {
+		String msg = ycyyclService.tsxll(field,table);
+		return msg;
+	}
+	/**
+	 * 设备异常未维修
+	 * @param request
+	 * @param stime
+	 * @param etime
+	 * @param vehicle
+	 * @param type
+	 * @param address
+	 * @param pageIndex
+	 * @param pageSize
+	 * @return
+	 */
+	@RequestMapping("/findsbyc")
+	@ResponseBody
+	public String findsbyc(HttpServletRequest request,
+			@RequestParam("stime") String stime,
+			@RequestParam("etime") String etime,
+			@RequestParam("vehicle") String vehicle,
+			@RequestParam("type") String type,
+			@RequestParam("address") String address,
+			@RequestParam("pageIndex") Integer pageIndex,
+			@RequestParam("pageSize") Integer pageSize) {
+		String msg = ycyyclService.findsbyc(stime,etime,vehicle,type,address,pageIndex,pageSize);
+		return msg;
+	}
+	/**
+	 * 设备异常未维修导出
+	 * @param request
+	 * @param stime
+	 * @param etime
+	 * @param vehicle
+	 * @param type
+	 * @param address
+	 * @return
+	 * @throws IOException 
+	 */
+	@RequestMapping("/findsbycdc")
+	@ResponseBody
+	public String findsbycdc(HttpServletRequest request,HttpServletResponse response,
+			@RequestParam("stime") String stime,
+			@RequestParam("etime") String etime,
+			@RequestParam("vehicle") String vehicle,
+			@RequestParam("type") String type,
+			@RequestParam("address") String address) throws IOException {
+		String a[] = {"车牌号","采集地点","异常类型","采集时间"};//导出列明
+		String b[] = {"VEHICLE_NO","ERROR_ADDRESS","ERROR_TYPE","ERROR_TIME"};//导出map中的key
+		String gzb = "设备异常未维修";//导出sheet名和导出的文件名
+		List<Map<String, Object>> list = ycyyclService.findsbycdc(stime,etime,vehicle,type,address);
+		downloadAct.download(request,response,a,b,gzb,list);
+		return null;
+	}
+	/**
+	 * 投诉违章未处理查询
+	 * @param request
+	 * @param stime
+	 * @param etime
+	 * @param vehicle
+	 * @param type
+	 * @param address
+	 * @param pageIndex
+	 * @param pageSize
+	 * @return
+	 */
+	@RequestMapping("/findtswz")
+	@ResponseBody
+	public String findtswz(HttpServletRequest request,
+			@RequestParam("stime") String stime,
+			@RequestParam("etime") String etime,
+			@RequestParam("vehicle") String vehicle,
+			@RequestParam("type") String type,
+			@RequestParam("address") String address,
+			@RequestParam("pageIndex") Integer pageIndex,
+			@RequestParam("pageSize") Integer pageSize) {
+		String msg = ycyyclService.findtswz(stime,etime,vehicle,type,address,pageIndex,pageSize);
+		return msg;
+	}
+	/**
+	 * 投诉违章未处理导出
+	 * @param request
+	 * @param stime
+	 * @param etime
+	 * @param vehicle
+	 * @param type
+	 * @param address
+	 * @return
+	 * @throws IOException 
+	 */
+	@RequestMapping("/findtswzdc")
+	@ResponseBody
+	public String findtswzdc(HttpServletRequest request,HttpServletResponse response,
+			@RequestParam("stime") String stime,
+			@RequestParam("etime") String etime,
+			@RequestParam("vehicle") String vehicle,
+			@RequestParam("type") String type,
+			@RequestParam("address") String address) throws IOException {
+		String a[] = {"车牌号","当事人姓名","IC卡分值","采集时间","执法时间","案件类型","执法部门","执法区域","经营许可证号"};//导出列明
+		String b[] = {"AUTO_NUM","PARTY_NAME","IC_SCORE","ILLEGAL_TIME","LEGAL_TIME","CASE_REASON","ORGAN","AREA","LIENCE_NUM"};//导出map中的key
+		String gzb = "投诉违章未处理";//导出sheet名和导出的文件名
+		List<Map<String, Object>> list = ycyyclService.findtswzdc(stime,etime,vehicle,type,address);
+		downloadAct.download(request,response,a,b,gzb,list);
+		return null;
+	}
+	/**
+	 * 疑似黑车查询
+	 * @param request
+	 * @param stime
+	 * @param etime
+	 * @param vehicle
+	 * @param type
+	 * @param address
+	 * @param pageIndex
+	 * @param pageSize
+	 * @return
+	 */
+	@RequestMapping("/findyshc")
+	@ResponseBody
+	public String findyshc(HttpServletRequest request,
+			@RequestParam("stime") String stime,
+			@RequestParam("etime") String etime,
+			@RequestParam("vehicle") String vehicle,
+			@RequestParam("type") String type,
+			@RequestParam("address") String address,
+			@RequestParam("pageIndex") Integer pageIndex,
+			@RequestParam("pageSize") Integer pageSize) {
+		String msg = ycyyclService.findyshc(stime,etime,vehicle,type,address,pageIndex,pageSize);
+		return msg;
+	}
+	/**
+	 * 疑似黑车导出
+	 * @param request
+	 * @param stime
+	 * @param etime
+	 * @param vehicle
+	 * @param type
+	 * @param address
+	 * @return
+	 * @throws IOException 
+	 */
+	@RequestMapping("/findyshcdc")
+	@ResponseBody
+	public String findyshcdc(HttpServletRequest request,HttpServletResponse response,
+			@RequestParam("stime") String stime,
+			@RequestParam("etime") String etime,
+			@RequestParam("vehicle") String vehicle,
+			@RequestParam("type") String type,
+			@RequestParam("address") String address) throws IOException {
+		String a[] = {"车牌号","采集地点","异常类型","采集时间"};//导出列明
+		String b[] = {"VEHICLE_NO","ERROR_ADDRESS","ERROR_TYPE","ERROR_TIME"};//导出map中的key
+		String gzb = "疑似黑车";//导出sheet名和导出的文件名
+		List<Map<String, Object>> list = ycyyclService.findyshcdc(stime,etime,vehicle,type,address);
+		downloadAct.download(request,response,a,b,gzb,list);
+		return null;
+	}
+	/**
+	 * 疑似套牌查询
+	 * @param request
+	 * @param stime
+	 * @param etime
+	 * @param vehicle
+	 * @param type
+	 * @param address
+	 * @param pageIndex
+	 * @param pageSize
+	 * @return
+	 */
+	@RequestMapping("/findystp")
+	@ResponseBody
+	public String findystp(HttpServletRequest request,
+			@RequestParam("stime") String stime,
+			@RequestParam("etime") String etime,
+			@RequestParam("vehicle") String vehicle,
+			@RequestParam("type") String type,
+			@RequestParam("address") String address,
+			@RequestParam("pageIndex") Integer pageIndex,
+			@RequestParam("pageSize") Integer pageSize) {
+		String msg = ycyyclService.findystp(stime,etime,vehicle,type,address,pageIndex,pageSize);
+		return msg;
+	}
+	/**
+	 * 疑似套牌导出
+	 * @param request
+	 * @param stime
+	 * @param etime
+	 * @param vehicle
+	 * @param type
+	 * @param address
+	 * @return
+	 * @throws IOException 
+	 */
+	@RequestMapping("/findystpdc")
+	@ResponseBody
+	public String findystpdc(HttpServletRequest request,HttpServletResponse response,
+			@RequestParam("stime") String stime,
+			@RequestParam("etime") String etime,
+			@RequestParam("vehicle") String vehicle,
+			@RequestParam("type") String type,
+			@RequestParam("address") String address) throws IOException {
+		String a[] = {"车牌号","采集地点","异常类型","采集时间","定位点经度","定位点纬度","定位点时间"};//导出列明
+		String b[] = {"VEHICLE_NO","PICTURE_ADDRESS","ERROR_TYPE","PICTURE_TIME","POS_LONGTI","POS_LATI","POS_TIME"};//导出map中的key
+		String gzb = "疑似套牌";//导出sheet名和导出的文件名
+		List<Map<String, Object>> list = ycyyclService.findystpdc(stime,etime,vehicle,type,address);
+		downloadAct.download(request,response,a,b,gzb,list);
+		return null;
+	}
+}

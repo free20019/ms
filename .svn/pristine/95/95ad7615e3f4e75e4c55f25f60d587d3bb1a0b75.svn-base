@@ -1,0 +1,72 @@
+package com.erxi.ms.service;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.erxi.ms.config.DS;
+import com.erxi.ms.dao.JxxfaDao;
+import com.erxi.ms.result.FastJsonUtil;
+import com.erxi.ms.result.Result;
+
+@Service
+public class JxxfbService {
+
+	@Autowired
+	private JxxfaDao jxxfaDao;
+
+	@DS("datasource1")
+	public Result<List<Map<String, Object>>> jxxfb(String datetimeStart,
+			String datetimeEnd, String type, Integer pageIndex, Integer pageSize) {
+		List<Map<String, Object>> list = jxxfaDao.getJxxfb(datetimeStart,
+				datetimeEnd, type, pageIndex, pageSize);
+		int count = 0;
+		if (list != null && list.size() > 0) {
+			count = Integer.parseInt(String.valueOf(list.get(0).get("COUNT")));
+		}
+		List<Map<String, Object>> lists = new ArrayList<Map<String, Object>>();
+		Map map = new HashMap();
+		map.put("count", count);
+		map.put("datas", list);
+		lists.add(map);
+		return Result.success(lists);
+	}
+
+	@DS("datasource1")
+	public String jxxfbExport(String datetimeStart, String datetimeEnd,
+			String type) {
+		List<Map<String, Object>> listWsx = jxxfaDao.getJxxfbExport(
+				datetimeStart, datetimeEnd, type);
+		Map map = new HashMap();
+		map.put("data", listWsx);
+		return FastJsonUtil.toJSONString(map);
+
+	}
+
+	@DS("datasource1")
+	public Integer getInsertFindAllService(@Param("bt") String bt,
+			@Param("nr") String nr, @Param("fbrq") String fbrq,
+			@Param("lb") String lb) {
+		Integer integer = jxxfaDao.getIntegerFindAllDao(bt, nr, fbrq, lb);
+		return integer;
+	}
+
+	@DS("datasource1")
+	public Integer getUpdateFindAllService(@Param("id") String id,
+			@Param("bt") String bt, @Param("nr") String nr,
+			@Param("fbrq") String fbrq, @Param("lb") String lb) {
+		Integer integer = jxxfaDao.getUpdateFindAllDao(id, bt, nr, fbrq, lb);
+		return integer;
+	}
+
+	@DS("datasource1")
+	public Integer getdaleteFindAllService(@Param("id") String id) {
+		Integer integer = jxxfaDao.getdaleteFindAllDao(id);
+		return integer;
+	}
+}

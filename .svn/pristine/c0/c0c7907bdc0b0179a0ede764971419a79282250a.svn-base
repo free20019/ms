@@ -1,0 +1,551 @@
+package com.erxi.ms.dao;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.ResultType;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.Update;
+
+import com.erxi.ms.result.Result;
+
+@Mapper
+public interface TlaqDao {
+	
+	/**
+	 * 车辆轨迹
+	 * @param table
+	 * @param vehino
+	 * @param sTime
+	 * @param eTime
+	 * @return
+	 */
+	@Select("select * from(select a.vehicle_num,a.SPEED_TIME,a.PX,a.PY,a.SPEED"
+				+ ",a.DIRECTION,a.STATE,a.CARSTATE, b.VEHI_SIM,b.COMP_NAME,b.OWN_NAME,b.own_tel,b.MDT_NO "
+				+ " from ${table} a,vw_vehicle  b where a.vehicle_num = b.vehi_no"
+				+ " and a.vehicle_num = '${vehino}' and "
+				+ "speed_time >= str_to_date('${sTime}', '%Y-%m-%d %H:%i:%s')"
+				+ " and speed_time <= str_to_date('${eTime}', '%Y-%m-%d %H:%i:%s') and a.CARSTATE = 0) t" 
+				+ " order by speed_time")
+	public List<Map<String, Object>> getVehicleList(
+			@Param("table")String table,
+			@Param("vehino")String vehino,
+			@Param("sTime")String sTime,
+			@Param("eTime")String eTime);
+	
+	
+	/**
+	 * 重点关注车辆
+	 * @return
+	 */
+	@Select("select * from TB_ZDGZCL_TAXI where vehicle <> '1'")
+	@ResultType(String.class)
+	public List<Map<String, Object>> getZdgzcl();
+
+	
+	
+	/**
+	 * 取消重点关注车辆
+	 * @param vehi
+	 * @return
+	 */
+	@Delete("delete from TB_ZDGZCL_TAXI where vehicle = '${vehi}'")
+	public int delVehi(@Param("vehi") String vehi);
+
+	/**
+	 * 取消所有重点关注车辆
+	 * @param vehi
+	 * @return
+	 */
+	@Delete("delete from TB_ZDGZCL_TAXI")
+	public int delAllVehi();
+	
+	/**
+	 * 增加重点关注车辆
+	 * @param vehi
+	 * @return
+	 */
+	@Insert("insert into TB_ZDGZCL_TAXI (vehicle) values (CASE WHEN EXISTS(SELECT t.* FROM (SELECT * FROM TB_ZDGZCL_TAXI WHERE vehicle='${vehi}') t ) THEN '1' ELSE '${vehi}' END)")
+	public int insVehi(@Param("vehi") String vehi,
+			@Param("longi") String longi,
+			@Param("lati") String lati);
+
+	
+	/**
+	 * 导入车辆
+	 * @return
+	 */
+	@Insert("insert into TB_ZDGZCL_TAXI (vehicle) values (CASE WHEN EXISTS(SELECT t.* FROM (SELECT * FROM TB_ZDGZCL_TAXI WHERE vehicle='${vehi}') t ) THEN '1' ELSE '${vehi}' END)")
+	public int insExcelVehi(@Param("vehi") String vehi);
+	
+	
+	/**
+	 * 查询公司 & 数目
+	 */
+	@Select("select t.name,t.VEHICLE_SUM from TB_GLOBAL_COMPANY t order by CAST(t.VEHICLE_SUM AS SIGNED) desc")
+	@ResultType(String.class)
+	public List<Map<String, Object>> getCompany();
+	
+	/**
+	 * 查询车辆
+	 */
+	@Select("select t.BRAND,t.MODEL,count(t.brand)as count from TB_GLOBAL_VEHICLE t where t.BUSINESS_SCOPE_NAME='客运：出租车客运。' AND t.STATUS_NAME='营运' and t.plate_number LIKE '浙A%' group by t.brand,t.MODEL order by count desc")
+	@ResultType(String.class)
+	public List<Map<String, Object>> getVehi();
+	
+	
+	/**
+	 * 车辆年限
+	 */
+	@Select("select case when (to_days(now()) - to_days(str_to_date(date_format(PURCHASE_DATE, '%Y-%m-%d'), '%Y-%m-%d'))) < 365 then '0(含)至1年' "+
+         "when (to_days(now()) - to_days(str_to_date(date_format(PURCHASE_DATE, '%Y-%m-%d'), '%Y-%m-%d'))) >= 365 and "+
+              "(to_days(now()) - to_days(str_to_date(date_format(PURCHASE_DATE, '%Y-%m-%d'), '%Y-%m-%d'))) < 2 * 365 then '1(含)至2年' "+
+         "when (to_days(now()) - to_days(str_to_date(date_format(PURCHASE_DATE, '%Y-%m-%d'), '%Y-%m-%d'))) >= 2 * 365 and "+
+              "(to_days(now()) - to_days(str_to_date(date_format(PURCHASE_DATE, '%Y-%m-%d'), '%Y-%m-%d'))) < 3 * 365 then '2(含)至3年' "+
+         "when (to_days(now()) - to_days(str_to_date(date_format(PURCHASE_DATE, '%Y-%m-%d'), '%Y-%m-%d'))) >= 3 * 365 and "+
+              "(to_days(now()) - to_days(str_to_date(date_format(PURCHASE_DATE, '%Y-%m-%d'), '%Y-%m-%d'))) < 4 * 365 then '3(含)至4年' else '4(含)年以上' "+
+       "end as ti,count(*) as count from TB_GLOBAL_VEHICLE where BUSINESS_SCOPE_NAME='客运：出租车客运。' AND STATUS_NAME='营运' and plate_number LIKE '浙A%' group by case "+
+       "when (to_days(now()) - to_days(str_to_date(date_format(PURCHASE_DATE, '%Y-%m-%d'), '%Y-%m-%d'))) < 365 then '0(含)至1年' "+
+       "when (to_days(now()) - to_days(str_to_date(date_format(PURCHASE_DATE, '%Y-%m-%d'), '%Y-%m-%d'))) >= 365 and "+
+            "(to_days(now()) - to_days(str_to_date(date_format(PURCHASE_DATE, '%Y-%m-%d'), '%Y-%m-%d'))) < 2 * 365 then '1(含)至2年' "+
+       "when (to_days(now()) - to_days(str_to_date(date_format(PURCHASE_DATE, '%Y-%m-%d'), '%Y-%m-%d'))) >= 2 * 365 and "+
+            "(to_days(now()) - to_days(str_to_date(date_format(PURCHASE_DATE, '%Y-%m-%d'), '%Y-%m-%d'))) < 3 * 365 then '2(含)至3年' "+
+       "when (to_days(now()) - to_days(str_to_date(date_format(PURCHASE_DATE, '%Y-%m-%d'), '%Y-%m-%d'))) >= 3 * 365 and "+
+            "(to_days(now()) - to_days(str_to_date(date_format(PURCHASE_DATE, '%Y-%m-%d'), '%Y-%m-%d'))) < 4 * 365 then '3(含)至4年' "+
+         "else '4(含)年以上' end order by ti")
+	@ResultType(String.class)
+	public List<Map<String, Object>> getVehiYear();
+	
+	/**
+	 * 查询驾驶员
+	 */
+	@Select("select case when DRIVER_AGE >=3 and DRIVER_AGE <5 then '3(含)至5年' "+
+         "when DRIVER_AGE >=5 and DRIVER_AGE <10 then '5(含)至10年' "+
+         "when DRIVER_AGE >=10 and DRIVER_AGE <15 then '10(含)至15年' "+
+         "when DRIVER_AGE >=15 and DRIVER_AGE <20 then '15(含)至20年' "+
+         "else '20年(含)以上'end as ti,count(*) as count "+
+         "from (select t.*,ti.ASSESS_SCORE,ti.ASSESS_YEAR from (select "+
+		 " b.* from (select gpc.* from "
+//		 + "tb_global_vehicle gv, "
+		 + " TB_GLOBAL_PERSON_CERTIFICATE gpc force INDEX(plate_number) "
+//		 + "where REPLACE(gpc.plate_number,'.','')=gv.plate_number and gv.BUSINESS_SCOPE_NAME='客运：出租车客运。' AND gv.STATUS_NAME='营运' AND gpc.plate_number LIKE '浙A%'"
+		 + ") b where 1=1 and id_number is not null and (id,id_number) in (select max(id),id_number from"+
+		 " (select gpc.id,gpc.id_number from"
+//		 + " tb_global_vehicle gv,"
+		 + " TB_GLOBAL_PERSON_CERTIFICATE gpc force INDEX(plate_number)"
+//		 + " where REPLACE(gpc.plate_number,'.','')=gv.plate_number and gv.BUSINESS_SCOPE_NAME='客运：出租车客运。' AND gv.STATUS_NAME='营运' AND gpc.plate_number LIKE '浙A%'
+		 + " ) c group by id_number) "
+		 + " ) t left join (select ti.ASSESS_SCORE,ti.ASSESS_YEAR,ti.id_number from TB_TAXI_INTEGRITY_INFO_OUT ti "+
+		 "where (ti.id_number,ti.ASSESS_YEAR) in (select id_number,max(ti.ASSESS_YEAR) from TB_TAXI_INTEGRITY_INFO_OUT ti  group by id_number)) ti  "+
+		 "on ti.id_number=t.id_number " +
+         ") t group by case "+
+         "when DRIVER_AGE >=3 and DRIVER_AGE <5 then '3(含)至5年' "+
+         "when DRIVER_AGE >=5 and DRIVER_AGE <10 then '5(含)至10年' "+
+         "when DRIVER_AGE >=10 and DRIVER_AGE <15 then '10(含)至15年' "+
+         "when DRIVER_AGE >=15 and DRIVER_AGE <20 then '15(含)至20年' "+
+         "else '20年(含)以上'" + 
+        " end order by ti")
+	@ResultType(String.class)
+	public List<Map<String, Object>> getPerson();
+	
+	
+	/**
+	 * 查询驾驶员驾龄
+	 */
+	@Select("select t.id_number from (select "+
+		 " b.* from (select gpc.* from"
+//		 + " tb_global_vehicle gv, "
+		 + " TB_GLOBAL_PERSON_CERTIFICATE gpc force INDEX(plate_number)"
+//		 + " where REPLACE(gpc.plate_number,'.','')=gv.plate_number and gv.BUSINESS_SCOPE_NAME='客运：出租车客运。' AND gv.STATUS_NAME='营运' AND gpc.plate_number LIKE '浙A%'"
+		 + ") b where 1=1 and id_number is not null and (id,id_number) in (select max(id),id_number from"
+		 +" (select gpc.id,gpc.id_number from "
+//		 + "tb_global_vehicle gv,"
+		 + " TB_GLOBAL_PERSON_CERTIFICATE gpc force INDEX(plate_number)"
+//		 + " where REPLACE(gpc.plate_number,'.','')=gv.plate_number and gv.BUSINESS_SCOPE_NAME='客运：出租车客运。' AND gv.STATUS_NAME='营运' AND gpc.plate_number LIKE '浙A%'"
+		 + ") c group by id_number) "+
+		 " ) t left join (select ti.ASSESS_SCORE,ti.ASSESS_YEAR,ti.id_number from TB_TAXI_INTEGRITY_INFO_OUT ti "+
+		 "where (ti.id_number,ti.ASSESS_YEAR) in (select id_number,max(ti.ASSESS_YEAR) from TB_TAXI_INTEGRITY_INFO_OUT ti  group by id_number)) ti  "+
+		 "on ti.id_number=t.id_number ")
+	@ResultType(String.class)
+	public List<Map<String, Object>> getPersoncount();
+	
+	
+	/**
+	 * 故障
+	 */
+	@Select("select count(gv.VEHI_NO) as count, gv.ba_name  from TB_ALARM_realtime t , VW_VEHICLE gv where t.vehicle_no  = gv.VEHI_NO and gv.ba_name is not null and (t.NO_GPS = 1 or t.VD_FAULT = 1 or t.METER_DISCONN = 1) group by gv.ba_name order by count desc")
+	@ResultType(String.class)
+	public List<Map<String, Object>> getIssue();
+	
+	/**
+	 * 设备
+	 */
+	@Select("select count(*) as count,mdt_sub_type from VW_VEHICLE t where mdt_sub_type is not null group by mdt_sub_type order by count desc")
+	@ResultType(String.class)
+	public List<Map<String, Object>> getAllMac();
+
+	/**
+	 * 行业营运状况 - 营运总览
+	 * @return
+	 */
+	@SelectProvider(type = getZl.class, method = "getYyzk")
+	@ResultType(String.class)
+	public List<Map<String, Object>> getAll();
+
+	/**
+	 * 订单总览
+	 * @return
+	 */
+	@SelectProvider(type = getZl.class, method = "getDdzl")
+	@ResultType(String.class)
+	public List<Map<String, Object>> getOrder();
+	
+	/**
+	 * 交易总览
+	 * @return
+	 */
+	@SelectProvider(type = getZl.class, method = "getJyzl")
+	@ResultType(String.class)
+	public List<Map<String, Object>> getSum();
+	
+	
+	/**
+	 * 投诉类型排名
+	 * @return
+	 */
+//	@Select("select replace(t.business_itemtype_name, '运管_客运_出租客运_', '') as tt,count(*) as count from V_GLOBAL_COMPLAINT_12328 t where date_format(t.archive_time,'%Y%m') = date_format(now(), '%Y%m') and instr(t.business_itemtype_name, '运管_客运_出租客运_') > 0 group by replace(t.business_itemtype_name, '运管_客运_出租客运_', '')")
+	@Select("select replace(t.business_itemtype_name, '运管_客运_出租客运_', '') as tt,count(*) as count from V_GLOBAL_COMPLAINT_12328 t where date_format(t.HAPPEN_TIME,'%Y%m') = date_format(now(), '%Y%m') and t.HAPPEN_TIME<=now() AND t.VEHICLE_PLATE_NUMBER IS NOT NULL and instr(t.business_itemtype_name, '运管_客运_出租客运_') > 0 group by replace(t.business_itemtype_name, '运管_客运_出租客运_', '')")
+	@ResultType(String.class)
+	public List<Map<String, Object>> getTs();
+	
+	
+	/**
+	 * 投诉已解决占比
+	 * @return
+	 */
+//	@Select("select t.business_status_name as tt, count(*) as count from V_GLOBAL_COMPLAINT_12328 t where date_format(t.archive_time,'%Y%m') = date_format(now(), '%Y%m')  and instr(t.business_itemtype_name, '运管_客运_出租客运_') > 0 group by t.business_status_name")
+	@Select("select t.business_status_name as tt, count(*) as count from V_GLOBAL_COMPLAINT_12328 t where date_format(t.HAPPEN_TIME,'%Y%m') = date_format(now(), '%Y%m') and t.HAPPEN_TIME<=now() AND t.VEHICLE_PLATE_NUMBER IS NOT NULL and instr(t.business_itemtype_name, '运管_客运_出租客运_') > 0 group by t.business_status_name")
+	@ResultType(String.class)
+	public List<Map<String, Object>> getTj();
+	
+	/**
+	 * 重点抓拍车辆
+	 * @return
+	 */
+	@Select("select z.*,m.*,v.VEHISTATUS,v.VEHI_SIM SIM_NUM,v.VT_NAME,v.COMP_NAME,v.VC_NAME,v.OWN_NAME,v.OWN_TEL,v.VEHI_NO"
+			+ " from tb_zdgzcl_monitor z,vw_vehicle v,tb_mdt_status m"
+			+ " where v.vehi_no=m.VEHI_NUM and  z.VEHICLE_NO= v.vehi_no and z.GET_TIME>=DATE_SUB(NOW(),INTERVAL 5 MINUTE)  order by z.GET_TIME desc")
+	@ResultType(String.class)
+	public List<Map<String, Object>> findFocusMonitor();
+	
+	/**
+	 * 故障车辆抓拍
+	 * @return
+	 */
+	@Select("select g.SUBSCRIBE_PLACE,g.SUBSCRIBE_TIME,g.LONGITUDE PX,g.LATITUDE PY,g.SPEED,DATE_FORMAT(g.last_time,'%Y-%m-%d %H:%i:%s') LAST_TIME,g.STATE,v.VEHISTATUS,v.VEHI_SIM SIM_NUM,v.VT_NAME,v.COMP_NAME,v.VC_NAME,v.OWN_NAME,v.OWN_TEL,v.VEHI_NO"
+			+ " from tb_gzfx_monitor g,vw_vehicle v"
+			+ " where v.vehi_no= g.car_number"
+			+ " and (ONE_ROAD_ONE!=0 or ONE_ROAD_TWO!=0 or ONE_ROAD_THREE!=0 or ONE_ROAD_FOUR!=0 or TWO_ROAD_ONE!=0 or TWO_ROAD_TWO!=0 or TWO_ROAD_THREE!=0 or TWO_ROAD_FOUR!=0)"
+			+ " and g.subscribe_time>=DATE_SUB(NOW(),INTERVAL"
+			+ " 5 MINUTE"
+//			+ " 10 HOUR"
+			+ ") order by g.subscribe_time desc")
+	@ResultType(String.class)
+	public List<Map<String, Object>> findFaultMonitor();
+
+	/**
+	 * 报警管理
+	 * @param pageSize 
+	 * @param pageIndex 
+	 * @return
+	 */
+	@SelectProvider(type = getZl.class, method = "getbjgl")
+	@ResultType(String.class)
+	public List<Map<String, Object>> getbjgl(
+			@Param("table") String table,
+			@Param("stime") String stime,
+			@Param("etime") String etime, 
+			@Param("cp") String cp,
+			@Param("pageIndex")Integer pageIndex, 
+			@Param("pageSize")Integer pageSize );
+	
+	/**
+	 * 视频管理
+	 * @param pageSize 
+	 * @param pageIndex 
+	 * @return
+	 */
+	@SelectProvider(type = getZl.class, method = "getspgl")
+	@ResultType(String.class)
+	public List<Map<String, Object>> getspgl(
+			@Param("table") String table,
+			@Param("stime") String stime,
+			@Param("etime") String etime, 
+			@Param("cp") String cp,
+			@Param("pageIndex")Integer pageIndex, 
+			@Param("pageSize")Integer pageSize );
+	
+	
+	/**
+	 * 下拉所有公司
+	 * @return
+	 */
+	@Select("select t.ID, t.NAME from TB_GLOBAL_COMPANY t order by vehicle_sum desc")
+	@ResultType(String.class)
+	public List<Map<String, Object>> getAllComp();
+	
+	/**
+	 * 下拉所有车辆
+	 * @return
+	 */
+	@Select("select t.vehi_no as PLATE_NUMBER,t.vehi_sim as ID from VW_VEHICLE t left join tb_mdt_status s  on t.mdt_no=s.mdt_no")
+//	@Select("select t.PLATE_NUMBER,t.ID from TB_GLOBAL_vehicle t where BUSINESS_SCOPE_NAME='客运：出租车客运。' AND STATUS_NAME='营运' AND PLATE_NUMBER LIKE '浙A%'")
+	@ResultType(String.class)
+	public List<Map<String, Object>> getallVehi();
+	
+	/**
+	 * 下拉所有区域
+	 * @return
+	 */
+	@Select("select t.area_id as id,t.area_name as name from tb_area t")
+	@ResultType(String.class)
+	public List<Map<String, Object>> getallArea();
+	
+	
+	/**
+	 * 营运车辆数
+	 * @return
+	 */
+	@SelectProvider(type = getZl.class, method = "getYycls")
+	@ResultType(String.class)
+	public List<Map<String, Object>> getYycls();
+	
+	
+	/**
+	 * 权限管理
+	 * @param xm
+	 * @return
+	 */
+	@Select("select * from TB_TAXI_USER where username like #{xm} order by id desc")
+	public List<Map<String, Object>> getQx(@Param("xm") String xm);
+	
+	/**
+	 * 权限管理 - 修改
+	 * @param qxname 
+	 * @param xm
+	 * @return
+	 */
+	@Update("update TB_TAXI_USER set menu = #{qx},menus = #{qxname} where id = #{id}")
+	public int qxglEdit(@Param("id")String id, @Param("qx")String qx,  @Param("qxname")String qxname);
+	
+	/**
+	 * 用户上线
+	 * @param pageSize 
+	 * @param pageIndex 
+	 * @return
+	 */
+	@SelectProvider(type = getZl.class, method = "findyhsx")
+	@ResultType(String.class)
+	public List<Map<String, Object>> findyhsx(
+			@Param("stime") String stime,
+			@Param("etime") String etime, 
+			@Param("name") String name,
+			@Param("pageIndex")Integer pageIndex, 
+			@Param("pageSize")Integer pageSize );
+	
+	/**
+	 * 查询用户
+	 * @param user
+	 * @return
+	 */
+	@Select("select * from TB_TAXI_USER where username = #{user}")
+	public List<Map<String, Object>> findUser(@Param("user") String user);
+	
+	/**
+	 * 查询用户
+	 * @param user
+	 * @return
+	 */
+	@Select("select * from TB_TAXI_USER where username = #{user} and id !=#{id}")
+	public List<Map<String, Object>> findEditUser(@Param("user") String user,@Param("id")String id);
+	
+	/**
+	 * 添加用户
+	 * @param user 
+	 * @param password 
+	 * @param salt
+	 * @return
+	 */
+	@Insert("insert into TB_TAXI_USER (username,salt,password) value(#{user},#{salt},#{password})")
+	public int addUser(@Param("user")String user, @Param("salt")String salt,  @Param("password")String password);
+	
+	/**
+	 * 修改用户
+	 * @param user 
+	 * @param password 
+	 * @param salt
+	 * @return
+	 */
+	@Update("update TB_TAXI_USER set username = #{user},salt = #{salt},password = #{password} where id = #{id}")
+	public int editUser(@Param("id")String id, @Param("user")String user, @Param("salt")String salt,  @Param("password")String password);
+	
+	/**
+	 * 删除用户
+	 * @param id
+	 * @return
+	 */
+	@Update("delete from TB_TAXI_USER where id = #{id}")
+	public int deleteUser(@Param("id")String id);
+	
+	class getZl{
+		public String getYyzk(){
+			/*	SELECT
+				SUM(jine/100) as je,
+				COUNT(1) count,
+				SUM(jicheng/10) lc,
+				SUM((xiache - shangche)) sc
+			FROM
+				jjq201901_1 c
+			where flag = '1000000000' and date_format(now(), '%Y%m%d') = c.shangchedate */
+			Date dt = new Date();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");   
+			String tj = sdf.format(dt); 
+//			String sql = "select sum(c.tjcs) as count,sum(c.zlc) as lc ,(sum(c.XJYYSC)+sum(c.SKYYSC))/60 as sc,sum(c.xjjine)+sum(c.skjine) as je from jjq_tj_";
+//			sql += tj;
+//			sql += "_day c, vw_vehicle t where concat('浙', c.cphm) = t.vehi_no and c.type = 5 and date_format(now(), '%Y%m%d') = c.day ";
+			String sql = "SELECT SUM(jine/100) as je,COUNT(1) count,SUM(jicheng/10) lc,SUM((UNIX_TIMESTAMP(xiache) - UNIX_TIMESTAMP(shangche))/3600) sc FROM jjq";
+			sql += tj;
+			sql += "_1 c where flag = '1000000000' and date_format(now(), '%Y%m%d') = c.shangchedate ";
+			return sql;
+		}
+		
+		public String getDdzl(){
+			Date dt = new Date();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");   
+			String tj = sdf.format(dt); 
+//			String sql = "select sum(c.tjcs) as count, date_format(jsyysj,'%H') as ti from jjq_tj_";
+//			sql += tj;
+//			sql += "_day c, vw_vehicle t where concat('浙', c.cphm) = t.vehi_no and c.type = 5 and date_format(now(), '%Y%m%d') = c.day group by date_format(jsyysj,'%H') order by date_format(jsyysj,'%H') ";
+//			
+			String sql = "SELECT COUNT(1) count,date_format(shangche,'%H') as ti FROM jjq";
+			sql += tj;
+			sql += "_1 c where flag = '1000000000' and date_format(now(), '%Y%m%d') = c.shangchedate group by date_format(shangche,'%H') order by date_format(shangche,'%H') ";
+			return sql;
+		}
+		
+		public String getJyzl(){
+			Date dt = new Date();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");   
+			String tj = sdf.format(dt); 
+//			String sql = "select sum(c.xjjine) + sum(c.skjine) as je, date_format(jsyysj,'%H') as ti from jjq_tj_";
+//			sql += tj;
+//			sql += "_day c, vw_vehicle t where concat('浙', c.cphm) = t.vehi_no and c.type = 5 and date_format(now(), '%Y%m%d') = c.day group by date_format(jsyysj,'%H') order by date_format(jsyysj,'%H') ";
+			String sql = "SELECT sum(ROUND(jine/100)) je,date_format(shangche,'%H') as ti FROM jjq";
+			sql += tj;
+			sql += "_1 c where flag = '1000000000' and date_format(now(), '%Y%m%d') = c.shangchedate group by date_format(shangche,'%H') order by date_format(shangche,'%H') ";
+			return sql;
+		}
+		
+		public String getbjgl(
+				@Param("table") String table,
+				@Param("stime") String stime,
+				@Param("etime") String etime, 
+				@Param("cp") String cp,
+				@Param("pageIndex")Integer pageIndex, 
+				@Param("pageSize")Integer pageSize){
+			String tj="";
+			table = "tb_taxi_gzfx_history";
+			
+			tj += " (b.NO_GPS = 1 or b.NO_JJQ = 1 or b.NO_GPS_JJQ = 1 or b.SEVEN_GPS_JJQ = 1 or b.EMPTY_HEAVY = 1) ";
+			if(stime!=null&&!stime.isEmpty()&&!stime.equals("null")&&stime.length()>0){
+				tj += " and b.DB_TIME >= str_to_date('"+stime+"', '%Y-%m-%d')";
+			}
+			if(etime!=null&&!etime.isEmpty()&&!etime.equals("null")&&etime.length()>0){
+				tj += " and b.DB_TIME <= str_to_date('"+etime+"', '%Y-%m-%d')";
+			}
+			if(cp!=null&&!cp.isEmpty()&&!cp.equals("null")&&cp.length()>0&&!cp.equals("全部")){
+				tj += " and b.VEHICLE_NO like '%"+cp+"%'";
+			}
+			String sql = "SELECT (SELECT count(b.VEHICLE_NO) count FROM "+table+"  b where ";
+			sql += tj;
+			sql+=") as count, tt.* from (SELECT d.*,c.COMP_NAME FROM (SELECT b.* FROM "+table+"  b where ";
+			sql += tj;
+			sql += " ) d,vw_vehicle c WHERE d.VEHICLE_NO = c.VEHI_NO ) tt ORDER BY tt.VEHICLE_NO,tt.DB_TIME desc limit "+((pageIndex-1)*pageSize)+","+pageSize;
+			System.out.println(sql);
+			return sql;
+		}
+		
+		
+		public String getspgl(
+				@Param("table") String table,
+				@Param("stime") String stime,
+				@Param("etime") String etime, 
+				@Param("cp") String cp,
+				@Param("pageIndex")Integer pageIndex, 
+				@Param("pageSize")Integer pageSize){
+			String tj="";
+			tj += " ( b.HD_FAULT = 1 or b.SD_FAULT = 1 or b.VD_FAULT = 1 or b.VD_EX_FAULT = 1) ";
+			if(stime!=null&&!stime.isEmpty()&&!stime.equals("null")&&stime.length()>0){
+				tj += " and b.DBTIME >= str_to_date('"+stime+"', '%Y-%m-%d %H:%i:%s')";
+			}
+			if(etime!=null&&!etime.isEmpty()&&!etime.equals("null")&&etime.length()>0){
+				tj += " and b.DBTIME <= str_to_date('"+etime+"', '%Y-%m-%d %H:%i:%s')";
+			}
+			if(cp!=null&&!cp.isEmpty()&&!cp.equals("null")&&cp.length()>0&&!cp.equals("全部")){
+				tj += " and b.VEHICLE_NO like '%"+cp+"%'";
+			}
+			String sql = "SELECT (SELECT count(b.VEHICLE_NO) count FROM "+table+"  b where ";
+			sql += tj;
+			sql+=" ) as count, tt.* from (SELECT d.*,c.COMP_NAME FROM (SELECT b.* FROM "+table+"  b where ";
+			sql += tj;
+			sql += " ) d,vw_vehicle c WHERE d.VEHICLE_NO = c.VEHI_NO ) tt ORDER BY tt.VEHICLE_NO,tt.dbtime desc limit "+((pageIndex-1)*pageSize)+","+pageSize;
+			System.out.println(sql);
+			return sql;
+		}
+		
+		
+		
+		public String getYycls(){
+			Date dt = new Date();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");   
+			String tj = sdf.format(dt); 
+			String sql = "select count(DISTINCT cphm_new) as count from JJQ";
+			sql += tj;
+			sql += "_1 t where t.flag = '1000000000' and t.shangchedate = date_format(now(),'%Y%m%d')";
+			return sql;
+		}
+		
+		public String findyhsx(
+				@Param("stime") String stime,
+				@Param("etime") String etime, 
+				@Param("name") String name,
+				@Param("pageIndex")Integer pageIndex, 
+				@Param("pageSize")Integer pageSize){
+			String tj="";			
+			if(stime!=null&&!stime.isEmpty()&&!stime.equals("null")&&stime.length()>0){
+				tj += " and b.LOGIN_TIME >= str_to_date('"+stime+" 00:00:00', '%Y-%m-%d %H:%i:%s')";
+			}
+			if(etime!=null&&!etime.isEmpty()&&!etime.equals("null")&&etime.length()>0){
+				tj += " and b.LOGIN_TIME <= str_to_date('"+etime+" 23:59:59', '%Y-%m-%d %H:%i:%s')";
+			}
+			if(name!=null&&!name.isEmpty()&&!name.equals("null")&&name.length()>0&&!name.equals("姓名")){
+				tj += " and b.USER_NAME like '%"+name+"%'";
+			}
+			String sql = "SELECT (SELECT count(b.USER_NAME) count FROM tb_taxi_user a,tb_login_history  b where a.username=b.USER_NAME";
+			sql += tj;
+			sql+=") as count, tt.* from (SELECT b.*,date_format(b.LOGIN_TIME,'%Y-%m-%d %H:%i:%s') TIME from tb_taxi_user a,tb_login_history b where a.username=b.USER_NAME ";
+			sql += tj;
+			sql += " ) tt ORDER BY tt.LOGIN_TIME desc limit "+((pageIndex-1)*pageSize)+","+pageSize;
+			System.out.println(sql);
+			return sql;
+		}
+	}
+
+}

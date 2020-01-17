@@ -1,0 +1,241 @@
+@import "../main";
+@import "../map";
+
+.template-wrapper {
+  padding: 10px;
+}
+
+.tw {
+  @mixin borderBar {
+    border: 1px solid #eeeeee;
+    box-shadow: 1px 1px 6px #aaaaaa;
+    background-color: #ffffff;
+  }
+
+  &-map {
+    &-tool {
+      &-bar {
+        top: 40px;
+        right: 30px;
+
+        .tw-map-tool-item {
+          cursor: pointer;
+        }
+      }
+    }
+
+    &-search {
+       &-for {
+         top: 40px;
+         left: 40px;
+         .tw-map-input {
+           width: 324px;
+         }
+       }
+     }
+
+     &-event {
+       &-bar {
+         position: absolute;
+         top: 85px;
+         left: 40px;
+         width: 370px;
+         border-radius: 2px;
+         @include borderBar;
+       }
+
+       &-item {
+         float: left;
+         width: 50%;
+         line-height: 40px;
+         text-align: center;
+         cursor: pointer;
+
+         &:first-child {
+           border-top-left-radius: inherit;
+           border-top-right-radius: 0;
+           border-bottom-left-radius: inherit;
+           border-bottom-right-radius: 0;
+         }
+
+         &:last-child {
+           border-top-left-radius: 0;
+           border-top-right-radius: inherit;
+           border-bottom-left-radius: 0;
+           border-bottom-right-radius: inherit;
+         }
+
+         &:hover {
+           color: #ffffff;
+           background-color: #1492ff;
+         }
+         .tw-icon {
+           margin-right: 5px;
+         }
+       }
+     }
+
+     &-panel {
+       position: absolute;
+       top: 85px;
+       left: 40px;
+       width: 370px;
+       height: calc(100% - 200px);
+
+       &-header {
+         padding-left: 10px;
+         padding-right: 10px;
+         line-height: 40px;
+         color: #888888;
+         background-color: #eeeeee;
+       }
+       &-body {
+         overflow: auto;
+         padding: 10px;
+         .tw-body-item {
+           position: relative;
+           line-height: 25px;
+           $titleWidth: 80px;
+           &-title {
+             position: absolute;
+             top: 0;
+             left: 0;
+             display: inline-block;
+             width: $titleWidth;
+             text-align: right;
+           }
+           &-value {
+             display: inline-block;
+             width: calc(100% - #{$titleWidth} + 5px);
+             min-height: 25px;
+             margin-left: $titleWidth + 5px;
+           }
+         }
+         .tw-map-list {
+           border: none;
+           border-radius: 0;
+           box-shadow: none;
+         }
+       }
+
+       &-title {
+         @include borderBar;
+         margin-bottom: 5px;
+
+         &:last-child {
+           margin-bottom: 0;
+         }
+       }
+     }
+
+     &-header {
+       @include borderBar;
+       position: relative;
+       margin-bottom: 5px;
+       padding: 0 10px;
+       line-height: 40px;
+       border-radius: 2px;
+       cursor: pointer;
+       &:hover {
+         color: #ffffff;
+         background-color: #1492ff;
+       }
+       .countNumber {
+         position: absolute;
+         top: 10px;
+         right: 0;
+         height: 20px;
+         padding: 0 10px;
+         border-left: 1px solid #eeeeee;
+         line-height: 20px;
+       }
+     }
+
+     &-list {
+       @include borderBar;
+       height: calc(100% - 40px);
+       border-radius: 3px;
+     }
+
+     &-item {
+       min-height: 40px;
+       padding-left: 10px;
+       padding-right: 10px;
+       border-bottom: 1px solid #eeeeee;
+       line-height: 40px;
+       cursor: pointer;
+
+       &:first-child {
+         border-top-left-radius: inherit;
+         border-top-right-radius: inherit;
+       }
+       &:last-child {
+         border-bottom-left-radius: inherit;
+         border-bottom-right-radius: inherit;
+         border-bottom: none;
+       }
+
+       &:hover {
+         color: #ffffff;
+         background-color: rgba(105, 105, 105, 0.16);
+         .tw-vehicle {
+           &:before {
+             border-left-color: #ffffff;
+           }
+         }
+       }
+
+       .tw-title, .tw-vehicle {
+         height: 40px;
+         float: left;
+         color: rgba(105, 105, 105, 0.71);
+       }
+       .tw-title {
+         width: calc(100% - 100px);
+         font-weight: bold;
+
+         & + .tw-vehicle {
+           float: left;
+           position: relative;
+           width: 100px;
+           text-align: center;
+
+           &:before {
+             content: '';
+             position: absolute;
+             top: 50%;
+             left: 0;
+             height: 50%;
+             border-left: 1px solid #eeeeee;
+             transform: translateY(-50%);
+           }
+         }
+       }
+       .tw-vehicle {
+         float: none;
+       }
+       .tw-card {
+         position: relative;
+         .tw-title, .tw-time, .tw-address {
+           height: 30px;
+           line-height: 30px;
+           color: rgba(105, 105, 105, 0.71);
+         }
+         .tw-title {
+           width: calc(100% - 140px);
+           color: #0C88E8;
+         }
+         .tw-time {
+           margin-left: calc(100% - 140px);
+           padding-left: 5px;
+         }
+         .tw-button {
+           position: absolute;
+           right: 10px;
+           bottom: 0;
+           font-size: 16px;
+         }
+       }
+     }
+   }
+ }

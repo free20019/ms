@@ -1,0 +1,11 @@
+package com.erxi.ms.redis;
+
+public class Monitor extends BasePrefix {
+
+	private Monitor(int expireSeconds, String prefix) {
+		super(expireSeconds, prefix);
+	}
+
+	//实时车辆信息
+	public static Monitor safetyMonitor = new Monitor(500, "mon");
+}

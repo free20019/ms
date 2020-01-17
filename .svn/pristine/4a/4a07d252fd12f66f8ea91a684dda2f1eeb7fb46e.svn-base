@@ -1,0 +1,197 @@
+var zpsjcx=(function ($) {
+	var clfb_map;
+	$(function () {
+		$('#zpsjcx-stateTime').datetimepicker(datetimeDefaultOption);
+		$('#zpsjcx-stateTime').val(new Date().Format('yyyy-MM-dd 00:00:00'));
+		$('#zpsjcx-endTime').datetimepicker(datetimeDefaultOption);
+		$('#zpsjcx-endTime').val(new Date().Format('yyyy-MM-dd 23:59:59'));
+
+		$(document).ready(function() {
+			  $(".select2").select2({  
+				  	language: "zh-CN",  //设置 提示语言
+			        tags:true,  
+			        allowClear: true,
+			        createTag:function (decorated, params) {  
+			            return null;  
+			        },  
+			    });
+			});
+		jqxhr=$.ajax({
+			type: "POST",
+			url: "../../zpsj/xll",
+			data:{"field":"VEHICLE_NO","table":"tb_vehicle_hk"},
+			timeout : 180000,
+			dataType: 'json',
+			success:function(data){
+				for(var i=0; i<data.length;i++){
+					if(null!=data[i].VEHICLE_NO){					
+						data[i].id=data[i].VEHICLE_NO;
+						data[i].text=data[i].VEHICLE_NO;
+					}
+				}
+				var qb={};
+				qb.id='null';
+				qb.text='全部';
+				data.unshift(qb);
+				$("#zpsjcx-cphm").select2({ 
+						language: "zh-CN",  //设置 提示语言
+				        minimumInputLength: 3,
+				        allowClear: true,
+				        data:data
+				    });
+			},
+			error: function(){
+			}         
+		});
+		jqxhr=$.ajax({
+			type: "POST",
+			url: "../../zpsj/xll",
+			data:{"field":"ADDRESS","table":"tb_vehicle_hk"},
+			timeout : 180000,
+			dataType: 'json',
+			success:function(data){
+				$("#zpsjcx-address").empty();
+				$("#zpsjcx-address").append('<option value="" disabled selected>场站</option>');
+				$("#zpsjcx-address").append('<option value="null">全部</option>');
+				for(var i=0; i<data.length;i++){
+					if(null!=data[i].ADDRESS){
+						$("#zpsjcx-address").append('<option value="'+data[i].ADDRESS+'">'+data[i].ADDRESS+'</option>');						
+					}
+				}
+			},
+			error: function(){
+			}         
+		});
+		
+		var bljlFields = [
+		                  	{name: 'id', title: '序号', width: 60, align: 'center'},
+			    			{name: 'cphm', title: '车牌号', width: 120, align: 'center'},
+			    			{name: 'cjdd', title: '场站', width: 120, align: 'center'},
+			    			{name: 'cjsj', title: '时间', width: 120, align: 'center'},
+			    		];
+		$('#zpsjcx-select').on('click', function () {
+			findzpsjcx();
+		});
+		function issh(str1,str2){
+			if(str1==''||str2==''){
+				return 0;
+			}else{				
+				if(str1.substring(5,7)==str2.substring(5,7)){
+					return 0;
+				}else{
+					
+					return 1;
+				}
+			}
+		}	
+		function findzpsjcx(){
+			var str1=$('#zpsjcx-stateTime').val();
+  			var str2=$('#zpsjcx-endTime').val();
+  			if(issh(str1,str2)=='1'){
+  				layer.msg('不支持跨越查询',{icon:2});
+  				return false;
+  			}
+			var all = 0;
+			$('#zpsjcxTable').jsGrid({
+				width: '100%',
+				height: 'calc(100% - 55px)',
+				autoload: true,
+				paging: true,
+				pageLoading: true,
+				editing: true,
+				sorting: true,
+				pageSize: 15,
+				pageIndex: 1,
+				controller: {
+                    loadData: function(filter) {
+                    	var d = $.Deferred();
+                    	var a = re(filter, function(item){
+                    		d.resolve(item);
+                    	})
+                    	return d.promise();
+                    }
+                },
+                fields: bljlFields,
+				pagerContainer: null,
+			    pageButtonCount: 5,
+			    pagerFormat: "{first} {prev} {pages} {next} {last} {pageIndex} of {pageCount}",
+			    pagePrevText: "上一页",
+			    pageNextText: "下一页",
+			    pageFirstText: "首页",
+			    pageLastText: "末页",
+			    pageNavigatorNextText: ">",
+			    pageNavigatorPrevText: "<"
+          	});
+
+		}
+		function re(filter, callback){
+            var startIndex = (filter.pageIndex - 1) * filter.pageSize;
+            jqxhr=$.ajax({
+            	type: "POST",
+				url: "../../zpsj/findzpsjcx",
+				data:{"stime":$("#zpsjcx-stateTime").val(),
+					"etime":$("#zpsjcx-endTime").val(),
+					"vehicle":$("#zpsjcx-cphm").val(),
+					"address":$("#zpsjcx-address").val(),
+					"pageIndex":filter.pageIndex,
+     				"pageSize":filter.pageSize
+					},
+				timeout : 180000,
+				dataType: 'json',
+            }).done(function(data) {
+            	if(data.code==500100){
+            		layer.msg('数据不存在',{icon:2});
+            		return callback();
+            	}
+            		var jsycxData = [];
+     				all = data[0].count;
+         			if(data.length>0){
+         				for(var i = 0; i< data[0].datas.length ;i++){
+         					var rs={};
+         					var vehicle=data[0].datas[i];
+         					rs.id = startIndex+i+1;	
+         					rs.cphm =  data[0].datas[i].VEHICLE_NO;
+         					rs.cjdd =  data[0].datas[i].ADDRESS;
+         					rs.cjsj = (data[0].datas[i].DBTIME==null?"":(new Date(data[0].datas[i].DBTIME)).Format("yyyy-MM-dd hh:mm:ss"));
+         					jsycxData.push(rs);
+         				}
+         				return callback({
+                            data: jsycxData,
+                            itemsCount: all
+                        });
+
+         			}else{
+        			}
+            }).fail(function() {
+            });
+		}
+		findzpsjcx();
+		$('#zpsjcx-reset').on('click', function () {
+			$('.panel-queryBar .form-control').val('');
+			$('.panel-queryBar .select2').val([""]).trigger("change");
+		});
+		$('#zpsjcx-dc').on('click', function () {
+			var str1=$('#zpsjcx-stateTime').val();
+  			var str2=$('#zpsjcx-endTime').val();
+  			if(issh(str1,str2)=='1'){
+  				layer.msg('不支持跨越导出',{icon:2});
+  				return false;
+  			}
+			layer.confirm('你确定要导出数据', {
+				btn: ['确定', '取消'],
+				offset: '100px'
+			}, function (layerIndex) {
+				window.open(basePath+"zpsj/findzpsjcxdc?stime="+$("#zpsjcx-stateTime").val()
+						+"&etime="+$("#zpsjcx-endTime").val()
+						+"&vehicle="+$("#zpsjcx-cphm").val()
+						+"&address="+$("#zpsjcx-address").val()
+				);
+				layer.close(layerIndex);
+			}, function (layerIndex) {
+				layer.close(layerIndex);
+			});
+		});
+	})
+	
+})(jQuery)
+

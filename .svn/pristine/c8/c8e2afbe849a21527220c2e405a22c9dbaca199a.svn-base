@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>应急预案</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<link rel="stylesheet" href="../../resources/style/css/yjzhcz/emergencyPlan.css">
+	<script src="../../resources/script/vue.min.js"></script>
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="../../resources/script/moment.min.js"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.min.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/wangEditor-3.1.1/wangEditor.min.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+</head>
+<body>
+<div class="template-wrapper" id="root">
+	<div class="tw-layout" style="">
+		<div class="tw-layout-left">
+			<div class="dataListPanel center">
+				<div class="header">
+					<button type="button" class="btn btn-primary btn-sm glyphicon glyphicon-plus" @click="handleAddClick"></button>
+				</div>
+				<div class="content">
+					<div class="scrollbar-macosx">
+						<div class="base-item text-clear" v-for="item in alkList" :key="item.id" @click="handleListItemClick(item)">
+							<div class="item-title" v-text="item.title"></div>
+							<div class="item-tool">
+								<button type="button" class="btn btn-primary btn-sm glyphicon glyphicon-pencil" @click="handleEditClick(item)"></button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="tw-layout-main">
+			<div class="dataListPanel center" style="padding: 0;">
+				<div class="header" v-text="alk.title">
+				</div>
+				<div class="content">
+					<div class="scrollbar-macosx">
+						<div v-text="alk.content" id="content"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="dialog" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title" v-text="dialog.title"></h4>
+				</div>
+				<div class="modal-body">
+					<form>
+						<div class="form-group">
+							<label>预案标题</label>
+							<input type="text" class="form-control" v-model="dialog.form.title" placeholder="预案标题">
+						</div>
+						<div class="form-group">
+							<label>预案内容</label>
+							<div id="editor"></div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+					<button type="button" class="btn btn-primary" @click="handleSaveClick">保存</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+</div>
+<script>
+	(function (Vue, _, moment, $) {
+		var vm = new Vue({
+			el: '#root',
+			data: function () {
+				return {
+					alkList: [],
+					alk: {
+						title: '出租汽车行业案例库',
+						content: ''
+					},
+					content: '',
+					editor: {
+						option: [
+							'head',  // 标题
+							'bold',  // 粗体
+							'fontSize',  // 字号
+							'fontName',  // 字体
+							'italic',  // 斜体
+							'underline',  // 下划线
+							'strikeThrough',  // 删除线
+							'foreColor',  // 文字颜色
+							'backColor',  // 背景颜色
+							'link',  // 插入链接
+							'list',  // 列表
+							'justify',  // 对齐方式
+							'quote',  // 引用
+							'emoticon',  // 表情
+							'undo',  // 撤销
+							'redo'  // 重复
+						],
+						tag: null
+					},
+					dialog: {
+						title: '',
+						form: {
+							id: '',
+							title: ''
+						}
+					}
+				}
+			},
+			mounted: function () {
+				var _this = this;
+				this.$nextTick(function () {
+					$('.scrollbar-macosx').scrollbar();
+					_this.editor.tag = new wangEditor('#editor');
+					_this.editor.tag.customConfig.menus = _this.editor.option;
+					_this.editor.tag.create();
+					$('#dialog').on('hidden.bs.modal', function () {
+						_this.dialog.form.title = '';
+						_this.editor.tag.txt.html('');
+					})
+					_this.getalkList();
+				})
+			},
+			methods: {
+				// 接口
+				getalkList: function() {
+					var _this = this;
+					$.ajax({
+						url:'../../Yjzh/getAllNames',
+						data:{table:"TB_YJZH_ALK"},
+						type: 'GET',
+						dataType: 'json'
+					}).then(function (res) {
+						_this.alkList = _.map(res, function (item) {
+							return {id: item.ID, title: item.NAME}
+						});
+					})
+				},
+				getalkContent: function(id) {
+					var _this = this;
+					$.ajax({
+						url:'../../Yjzh/getContent',
+						type: 'GET',
+						dataType: 'html',
+						cache:false,
+						async:false, 
+						data: {
+							table:"TB_YJZH_ALK",
+							id: id
+						}
+					}).then(function (res) {
+						_this.content = decodeURI(res);
+						document.getElementById('content').innerHTML=decodeURI(res);
+						
+					})
+				},
+				// 事件
+				handleAddClick: function() {
+					this.dialog.title = '添加';
+					$('#dialog').modal('show');
+				},
+				handleEditClick: function(item) {
+					var _this=this;
+					_this.getalkContent(item.id);
+					event.stopPropagation();
+					_this.dialog.title = '修改';
+					_this.dialog.form.title = item.title;
+					_this.dialog.form.id = item.id;
+					_this.editor.tag.txt.html(_this.content);
+					$('#dialog').modal('show');
+				},
+				handleListItemClick: function(item) {
+					this.getalkContent(item.id);
+				},
+				handleSaveClick: function() {
+					var _this=this;
+					if(_this.dialog.title=='添加'){	
+						$.ajax({
+							url:'../../Yjzh/saveContent',
+							type: 'post',
+							dataType: 'json',
+							data: {
+								table:"TB_YJZH_ALK",
+								name: _this.dialog.form.title,
+								content:encodeURI(_this.editor.tag.txt.html())
+							}
+						}).then(function (res) {
+							if(res>0){
+	  							layer.msg('添加成功',{icon:1});
+	  							_this.getalkList();
+	  							$('#dialog').modal('hide');
+	  						}else{
+	                            layer.msg('添加失败',{icon:1});
+							}
+							
+						})
+					}else if(_this.dialog.title=='修改'){
+						$.ajax({
+							url:'../../Yjzh/editContent',
+							type: 'post',
+							dataType: 'json',
+							data: {
+								table:"TB_YJZH_ALK",
+								id:_this.dialog.form.id,
+								name: _this.dialog.form.title,
+								content:encodeURI(_this.editor.tag.txt.html())
+							}
+						}).then(function (res) {
+							if(res>0){
+	  							layer.msg('修改成功',{icon:1});
+	  							$('#dialog').modal('hide');
+	  							_this.getalkContent(_this.dialog.form.id);
+	  							_this.getalkList();
+	  						}else{
+	                            layer.msg('修改失败',{icon:1});
+							}
+							
+						})
+					}
+				}
+			}
+		})
+	})(Vue, _, moment, jQuery);
+</script>
+</body>
+</html>

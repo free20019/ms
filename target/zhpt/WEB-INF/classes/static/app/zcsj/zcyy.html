@@ -1,0 +1,208 @@
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>专车数据总览</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+	<style>
+		#title-img{
+			width: 100%;
+			height: 90%;
+			background: url('../../resources/images/zc.png')  no-repeat center;
+			position: absolute;
+		}
+		[id^=ysb]{
+			position: relative;
+			width: 200px;
+			height:25px;
+			left: 50%;
+			top: 50%;
+			/*border-bottom: 1px solid #000000;*/
+		}
+		[id^=ysb] a{
+			width: 100%;
+			height: 100%;
+			font-family:Arial,Helvetica,sans-serif;
+			font-size: 16px;
+			padding-bottom: 1px;
+			color: rgba(105, 105, 105, 0.86);
+			border-bottom: 1px solid rgba(105, 105, 105, 0.31);
+			font-weight: bold;
+
+		}
+		[id^=ysb] i{
+			width: 100%;
+			height: 90%;
+			font-family:Arial,Helvetica,sans-serif;
+			font-size: 16px;
+			color: rgba(105, 105, 105, 0.86);
+			font-weight: bold;
+			font-style: normal;
+		}
+
+
+		#ysb1{
+			margin: 130px -450px;
+		}
+		#ysb2{
+			margin: -340px -400px;
+		}
+		#ysb3{
+			margin: 185px -290px;
+		}
+		#ysb4{
+			margin: -210px 150px;
+		}
+		#ysb5{
+			margin: 300px 290px;
+		}
+		#ysb6{
+			margin: -135px 335px;
+		}
+		#ysb7{
+			margin: 220px -120px;
+		}
+		#ysb8{
+			margin: -245px 20px;
+		}
+
+
+		[id^=ysj]{
+			position: relative;
+			width: 230px;
+/* 				height:120px; */
+			left: 50%;
+			top: 50%;
+			/*border: 1px solid #000000;*/
+			cursor: pointer;
+		}
+		#ysj1{
+			margin: 475px -430px;
+		}
+		#ysj2{
+			margin: -780px -400px;
+		}
+		#ysj3{
+			margin: 530px -270px;
+		}
+		#ysj4{
+			margin: -655px 45px;
+		}
+		#ysj5{
+			margin: 660px 185px;
+		}
+		#ysj6{
+			margin: -595px 230px;
+		}
+		html,body {
+			background: #ffffff;
+			margin-top:100px;
+		}
+	</style>
+</head>
+<body>
+<div id="title-img">
+	<div id="ysb1"><a id="sq" href="javascript:;">车辆数:0辆</a><br/><i>司机:0人</i></div>
+	<div id="ysb2"><a id="cc" href="javascript:;">车辆数:0辆</a><br/><i>司机:0人</i></div>
+	<div id="ysb3"><a id="dd" href="javascript:;">车辆数:0辆</a><br/><i>司机:0人</i></div>
+	<div id="ysb4"><a id="yb" href="javascript:;">车辆数:0辆</a><br/><i>司机:0人</i></div>
+	<div id="ysb5"><a id="yd" href="javascript:;">车辆数:0辆</a><br/><i>司机:0人</i></div>
+	<div id="ysb6"><a id="sz" href="javascript:;">车辆数:0辆</a><br/><i>司机:0人</i></div>
+	<div id="ysb7"><a>车辆总数:0辆</a></div>
+	<div id="ysb8"><a>司机:0人</a></div>
+</div>
+<div id="title-div">
+	<div id="ysj1"></div>
+	<div id="ysj2"></div>
+	<div id="ysj3"></div>
+	<div id="ysj4"></div>
+	<div id="ysj5"></div>
+	<div id="ysj6"></div>
+</div>
+<script type="text/javascript">
+var szdc=(function ($) {
+	$(function () {
+			$('a').on('click',function(){
+				var id = $(this).attr("id");
+				var _parent = parent.$(window.parent.document);
+				console.log(id)
+				if(id == "sq"){
+					_parent.find('.ip-menuItem [data-skip="sqdc"]').trigger("click");
+				}else if(id == "cc"){
+					_parent.find('.ip-menuItem [data-skip="ccdc"]').trigger("click");
+				}else if(id == "dd"){
+					_parent.find('.ip-menuItem [data-skip="dddc"]').trigger("click");
+				}else if(id == "yb"){
+					_parent.find('.ip-menuItem [data-skip="ybdc"]').trigger("click");
+				}else if(id == "yd"){
+					_parent.find('.ip-menuItem [data-skip="yddc"]').trigger("click");
+				}else if(id == "sz"){
+					_parent.find('.ip-menuItem [data-skip="szdc"]').trigger("click");
+				}
+			});
+		jqxhr=$.ajax({
+			type: "POST",
+			url: "../../jyxx/findzcyytj",
+			data:{},
+			timeout : 180000,
+			dataType: 'json',
+			success:function(data){
+				for(var i=0;i<data.length;i++){
+					if(data[i].COMPNAME=='首汽专车'){
+						document.getElementsByTagName('a')[0].innerText='车辆数'+ data[i].VEHICLE+'辆';
+						document.getElementsByTagName('i')[0].innerText='司机数'+ data[i].NAME+'人';					
+					}else if(data[i].COMPNAME=='曹操专车'){
+						document.getElementsByTagName('a')[1].innerText='车辆数'+ data[i].VEHICLE+'辆';
+						document.getElementsByTagName('i')[1].innerText='司机数'+ data[i].NAME+'人';					
+					}else if(data[i].COMPNAME=='滴滴'){
+						document.getElementsByTagName('a')[2].innerText='车辆数'+ data[i].VEHICLE+'辆';
+						document.getElementsByTagName('i')[2].innerText='司机数'+ data[i].NAME+'人';					
+					}else if(data[i].COMPNAME=='优步'){
+						document.getElementsByTagName('a')[3].innerText='车辆数'+ data[i].VEHICLE+'辆';
+						document.getElementsByTagName('i')[3].innerText='司机数'+ data[i].NAME+'人';					
+					}else if(data[i].COMPNAME=='易到'){
+						document.getElementsByTagName('a')[4].innerText='车辆数'+ data[i].VEHICLE+'辆';
+						document.getElementsByTagName('i')[4].innerText='司机数'+ data[i].NAME+'人';					
+					}else if(data[i].COMPNAME=='神州专车'){
+						document.getElementsByTagName('a')[5].innerText='车辆数'+ data[i].VEHICLE+'辆';
+						document.getElementsByTagName('i')[5].innerText='司机数'+ data[i].NAME+'人';					
+					}
+				}
+				var count1=data[0].VEHICLE+data[1].VEHICLE+data[2].VEHICLE+data[3].VEHICLE+data[4].VEHICLE+data[5].VEHICLE;
+				document.getElementsByTagName('a')[6].innerText='车辆数'+ count1+'辆';
+				var count2=data[0].NAME+data[1].NAME+data[2].NAME+data[3].NAME+data[4].NAME+data[5].NAME;
+				document.getElementsByTagName('a')[7].innerText='司机数'+ count2+'人';
+			},
+			error: function(){
+			}         
+		});
+	})
+})(jQuery)
+
+</script>
+</body>
+</html>

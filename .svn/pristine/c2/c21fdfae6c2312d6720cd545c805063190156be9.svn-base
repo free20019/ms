@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>指挥调度</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<link rel="stylesheet" href="../../resources/style/css/yjzhcz/comAControl.css">
+	<script src="../../resources/script/vue.min.js"></script>
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="../../resources/script/moment.min.js"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.min.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+</head>
+<body>
+<div class="template-wrapper" id="root">
+	<div class="dataListPanel">
+		<div class="tw-map" id="amap"></div>
+		<div class="tw-map-search-for" v-if="hasVehicleSearch">
+			<input class="tw-map-input" v-model="vehicleSearch" placeholder="车辆搜索" @focus="handleVehicleSearchFocus" @keyup="handleVehicleSearchKeyup"/>
+			<a class="tw-map-button btn btn-primary iconfont icon-search"></a>
+		</div>
+		<div class="tw-map-event-bar" v-if="hasVehicleSearch && hasEventBar">
+			<div class="tw-map-event-item" @click="handleEventClick"><i class="tw-icon iconfont icon-lable"></i>事件</div>
+			<div class="tw-map-event-item" @click="handleVehicleClick"><i class="tw-icon iconfont icon-car"></i>车辆</div>
+		</div>
+		<div class="tw-map-panel" v-if="hasVehicleSearch && hasEventList">
+			<div class="tw-map-header" @click="handleCloseEventClick">
+				返回<span class="countNumber">共计{{eventList.length}}条记</span>
+			</div>
+			<div class="tw-map-list">
+				<div class="tw-map-item" v-for="item in eventList" :key="item.ID">
+					<div class="tw-card">
+						<div class="tw-title" v-text="item.SJZT"></div>
+						<div class="tw-time" v-text="formatDateTime(item.TIME)"></div>
+						<div class="tw-address" v-text="item.ADDRESS"></div>
+						<a class="tw-button btn btn-link btn-sm iconfont icon-details" @click="handleEventDetailsClick(item)"></a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="tw-map-panel" v-if="hasVehicleSearch && hasEventDetails">
+			<div class="tw-map-header" @click="handleCloseEventDetailsClick">
+				返回<span class="countNumber">共计{{eventList.length}}条记</span>
+			</div>
+			<div class="tw-map-panel-title">
+				<div class="tw-map-panel-header"><i class="iconfont icon-details"></i>事件详情</div>
+				<div class="tw-map-panel-body" style="height: 180px;">
+					<div class="tw-body-item">
+						<div class="tw-body-item-title">事件名称:</div>
+						<div class="tw-body-item-value" v-text="selectEventItem.SJZT"></div>
+					</div>
+					<div class="tw-body-item">
+						<div class="tw-body-item-title">事件时间:</div>
+						<div class="tw-body-item-value" v-text="formatDateTime(selectEventItem.TIME)"></div>
+					</div>
+					<div class="tw-body-item">
+						<div class="tw-body-item-title">事件地点:</div>
+						<div class="tw-body-item-value" v-text="selectEventItem.ADDRESS"></div>
+					</div>
+					<div class="tw-body-item">
+						<div class="tw-body-item-title">事件内容:</div>
+						<div class="tw-body-item-value" v-text="selectEventItem.SJNR" style="width: 100%; margin-left: 0; text-indent: 85px"></div>
+					</div>
+					<div class="tw-body-item">
+						<div class="tw-body-item-title">相关车辆数:</div>
+						<div class="tw-body-item-value" v-text="formatVehicleList(selectEventItem).length"></div>
+					</div>
+				</div>
+			</div>
+			<div class="tw-map-panel-title" style="height: calc(100% - 274px);">
+				<div class="tw-map-panel-header"><i class="iconfont icon-car"></i>有关车辆</div>
+				<div class="tw-map-panel-body" style="padding: 0; height: calc(100% - 41px);">
+					<div class="tw-map-list">
+						<div class="tw-map-item" v-for="(item, index) in formatVehicleList(selectEventItem)" :key="index" @click="handleEventVehicleDetailsClick(item)">
+							<div class="tw-vehicle" v-text="item.vehicle"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="tw-map-panel" v-if="hasVehicleSearch && hasEventVehicleDetails" style="height: auto;">
+			<div class="tw-map-header" @click="handleCloseEventVehicleDetailsClick">
+				返回<span class="countNumber">共计{{eventList.length}}条记</span>
+			</div>
+			<div class="tw-map-panel-title">
+				<div class="tw-map-panel-header"><i class="iconfont icon-details"></i>事件详情</div>
+				<div class="tw-map-panel-body" style="height: 180px;">
+					<div class="tw-body-item">
+						<div class="tw-body-item-title">车牌号码:</div>
+						<div class="tw-body-item-value" v-text="selectEventVehicleItem.vehicle"></div>
+					</div>
+					<div class="tw-body-item">
+						<div class="tw-body-item-title">司机:</div>
+						<div class="tw-body-item-value" v-text="selectEventVehicleItem.name"></div>
+					</div>
+					<div class="tw-body-item">
+						<div class="tw-body-item-title">电话:</div>
+						<div class="tw-body-item-value" v-text="selectEventVehicleItem.phone || ''"></div>
+					</div>
+					<div class="tw-body-item">
+						<div class="tw-body-item-title">所属公司:</div>
+						<div class="tw-body-item-value" v-text="selectEventVehicleItem.company"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="tw-map-panel" v-if="hasVehicleSearch && hasVehicleList">
+			<div class="tw-map-header" @click="handleCloseVehicleClick">
+				返回<span class="countNumber">共计{{10860}}条记</span>
+			</div>
+			<div class="tw-map-list">
+				<div class="tw-map-item">
+					<div class="tw-title">浙江中侨汽车出租有限公司</div>
+					<div class="tw-vehicle">浙A12345</div>
+				</div>
+				<div class="tw-map-item">
+					<div class="tw-title">浙江中侨汽车出租有限公司</div>
+					<div class="tw-vehicle">浙A12345</div>
+				</div>
+			</div>
+		</div>
+		<div class="tw-map-panel" v-if="hasVehicleSearch && vehicleSearchList.length > 0" style="overflow: auto; height: auto; max-height: calc(100% - 200px);">
+			<div class="tw-map-list">
+				<div class="tw-map-item" v-for="(item, index) in vehicleSearchList" :key="index">
+					<div class="tw-title" v-text="item.COMP_NAME"></div>
+					<div class="tw-vehicle" v-text="item.VEHI_NO"></div>
+				</div>
+			</div>
+		</div>
+		<div class="tw-map-tool-bar">
+			<div class="tw-map-tool-header"><i class="tw-icon iconfont icon-menu">&nbsp;</i></div>
+			<div class="tw-map-tool-item">
+				<i class="tw-icon iconfont icon-gjhf"></i>轨迹
+			</div>
+			<div class="tw-map-tool-item">
+				<i class="tw-icon iconfont icon-hld"></i>路况
+			</div>
+			<div class="tw-map-tool-item">
+				<i class="tw-icon iconfont icon-weixing"></i>卫星图
+			</div>
+			<div class="tw-map-tool-item" @click="handleDisplayList">
+				<i class="tw-icon iconfont icon-rzsh"></i>列表
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	(function (Vue, _, $) {
+		var vm = new Vue({
+			el: '#root',
+			data: function() {
+				return {
+					map: null,
+					vehicleSearch: '',
+					vehicleSearchList: [],
+					hasVehicleSearch: true,
+					hasEventBar: false,
+					hasEventList: false,
+					hasEventDetails: false,
+					hasEventVehicleDetails: false,
+					hasVehicleList: false,
+					eventList: [],
+					selectEventItem: {},
+					selectEventVehicleItem: {}
+				}
+			},
+			mounted: function () {
+				var _this = this;
+				this.$nextTick(function () {
+					$('.scrollbar-macosx').scrollbar();
+					_this.map = new AMap.Map('amap', {
+						zoom:14,
+						center: new AMap.LngLat(120.153576,30.287459)
+					});
+				})
+			},
+			methods: {
+				getEventList: function() {
+					var _this = this;
+					$.ajax({
+						url: 'http://115.236.61.148:9085/zhpt/yjzh/findjtsj',
+						type: 'GET',
+						dataType: 'json'
+					}).then(function (res) {
+						_this.eventList = res || [];
+					});
+				},
+				getQuerVehicleList: function() {
+					var _this = this;
+					var vehicle = this.vehicleSearch;
+					$.ajax({
+						url: 'http://115.236.61.148:9085/zhpt/yjzh/findclsj',
+						type: 'GET',
+						dataType: 'json',
+						data: {
+							info: vehicle
+						}
+					}).then(function (res) {
+						console.info('getQuerVehicleList:', res)
+						_this.vehicleSearchList = res || [];
+					});
+				},
+				handleVehicleSearchFocus: function() {
+					this.hasEventBar = true;
+					this.hasEventList = false;
+					this.hasVehicleList = false;
+				},
+				handleVehicleSearchKeyup: function(value) {
+					console.info('handleVehicleSearchKeyup:', value, this.vehicleSearch)
+					if (this.vehicleSearch.length <= 2) return this.vehicleSearchList = [];
+					this.getQuerVehicleList();
+				},
+				handleEventClick: function() {
+					this.hasEventList = true;
+					this.getEventList();
+				},
+				handleCloseEventClick: function() {
+					this.hasEventList = false;
+				},
+				handleEventDetailsClick: function(item) {
+					this.hasEventList = false;
+					this.hasEventDetails = true;
+					this.selectEventItem = item;
+					setTimeout(function () {
+						$('.scrollbar-macosx').scrollbar();
+					}, 300);
+				},
+				handleCloseEventDetailsClick: function() {
+					this.hasEventDetails = false;
+					this.hasEventList = true;
+				},
+				handleEventVehicleDetailsClick: function(item) {
+					this.hasEventVehicleDetails = true;
+					this.selectEventVehicleItem = item;
+				},
+				handleCloseEventVehicleDetailsClick: function() {
+					this.hasEventVehicleDetails = false;
+					this.selectEventVehicleItem = {};
+				},
+				handleVehicleClick: function() {
+					this.hasVehicleList = true;
+				},
+				handleCloseVehicleClick: function() {
+					this.hasVehicleList = false;
+				},
+				handleDisplayList: function() {
+					this.hasVehicleSearch = !this.hasVehicleSearch;
+				},
+				formatDateTime: function (time) {
+					return moment(time).format('YYYY-MM-DD HH:mm:ss');
+				},
+				formatVehicleList: function (item) {
+					var vehicle = item.VEHI_NO.split(',');
+					var name = item.OWN_NAME.split(',');
+					var phone = item.OWN_TEL.split(',');
+					var company = item.COMP_NAME.split(',');
+					var newItem = [];
+					_.each(vehicle, function (_, index) {
+						if (!vehicle[index] && !name[index] && !phone[index] && !company[index]) return;
+						newItem.push({
+							vehicle: vehicle[index],
+							name: name[index],
+							phone: phone[index],
+							company: company[index]
+						});
+					})
+					console.info(11111, newItem)
+					return newItem;
+				}
+			}
+		})
+	})(Vue, _, jQuery);
+</script>
+</body>
+</html>

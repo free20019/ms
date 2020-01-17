@@ -1,0 +1,574 @@
+package com.erxi.ms.service;
+
+import java.io.InputStream;
+import java.sql.Clob;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.erxi.ms.config.DS;
+import com.erxi.ms.dao.SbwxDao;
+import com.erxi.ms.domain.Vehicle1;
+import com.erxi.ms.redis.Monitor;
+import com.erxi.ms.redis.RedisService;
+import com.erxi.ms.redis.VeKey;
+import com.erxi.ms.redis.ZlKey;
+import com.erxi.ms.result.CodeMsg;
+import com.erxi.ms.result.FastJsonUtil;
+import com.erxi.ms.result.Result;
+
+@Service
+public class SbwxService {
+	@Autowired
+	SbwxDao sbwxDao;
+	private Map<String, Object> map;
+	
+	@Autowired
+	RedisService redisService;
+	 /**
+	 * 标记redis取数据
+	 */
+	public static boolean flag =true;
+	@Transactional
+	public void task(){
+		ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
+        //延时1秒执行,每0.5分钟执行一次
+        service.scheduleAtFixedRate(new Runnable() {
+        	private List<Map<String, Object>> monitorlist = null;
+            @Override
+            public void run() {
+//            		System.out.println("-----huang-----");
+            		monitorlist = setsafety();
+					redisService.set(Monitor.safetyMonitor,"",FastJsonUtil.toJSONString(monitorlist));
+//					System.out.println("-----xianle ----");
+				}
+        }, 1, 30, TimeUnit.SECONDS);
+	}
+	
+	 @DS("datasource1")
+	public List<Map<String, Object>> setsafety() {
+		List<Map<String, Object>> list = sbwxDao.setsafety();
+		return list;
+	}
+	
+	 /**
+	  * 流量
+	  * @return
+	  */
+	public String getsafety() {
+		String token = CommonService.COOKIE_NAME_TOKEN;
+		String msg = redisService.get(Monitor.safetyMonitor, "", String.class);
+		return msg;
+	}
+	  /**
+	 * 下拉所有公司
+	 * @return
+	 */
+	@DS("datasource1")
+	public String qycomp() {
+		if(flag){
+			Map map = new HashMap();
+			map.put("datacomp", allComp());
+			redisService.set(Monitor.selectwxcomp, "", FastJsonUtil.toJSONString(map));
+			return null;
+		}else {
+			return FastJsonUtil.toJSONString(FastJsonUtil.stringToMap(redisService.get(Monitor.selectwxcomp, "", String.class)));
+		}	
+	}
+	private List<Map<String, Object>> allComp() {
+		return sbwxDao.getAllComp();
+	}
+	 @DS("datasource1")
+	public String findxll(String table) {
+		List<Map<String, Object>> list = sbwxDao.findxll(table);
+		return FastJsonUtil.toJSONString(list);
+	}
+	 @DS("datasource1")
+	public String findclxll(String table) {
+		List<Map<String, Object>> list = sbwxDao.findclxll(table);
+		return FastJsonUtil.toJSONString(list);
+	}
+	 @DS("datasource1")
+	public String findclxll2(String table) {
+		List<Map<String, Object>> list = sbwxDao.findclxll2(table);
+		return FastJsonUtil.toJSONString(list);
+	}
+	 @DS("datasource1")
+	public String vehicle() {
+		List<Map<String, Object>> list = sbwxDao.vehicle();
+		return FastJsonUtil.toJSONString(list);
+	}
+	 @DS("datasource1")
+	public String vhicmarker(String vehi_no) {
+		List<Map<String, Object>> list = sbwxDao.vhicmarker(vehi_no);
+		return FastJsonUtil.toJSONString(list);
+	}
+	 @DS("datasource1")
+	public String vhicmarker2(String vehi_no) {
+		List<Map<String, Object>> list = sbwxDao.vhicmarker2(vehi_no);
+		return FastJsonUtil.toJSONString(list);
+	}
+//	 @DS("datasource1")
+//	public String vhicmarker(String vehi_no) {
+//		Date date=new Date();
+//		SimpleDateFormat sdf=new SimpleDateFormat("yyMM");
+//		String table="tb_gps_"+sdf.format(date);
+//		
+//		SimpleDateFormat sdf2=new SimpleDateFormat("yyyy-MM");
+//		String today=sdf2.format(date);
+//		List<Map<String, Object>> list = sbwxDao.vhicmarker(vehi_no,table,today);
+//		return FastJsonUtil.toJSONString(list);
+//	}
+	 
+	 @DS("datasource1")
+	public String findfzjk(String status,String vehstr) {
+		List<Map<String, Object>> list = sbwxDao.findfzjk(status,vehstr);
+		return FastJsonUtil.toJSONString(list);
+	}
+	 @DS("datasource1")
+	public Result<List<Map<String, Object>>> tree(String id,String tree_name,String vehstr,String type) {
+		 int count =0;
+		 try {
+			 if(type.equals("添加车组")){				 
+				 count = sbwxDao.addtree(tree_name,vehstr);
+			 }else if(type.equals("修改车组")){
+				 count = sbwxDao.editTree(id,tree_name,vehstr);
+			 }
+			} catch(RuntimeException e) {
+				return Result.error(CodeMsg.BIND_ERROR);
+			}
+		if(count > 0){
+			return Result.error(CodeMsg.SUCCESS);
+		}else{
+			return Result.error(CodeMsg.DATA_ERROR);
+		}
+	}
+//	 @DS("datasource1")
+//	public Result<List<Map<String, Object>>> editTree(String id,String tree_name,String vehstr) {
+//		int count =0;
+//		 try {
+//			 count = sbwxDao.editTree(id,tree_name,vehstr);
+//			} catch(RuntimeException e) {
+//				return Result.error(CodeMsg.BIND_ERROR);
+//			}
+//		if(count > 0){
+//			return Result.error(CodeMsg.SUCCESS);
+//		}else{
+//			return Result.error(CodeMsg.DATA_ERROR);
+//		}
+//	}
+	 @DS("datasource1")
+	public Result<List<Map<String, Object>>> removeTree(String id) {
+		int count = sbwxDao.removeTree(id);
+		if(count > 0){
+			return Result.error(CodeMsg.SUCCESS);
+		}else{
+			return Result.error(CodeMsg.DATA_ERROR);
+		}
+	}
+	 @DS("datasource1")
+	public String findtree() {
+		List<Map<String, Object>> list = sbwxDao.findtree();
+		if(null !=list && list.size() >0){	
+			List<Map<String, Object>> tree = new ArrayList<Map<String,Object>>();
+			for (int i = 0; i < list.size(); i++) {
+				String qx [] = list.get(i).get("CHILDREN").toString().split(";");
+				Map<String, Object> map = new HashMap<String, Object>();
+				map.put("id", list.get(i).get("ID"));
+				map.put("label", list.get(i).get("NAME"));
+				map.put("type", "group");
+				tree.add(map);
+				List<Map<String, Object>> sontree = new ArrayList<Map<String,Object>>();
+				for(int j = 0; j < qx.length; j++){
+					Map<String, Object> map1 = new HashMap<String, Object>();
+					map1.put("label", qx[j]);
+					map1.put("type", "click");
+					sontree.add(map1);
+				}
+				map.put("children", sontree);
+			}
+			return FastJsonUtil.toJSONString(tree);
+		}
+		return FastJsonUtil.toJSONString(list);
+	}
+//	 @DS("datasource1")
+//		public String findtree() {
+//			List<Map<String, Object>> list = sbwxDao.findtree();
+//			if(null !=list && list.size() >0){	
+//				List<Map<String, Object>> tree = new ArrayList<Map<String,Object>>();
+//				for (int i = 0; i < list.size(); i++) {
+//					String qx [] = list.get(i).get("CHILDREN").toString().split(";");
+//					Map<String, Object> map = new HashMap<String, Object>();
+//					map.put("id", list.get(i).get("ID"));
+//					map.put("pId", "0");
+//					map.put("name", list.get(i).get("NAME"));
+//					tree.add(map);
+//					for(int j = 0; j < qx.length; j++){
+//						Map<String, Object> map1 = new HashMap<String, Object>();
+//						map1.put("id", list.get(i).get("ID")+"00000"+(j+1));
+//						map1.put("pId", list.get(i).get("ID"));
+//						map1.put("name", qx[j]);
+//						tree.add(map1);
+//					}
+//				}
+//				return FastJsonUtil.toJSONString(tree);
+//			}
+//			return FastJsonUtil.toJSONString(list);
+//		}
+	 @DS("datasource1")
+	public String findclbj(String day,String etime,String type) {
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+		String time="";
+		String stime="";
+		int a=Integer.parseInt(day);
+		try {
+			time=sdf.format(sdf.parse(etime).getTime()-a*60*60*1000*24);
+			stime=sdf.format(sdf.parse(etime).getTime()-(a-1)*60*60*1000*24);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		List<Map<String, Object>> list=null;
+		if(type.equals("2")){
+			list = sbwxDao.findjjbj(stime,etime,time);			
+		}else if(type.equals("1")){
+			list = sbwxDao.findydqbj(etime,time);			
+		}
+		return FastJsonUtil.toJSONString(list);
+	}
+//	 @DS("datasource1")
+//	public String findydqbj(String stime,String etime) {
+//		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+//		String time="";
+//		try {
+//			time=sdf.format(sdf.parse(stime).getTime()-60*60*1000*24);
+//		} catch (ParseException e) {
+//			e.printStackTrace();
+//		}
+//		List<Map<String, Object>> list = sbwxDao.findydqbj(etime,time);
+//		return FastJsonUtil.toJSONString(list);
+//	}
+	 @DS("datasource1")
+	public String findwxcl(String stime,String etime,String vehicle,String company,String terminal, Integer pageIndex, Integer pageSize) {
+		List<Map<String, Object>> list = sbwxDao.findwxcl(stime,etime,vehicle,company,terminal,pageIndex,pageSize);
+		int count = 0;
+		if( list!=null && list.size() >0){
+			count = Integer.parseInt(String.valueOf(list.get(0).get("COUNT")));
+		}
+		List<Map<String, Object>> lists = new ArrayList<Map<String,Object>>();
+		map = new HashMap<String, Object> ();
+		map.put("count", count);
+		map.put("datas",list);
+		lists.add(map);
+		return FastJsonUtil.toJSONString(lists);
+	} 
+	 @DS("datasource1")
+	public List<Map<String, Object>> findwxcldc(String stime,String etime,String vehicle,String company,String terminal) {
+		List<Map<String, Object>> list = sbwxDao.findwxcldc(stime,etime,vehicle,company,terminal);
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");  
+		if(list.size()>0){
+			for(int i = 0; i< list.size();i++){
+				Map<String, Object> vehicle1=list.get(i);
+				vehicle1.put("GZ", findgz(vehicle1));
+			}
+		}
+		return list;
+	} 
+	 @DS("datasource1")
+	public String findwxjd(String stime,String etime,String vehicle,String company, Integer pageIndex, Integer pageSize) {
+		List<Map<String, Object>> list = sbwxDao.findwxjd(stime,etime,vehicle,company,pageIndex,pageSize);
+		int count = 0;
+		if( list!=null && list.size() >0){
+			count = Integer.parseInt(String.valueOf(list.get(0).get("COUNT")));
+		}
+		List<Map<String, Object>> lists = new ArrayList<Map<String,Object>>();
+		map = new HashMap<String, Object> ();
+		map.put("count", count);
+		map.put("datas",list);
+		lists.add(map);
+		return FastJsonUtil.toJSONString(lists);
+	} 
+	 @DS("datasource1")
+	public List<Map<String, Object>> findwxjddc(String stime,String etime,String vehicle,String company) {
+		List<Map<String, Object>> list = sbwxDao.findwxjddc(stime,etime,vehicle,company);
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");  
+			if(list.size()>0){
+ 				for(int i = 0; i< list.size();i++){
+ 					Map<String, Object> vehicle1=list.get(i);
+ 					try {
+//						if(sdf.parse(String.valueOf(vehicle1.get("DB_TIME"))).getTime()<=sdf.parse(String.valueOf(vehicle1.get("RR_TIME_END"))).getTime()){
+							Date date=new Date();
+							if(date.getTime()>sdf.parse(String.valueOf(vehicle1.get("RR_TIME_END"))).getTime()){
+								vehicle1.put("JDXX", "维修完成");
+							}else{
+								vehicle1.put("JDXX", "正在维修");
+							}
+//						}else{
+//							vehicle1.put("RR_TIME", "");
+//							vehicle1.put("RR_TIME_END", "");
+//							vehicle1.put("JDXX", "");
+//							vehicle1.put("RC_CONTENT", "");
+//						}
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
+ 				}
+ 			}
+		return list;
+	} 
+	 @DS("datasource1")
+	public String findwxtj(String stime,String etime,String vehicle,String company,String terminal,String status, Integer pageIndex, Integer pageSize) {
+		List<Map<String, Object>> list = sbwxDao.findwxtj(stime,etime,vehicle,company,terminal,status,pageIndex,pageSize);
+		int count = 0;
+		if( list!=null && list.size() >0){
+			count = Integer.parseInt(String.valueOf(list.get(0).get("COUNT")));
+		}
+		List<Map<String, Object>> lists = new ArrayList<Map<String,Object>>();
+		map = new HashMap<String, Object> ();
+		map.put("count", count);
+		map.put("datas",list);
+		lists.add(map);
+		return FastJsonUtil.toJSONString(lists);
+	} 
+	 @DS("datasource1")
+	public List<Map<String, Object>> findwxtjdc(String stime,String etime,String vehicle,String company,String terminal,String status) {
+		List<Map<String, Object>> list = sbwxDao.findwxtjdc(stime,etime,vehicle,company,terminal,status);
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");  
+		if(list.size()>0){
+				for(int i = 0; i< list.size();i++){
+					Map<String, Object> vehicle1=list.get(i);
+					String gz =findgz(vehicle1);
+					try {
+//					if(sdf.parse(String.valueOf(vehicle1.get("DB_TIME"))).getTime()<=sdf.parse(String.valueOf(vehicle1.get("RR_TIME_END"))).getTime()){
+						Date date=new Date();
+						if(date.getTime()<sdf.parse(String.valueOf(vehicle1.get("RR_TIME_END"))).getTime()){
+							vehicle1.put("JDXX", "正在维修");
+						}else if(gz==""){
+							vehicle1.put("JDXX", "维修完成");
+						}else {
+							vehicle1.put("JDXX", "未维修");
+						}
+//					}else{
+//						vehicle1.put("RA_ADDR", "");
+//						vehicle1.put("RT_TYPE", "");
+//						vehicle1.put("WXRY", "");
+//						vehicle1.put("RR_COST", "");
+//						vehicle1.put("TCSS", "");
+//						vehicle1.put("RR_TIME", "");
+//						vehicle1.put("RR_TIME_END", "");
+//						vehicle1.put("JDXX", "");
+//						vehicle1.put("RC_CONTENT", "");
+//					}
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+					vehicle1.put("GZ", gz);
+				}
+			}
+		return list;
+	} 
+	 
+	 @DS("datasource1")
+	public String findwxgd(String stime,String etime,String vehicle, Integer pageIndex, Integer pageSize) {
+		List<Map<String, Object>> list = sbwxDao.findwxgd(stime,etime,vehicle,pageIndex,pageSize);
+		int count = 0;
+		if( list!=null && list.size() >0){
+			count = Integer.parseInt(String.valueOf(list.get(0).get("COUNT")));
+			for(int i = 0; i< list.size();i++){
+				list.get(i).put("IS_REPAIR", String.valueOf(list.get(i).get("IS_REPAIR")).equals("0")?"已维修":(String.valueOf(list.get(i).get("IS_REPAIR")).equals("1")?"未维修":""));
+			}
+
+		}
+		List<Map<String, Object>> lists = new ArrayList<Map<String,Object>>();
+		map = new HashMap<String, Object> ();
+		map.put("count", count);
+		map.put("datas",list);
+		lists.add(map);
+		return FastJsonUtil.toJSONString(lists);
+	} 
+	 @DS("datasource1")
+	public List<Map<String, Object>> findwxgddc(String stime,String etime,String vehicle) {
+		List<Map<String, Object>> list = sbwxDao.findwxgddc(stime,etime,vehicle);
+		return list;
+	} 
+	 
+	 @DS("datasource1")
+	public String findspywxj(String stime,String etime,String vehicle,String company, Integer pageIndex, Integer pageSize) {
+		List<Map<String, Object>> list = sbwxDao.findspywxj(stime,etime,vehicle,company,pageIndex,pageSize);
+		int count = 0;
+		if( list!=null && list.size() >0){
+			count = Integer.parseInt(String.valueOf(list.get(0).get("COUNT")));		
+			for(int i = 0; i< list.size();i++){
+				list.get(i).put("ONE_ROAD_ONE", String.valueOf(list.get(i).get("ONE_ROAD_ONE")).equals("0")?"正常":(String.valueOf(list.get(i).get("ONE_ROAD_ONE")).equals("1")?"偏移":(String.valueOf(list.get(i).get("ONE_ROAD_ONE")).equals("2")?"黑屏":"")));
+				list.get(i).put("ONE_ROAD_TWO", String.valueOf(list.get(i).get("ONE_ROAD_TWO")).equals("0")?"正常":(String.valueOf(list.get(i).get("ONE_ROAD_TWO")).equals("1")?"偏移":(String.valueOf(list.get(i).get("ONE_ROAD_TWO")).equals("2")?"黑屏":"")));
+				list.get(i).put("ONE_ROAD_THREE", String.valueOf(list.get(i).get("ONE_ROAD_THREE")).equals("0")?"正常":(String.valueOf(list.get(i).get("ONE_ROAD_THREE")).equals("1")?"偏移":(String.valueOf(list.get(i).get("ONE_ROAD_THREE")).equals("2")?"黑屏":"")));
+				list.get(i).put("ONE_ROAD_FOUR", String.valueOf(list.get(i).get("ONE_ROAD_FOUR")).equals("0")?"正常":(String.valueOf(list.get(i).get("ONE_ROAD_FOUR")).equals("1")?"偏移":(String.valueOf(list.get(i).get("ONE_ROAD_FOUR")).equals("2")?"黑屏":"")));
+				list.get(i).put("TWO_ROAD_ONE", String.valueOf(list.get(i).get("TWO_ROAD_ONE")).equals("0")?"正常":(String.valueOf(list.get(i).get("TWO_ROAD_ONE")).equals("1")?"偏移":(String.valueOf(list.get(i).get("TWO_ROAD_ONE")).equals("2")?"黑屏":"")));
+				list.get(i).put("TWO_ROAD_TWO", String.valueOf(list.get(i).get("TWO_ROAD_TWO")).equals("0")?"正常":(String.valueOf(list.get(i).get("TWO_ROAD_TWO")).equals("1")?"偏移":(String.valueOf(list.get(i).get("TWO_ROAD_TWO")).equals("2")?"黑屏":"")));
+				list.get(i).put("TWO_ROAD_THREE", String.valueOf(list.get(i).get("TWO_ROAD_THREE")).equals("0")?"正常":(String.valueOf(list.get(i).get("TWO_ROAD_THREE")).equals("1")?"偏移":(String.valueOf(list.get(i).get("TWO_ROAD_THREE")).equals("2")?"黑屏":"")));
+				list.get(i).put("TWO_ROAD_FOUR", String.valueOf(list.get(i).get("TWO_ROAD_FOUR")).equals("0")?"正常":(String.valueOf(list.get(i).get("TWO_ROAD_FOUR")).equals("1")?"偏移":(String.valueOf(list.get(i).get("TWO_ROAD_FOUR")).equals("2")?"黑屏":"")));
+				list.get(i).put("TIME", String.valueOf(list.get(i).get("TWO_TIME")).equals("")?String.valueOf(list.get(i).get("ONE_TIME")):String.valueOf(list.get(i).get("TWO_TIME")));
+			}
+		}
+		List<Map<String, Object>> lists = new ArrayList<Map<String,Object>>();
+		map = new HashMap<String, Object> ();
+		map.put("count", count);
+		map.put("datas",list);
+		lists.add(map);
+		return FastJsonUtil.toJSONString(lists);
+	} 
+	 @DS("datasource1")
+	public List<Map<String, Object>> findspywxjdc(String stime,String etime,String vehicle, String company) {
+		List<Map<String, Object>> list = sbwxDao.findspywxjdc(stime,etime,vehicle,company);
+		return list;
+	} 
+	 @DS("datasource1")
+	public String findvehicle(String stime,String etime,String vehicle,String block,String company,String person,String type,String terminal, Integer pageIndex, Integer pageSize) {
+		List<Map<String, Object>> list = sbwxDao.getRepairVehicle(stime,etime,vehicle,block,company,person,type,terminal,pageIndex,pageSize);
+		int count = 0;
+		if( list!=null && list.size() >0){
+			count = Integer.parseInt(String.valueOf(list.get(0).get("COUNT")));
+		}
+		List<Map<String, Object>> lists = new ArrayList<Map<String,Object>>();
+		map = new HashMap<String, Object> ();
+		map.put("count", count);
+		map.put("datas",list);
+		lists.add(map);
+		return FastJsonUtil.toJSONString(lists);
+	} 
+	 @DS("datasource1")
+	public String findjd(String stime,String etime,String vehicle,String block,String company,String person,String type,String terminal, Integer pageIndex, Integer pageSize) {
+		List<Map<String, Object>> list = sbwxDao.getRepairjd(stime,etime,vehicle,block,company,person,type,terminal,pageIndex,pageSize);
+		int count = 0;
+		if( list!=null && list.size() >0){
+			count = Integer.parseInt(String.valueOf(list.get(0).get("COUNT")));
+		}
+		List<Map<String, Object>> lists = new ArrayList<Map<String,Object>>();
+		map = new HashMap<String, Object> ();
+		map.put("count", count);
+		map.put("datas",list);
+		lists.add(map);
+		return FastJsonUtil.toJSONString(lists);
+	} 
+	 @DS("datasource1")
+	public String findtj(String stime,String etime,String vehicle,String block,String company,String terminal, Integer pageIndex, Integer pageSize) {
+		List<Map<String, Object>> list = sbwxDao.getRepairtj(stime,etime,vehicle,block,company,terminal,pageIndex,pageSize);
+		int count = 0;
+		if( list!=null && list.size() >0){
+			count = Integer.parseInt(String.valueOf(list.get(0).get("COUNT")));
+		}
+		List<Map<String, Object>> lists = new ArrayList<Map<String,Object>>();
+		map = new HashMap<String, Object> ();
+		map.put("count", count);
+		map.put("datas",list);
+		lists.add(map);
+		return FastJsonUtil.toJSONString(lists);
+	}
+
+	public String findgz(Map<String, Object> vehicle1){
+			String gz="";
+			//有定位无营运
+			if (String.valueOf(vehicle1.get("NO_GPS")).equals("1")){
+				gz +="有定位无营运;";
+			}	
+			//有营运无定位
+			if (String.valueOf(vehicle1.get("NO_JJQ")).equals("1")) {
+				gz +="有营运无定位;";
+			}
+			//有抓拍无定位无营运
+			if (String.valueOf(vehicle1.get("NO_GPS_JJQ")).equals("1")) {
+				gz +="有抓拍无定位无营运;";
+			}
+			//7天无定位无营运
+			if (String.valueOf(vehicle1.get("SEVEN_GPS_JJQ")).equals("1")) {
+				gz +="7天无定位无营运;";
+			}
+			//空重车无变化
+			if (String.valueOf(vehicle1.get("EMPTY_HEAVY")).equals("1")) {
+				gz +="空重车无变化;";
+			}
+		return gz;
+		
+	}
+//	@DS("datasource2")
+	@DS("datasource1")
+	public String dcrdfx() {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String stime = sdf.format(new Date(new Date().getTime()-1000*60*60*6));
+		String etime = sdf.format(new Date());
+		List<Map<String, Object>> list = sbwxDao.dcrdfx(stime,etime);
+		return FastJsonUtil.toJSONString(list);
+	}
+//	@DS("datasource2")
+	@DS("datasource1")
+	public String dcsjfb() {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		String stime = sdf.format(new Date())+" 00:00:00";
+		String etime = sdf.format(new Date())+" 23:59:59";
+		List<Map<String, Object>> list = sbwxDao.dcsjfb(stime,etime);
+		return FastJsonUtil.toJSONString(list);
+	}
+//	@DS("datasource3")
+	@DS("datasource1")
+	public String cklxfx(String time,String table) {
+		List<Map<String, Object>> list = sbwxDao.cklxfx(time,table);
+//		List<Map<String, Object>> l = new ArrayList<Map<String,Object>>();
+//		for (int i = 0; i < list.size(); i++) {
+//			Map<String, Object> map = new HashMap<String, Object>();
+//			map.put("AREA_NAME", list.get(i).get("area_name"));
+//			map.put("ZDAREA_NAME", list.get(i).get("ZDAREA_NAME"));
+//			map.put("ORDER_COUNT", list.get(i).get("Order_count"));
+//			//起点经纬度
+//			Clob clob = (Clob) list.get(i).get("area_coordinates");//java.sql.Clob
+//		    int j = 0;
+//		    if(clob != null){
+//			     InputStream input;
+//				try {
+//					input = clob.getAsciiStream();
+//					 int len = (int)clob.length();
+//					 byte by[] = new byte[len];
+//					 while(-1 != (j = input.read(by, 0, by.length))){
+//					      input.read(by, 0, j);
+//					     }
+//				     String detailinfo = new String(by, "utf-8");
+//				     map.put("QDJWD", detailinfo);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//		    }
+//		    
+//		    //终点经纬度
+//			Clob clob1 = (Clob) list.get(i).get("AREA_COORDINATES1");//java.sql.Clob
+//		    int j1 = 0;
+//		    if(clob1 != null){
+//			     InputStream input;
+//				try {
+//					input = clob1.getAsciiStream();
+//					 int len = (int)clob1.length();
+//					 byte by[] = new byte[len];
+//					 while(-1 != (j1 = input.read(by, 0, by.length))){
+//					      input.read(by, 0, j1);
+//					     }
+//				     String detailinfo = new String(by, "utf-8");
+//				     map.put("ZDJWD", detailinfo);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//		    }
+//		    
+//		    l.add(map);
+//		}
+//		
+		return FastJsonUtil.toJSONString(list);
+	}
+}

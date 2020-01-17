@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>异常车辆查询</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+	<script src="./ycclcx.js"></script>
+	<style>
+		.panel-queryBar {padding: 10px 10px 0;}
+		.form-inline .form-group {margin-bottom: 10px;}
+		.dataListPanel.center {height: calc(100% - 50px);padding: 10px;}
+		
+	</style>
+
+</head>
+<body>
+<div class="panel-wrapper" style="position: relative;">
+	<div class="panel-layout" layout="center">
+		<div class="panel-queryBar">
+			<form class="form-inline">
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="iconfont icon-yichangguanli" type="icon"></i>
+						<select class="form-control select2" id="ycclcx-exceptionType" data-placeholder="异常类型"></select>
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="ip-iconfont ip-icon-user" type="icon"></i>
+						<!--<input type="text" class="form-control input-sm" id="ycclcx-carNumber" placeholder="业户名称">-->
+						<select type="text" class="form-control input-sm select2" autocomplete="off" id="ycclcx-carNumber" style="width: 150px;" data-placeholder="业户名称"><option></option></select>
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="glyphicon glyphicon-calendar" type="icon"></i>
+						<input type="text" class="form-control" id="ycclcx-datetimeStart" placeholder="开始时间">
+					</div>
+					<label class="addTimePeriod" db-control></label>
+					<div type="calendar">
+						<i class="glyphicon glyphicon-calendar" type="icon"></i>
+						<input type="text" class="form-control" id="ycclcx-datetimeEnd" placeholder="结束时间">
+					</div>
+					<a class="btn btn-primary btn-sm" id="ycclcx_select">查询</a>
+					<a class="btn btn-primary btn-sm" id="ExportFindAll">导出</a>
+				</div>
+			</form>
+		</div>
+		<div class="dataListPanel center">
+			<div id="ycclcxTable"></div>
+		</div>
+	</div>
+</div>
+<!--<script>
+	(function ($) {
+		var wyysjclFields = [
+			{name: 'gong', title: '公司', width: 160},
+			{name: 'cheh', title: '车号', width: 120},
+			{name: 'simk', title: 'SIM卡号', width: 150},
+			{name: 'lxir', title: '联系人', width: 150},
+			{name: 'lxdh', title: '联系电话', width: 150}
+		];
+		var wsxclFields = [
+			{name: 'gong', title: '公司', width: 160},
+			{name: 'cheh', title: '车号', width: 120},
+			{name: 'simk', title: 'SIM卡号', width: 140},
+			{name: 'lxir', title: '联系人', width: 120},
+			{name: 'lxdh', title: '联系电话', width: 140},
+			{name: 'hbsj', title: '最后汇报时间', width: 150}
+		];
+		var ycclcxData = [
+			{gong: '公司1', cheh: '车号1', simk: 'SIM卡号1', lxir: '联系人1', lxdh: '联系电话1', hbsj: '最后汇报时间1'},
+			{gong: '公司2', cheh: '车号2', simk: 'SIM卡号2', lxir: '联系人2', lxdh: '联系电话2', hbsj: '最后汇报时间2'},
+			{gong: '公司3', cheh: '车号3', simk: 'SIM卡号3', lxir: '联系人3', lxdh: '联系电话3', hbsj: '最后汇报时间3'},
+			{gong: '公司4', cheh: '车号4', simk: 'SIM卡号4', lxir: '联系人4', lxdh: '联系电话4', hbsj: '最后汇报时间4'},
+			{gong: '公司5', cheh: '车号5', simk: 'SIM卡号5', lxir: '联系人5', lxdh: '联系电话5', hbsj: '最后汇报时间5'},
+		];
+		$(function () {
+			$('#ycclcx-datetimeStart').datetimepicker(dateDefaultOption);
+			$('#ycclcx-datetimeEnd').datetimepicker(dateDefaultOption);
+			$('.addTimePeriod, .period').on('click', function () {
+				if ($(this).hasClass('addTimePeriod')) $(this).addClass('period').removeClass('addTimePeriod');
+				else if ($(this).hasClass('period')) $(this).addClass('addTimePeriod').removeClass('period');
+			});
+			$('#ycclcx-exceptionType').select2({
+				language: 'zh-CN',
+				width: '160',
+				minimumResultsForSearch: -1,
+				data: [
+					{id: '1', text: '无营运数据车辆'},
+					{id: '2', text: '未上线车辆'}
+				]
+			});
+			$('#ycclcx-exceptionType').on('change', function () {
+				if ($(this).val() == 1){
+					$('#ycclcxTable').jsGrid({fields: wyysjclFields})
+				} else if ($(this).val() == 2){
+					$('#ycclcxTable').jsGrid({fields: wsxclFields})
+				}
+			});
+			$('#ycclcxTable').jsGrid({
+				width: 'calc(100% - 2px)',
+				height: 'calc(100% - 2px)',
+				editing: true,
+				sorting: true,
+				paging: false,
+				autoload: true,
+				data: ycclcxData,
+				fields: wyysjclFields
+			});
+		})
+	})(jQuery)
+</script>-->
+</body>
+</html>

@@ -1,0 +1,192 @@
+var yshccx=(function ($) {
+	var clfb_map;
+	$(function () {
+		$('#yshc-stateTime').datetimepicker(datetimeDefaultOption);
+//		$('#yshc-stateTime').val(new Date().Format('yyyy-MM-dd hh:mm:ss'));
+		$('#yshc-endTime').datetimepicker(datetimeDefaultOption);
+//		$('#yshc-endTime').val(new Date().Format('yyyy-MM-dd hh:mm:ss'));
+
+		$(document).ready(function() {
+			  $(".select2").select2({  
+				  	language: "zh-CN",  //设置 提示语言
+			        tags:true,  
+			        allowClear: true,
+			        createTag:function (decorated, params) {  
+			            return null;  
+			        },  
+			    });
+			});
+		jqxhr=$.ajax({
+				type: "POST",
+				url: "../../ycyy/xll",
+				data:{"field":"VEHICLE_NO","table":"TB_BLACK_TAXI"},
+				timeout : 180000,
+				dataType: 'json',
+				success:function(data){
+					$("#yshc-cphm").select2({ 
+						language: "zh-CN",  //设置 提示语言
+				        minimumInputLength: 3,
+				        tags:true,  
+				        allowClear: true,
+				        closeOnSelect: true,
+				        createTag:function (decorated, params) {  
+				            return null;  
+				        },  
+				    });
+					$("#yshc-cphm").empty();
+					$("#yshc-cphm").append('<option value="" selected></option>');
+					$("#yshc-cphm").append('<option value="null">全部车辆</option>');
+					for(var i=0; i<data.length;i++){
+						$("#yshc-cphm").append('<option value="'+data[i].VEHICLE_NO+'">'+data[i].VEHICLE_NO+'</option>');
+					}
+				},
+				error: function(){
+				}         
+			});
+		jqxhr=$.ajax({
+				type: "POST",
+				url: "../../ycyy/xll",
+				data:{"field":"ERROR_TYPE","table":"TB_BLACK_TAXI"},
+				timeout : 180000,
+				dataType: 'json',
+				success:function(data){
+					$("#yshc-type").empty();
+					$("#yshc-type").append('<option value="" disabled selected>类型</option>');
+					$("#yshc-type").append('<option value="null">全部类型</option>');
+					for(var i=0; i<data.length;i++){
+						$("#yshc-type").append('<option value="'+data[i].ERROR_TYPE+'">'+data[i].ERROR_TYPE+'</option>');
+					}
+				},
+				error: function(){
+				}         
+			});
+		jqxhr=$.ajax({
+			type: "POST",
+			url: "../../ycyy/xll",
+			data:{"field":"ERROR_ADDRESS","table":"TB_BLACK_TAXI"},
+			timeout : 180000,
+			dataType: 'json',
+			success:function(data){
+				$("#yshc-address").empty();
+				$("#yshc-address").append('<option value="" disabled selected>采集点</option>');
+				$("#yshc-address").append('<option value="null">全部地点</option>');
+				for(var i=0; i<data.length;i++){
+					if(null!=data[i].ERROR_ADDRESS){
+						$("#yshc-address").append('<option value="'+data[i].ERROR_ADDRESS+'">'+data[i].ERROR_ADDRESS+'</option>');						
+					}
+				}
+			},
+			error: function(){
+			}         
+		});
+		
+		var bljlFields = [
+		                  	{name: 'id', title: '序号', width: 60, align: 'center'},
+			    			{name: 'cphm', title: '车牌号', width: 120, align: 'center'},
+			    			{name: 'cjdd', title: '采集地点', width: 120, align: 'center'},
+			    			{name: 'yclx', title: '异常类型', width: 120, align: 'center'},
+			    			{name: 'cjsj', title: '采集时间', width: 120, align: 'center'},
+			    		];
+		$('#yshc-select').on('click', function () {
+			findyshc();
+		});
+		function findyshc(){
+			var all = 0;
+			$('#yshcTable').jsGrid({
+				width: '100%',
+				height: 'calc(100% - 55px)',
+				autoload: true,
+				paging: true,
+				pageLoading: true,
+				editing: true,
+				sorting: true,
+				pageSize: 15,
+				pageIndex: 1,
+				controller: {
+                    loadData: function(filter) {
+                    	var d = $.Deferred();
+                    	var a = re(filter, function(item){
+                    		d.resolve(item);
+                    	})
+                    	return d.promise();
+                    }
+                },
+                fields: bljlFields,
+				pagerContainer: null,
+			    pageButtonCount: 5,
+			    pagerFormat: "{first} {prev} {pages} {next} {last} {pageIndex} of {pageCount}",
+			    pagePrevText: "上一页",
+			    pageNextText: "下一页",
+			    pageFirstText: "首页",
+			    pageLastText: "末页",
+			    pageNavigatorNextText: ">",
+			    pageNavigatorPrevText: "<"
+          	});
+
+//			setTimeout("findyshc()",1000);
+		}
+		function re(filter, callback){
+            var startIndex = (filter.pageIndex - 1) * filter.pageSize;
+            jqxhr=$.ajax({
+            	type: "POST",
+				url: "../../ycyy/findyshc",
+				data:{"stime":$("#yshc-stateTime").val(),
+					"etime":$("#yshc-endTime").val(),
+					"vehicle":$("#yshc-cphm").val(),
+					"type":$("#yshc-type").val(),
+					"address":$("#yshc-address").val(),
+					"pageIndex":filter.pageIndex,
+     				"pageSize":filter.pageSize
+					},
+				timeout : 180000,
+				dataType: 'json',
+            }).done(function(data) {
+            		var jsycxData = [];
+     				all = data[0].count;
+         			if(data.length>0){
+         				for(var i = 0; i< data[0].datas.length ;i++){
+         					var rs={};
+         					var vehicle=data[0].datas[i];
+         					rs.id = startIndex+i+1;	
+         					rs.cphm =  data[0].datas[i].VEHICLE_NO;
+         					rs.cjdd =  data[0].datas[i].ERROR_ADDRESS;
+         					rs.yclx =  data[0].datas[i].ERROR_TYPE;
+         					rs.cjsj = (data[0].datas[i].ERROR_TIME==null?"":(new Date(data[0].datas[i].ERROR_TIME)).Format("yyyy-MM-dd hh:mm:ss"));
+         					jsycxData.push(rs);
+         				}
+         				return callback({
+                            data: jsycxData,
+                            itemsCount: all
+                        });
+
+         			}else{
+        			}
+            }).fail(function() {
+//        			alert("数据异常");
+            });
+		}
+		findyshc();
+		$('#yshc-reset').on('click', function () {
+			$('.panel-queryBar .form-control').val('');
+			$('.panel-queryBar .select2').val([""]).trigger("change");
+		});
+		$('#yshc-dc').on('click', function () {
+			layer.confirm('你确定要导出数据', {
+				btn: ['确定', '取消'],
+				offset: '100px'
+			}, function (layerIndex) {
+				window.open(basePath+"ycyy/findyshcdc?stime="+$("#yshc-stateTime").val()
+						+"&etime="+$("#yshc-endTime").val()
+						+"&vehicle="+$("#yshc-cphm").val()
+						+"&type="+$("#yshc-type").val()
+						+"&address="+$("#yshc-address").val()
+				);
+				layer.close(layerIndex);
+			}, function (layerIndex) {
+				layer.close(layerIndex);
+			});
+		});
+	})
+	
+})(jQuery)
+

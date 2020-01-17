@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>车辆燃油类型分析</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+	<style>
+		.panel-layout[layout='left'] {
+			width: 400px;
+		}
+		.panel-layout[layout='left'] ~ .panel-layout[layout='center'] {
+			width: calc(100% - 415px);
+			margin-left: 415px;
+		}
+		.item[type='inline']:first-child {
+			border-bottom: 1px solid #f9f9f9;
+		}
+		.item[type='inline'] .col {
+			display: inline-block;
+			width: 50%;
+			text-align: right;
+		}
+		.item[type='inline'] .col + .col {
+			text-indent: 2em;
+			text-align: left;
+		}
+		#clrylxfxEchart {
+			height: calc(100% - 60px);
+		}
+
+		[unit]:after {content: attr(unit);}
+		[type='number'] {
+			text-align: right;
+		}
+		div.form-control {
+			border-color: #66afe9;
+			outline: 0;
+			-webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
+			box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
+		}
+		.numberBox {
+			width: 140px;
+			font-family: '452-CAI978';
+			font-size: 18px;
+			font-weight: bold;
+			color: #1890ff;
+		}
+		.numberBox + [unit]:after {
+			color: #1890ff;
+		}
+	</style>
+</head>
+<body>
+<div class="panel-wrapper" style="position: relative;">
+	<div class="panel-layout" layout="left">
+		<div class="dataListPanel" style="padding: 15px;">
+			<div class="item" type="inline"><div class="col">新能源车辆：<span class="ip-highlight-orange">2589</span>&nbsp;辆</div><div class="col">占比：<span class="ip-highlight-orange">76%</span></div></div>
+			<div class="item" type="inline"><div class="col">非新能源车辆：<span class="ip-highlight-green">2589</span>&nbsp;辆</div><div class="col">占比：<span class="ip-highlight-green">76%</span></div></div>
+			<div id="clrylxfxEchart"></div>
+		</div>
+	</div>
+	<div class="panel-layout" layout="center">
+		<div class="panel-queryBar" style="padding: 10px;">
+			<form class="form-inline">
+				<div class="form-group">
+					<label for="clrylxfx-datetimeStart">时间</label>
+					<input type="text" class="form-control" id="clrylxfx-datetimeStart" placeholder="开始时间">
+					<label>-</label>
+					<input type="text" class="form-control" id="clrylxfx-datetimeEnd" placeholder="结束时间">
+				</div>
+				<button type="submit" class="btn btn-primary">查询</button>
+				<label style="margin-left: 30px;">进出城出租车车辆数</label>
+				<div class="form-control numberBox" type="number" style="width: 80px;">3364</div>
+				<span unit="辆" style="margin-right: 10px;"></span>
+				<a class="btn btn-primary">详情</a>
+			</form>
+		</div>
+		<div class="dataListPanel" style="height: calc(100% - 54px); padding: 10px;">
+			<div id="czckfxTable"></div>
+		</div>
+	</div>
+</div>
+<script>
+	(function ($) {
+		var clrylxfxFields = [
+			{name: 'wlmc', title: '围栏名称', width: 100, align: 'left'},
+			{name: 'cphm', title: '车牌号码', width: 100, align: 'left'},
+			{name: 'jcsj', title: '进出时间', width: 140, align: 'left'},
+			{name: 'crdd', title: '出入地点', width: 80, align: 'left'},
+			{name: 'beiz', title: '备注', width: 200, align: 'left'}
+		];
+		var clrylxfxData = [
+			{wlmc: '围栏名称1', cphm: '车牌号码1', jcsj: '进出时间1', crdd: '出入地点1', beiz: '备注1'},
+			{wlmc: '围栏名称2', cphm: '车牌号码2', jcsj: '进出时间2', crdd: '出入地点2', beiz: '备注2'},
+			{wlmc: '围栏名称3', cphm: '车牌号码3', jcsj: '进出时间3', crdd: '出入地点3', beiz: '备注3'},
+			{wlmc: '围栏名称4', cphm: '车牌号码4', jcsj: '进出时间4', crdd: '出入地点4', beiz: '备注4'},
+			{wlmc: '围栏名称5', cphm: '车牌号码5', jcsj: '进出时间5', crdd: '出入地点5', beiz: '备注5'},
+		];
+		$(function () {
+			var clrylxfxEchart = echarts.init(document.getElementById('clrylxfxEchart'));
+			clrylxfxEchart.setOption({
+				color: [
+					'#fdca57',
+					'#1cd1a1'
+				],
+				legend: {
+					orient: 'horizontal',
+					y: 'bottom',
+					x: 'center',
+					data: ['非新能源','新能源']
+				},
+				series : [
+					{
+						name: '访问来源',
+						type: 'pie',
+						radius : '80%',
+						center: ['50%', '40%'],
+						data:[
+							{value:24, name:'非新能源'},
+							{value:76, name:'新能源'}
+						],
+						itemStyle: {
+							emphasis: {
+								shadowBlur: 10,
+								shadowOffsetX: 0,
+								shadowColor: 'rgba(0, 0, 0, 0.5)'
+							}
+						},
+						labelLine: {
+							show: false
+						},
+						label: {
+							formatter: '{b}：{d}%',
+							position: 'inside'
+						}
+					}
+				]
+			});
+			$('.ip-tabWrapper').Tab();
+			$('#czckfx-lydDatetimeStart').datetimepicker(dateDefaultOption);
+			$('#czckfx-mddDatetimeStart').datetimepicker(dateDefaultOption);
+			$('#czckfxTable').jsGrid({
+				width: 'calc(100% - 2px)',
+				height: 'calc(100% - 2px)',
+				editing: true,
+				sorting: true,
+				paging: false,
+				autoload: true,
+				data: clrylxfxData,
+				fields: clrylxfxFields
+			});
+		})
+	})(jQuery)
+</script>
+</body>
+</html>

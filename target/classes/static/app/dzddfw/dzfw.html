@@ -1,0 +1,350 @@
+<!-- 业户查询 -->
+<html>
+<head>
+<!-- 	<link rel="stylesheet" href="../../resources/style/reset.css"> -->
+<!-- 	<link rel="stylesheet" href="../../resources/style/iconfont.css"> -->
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+    <link rel="stylesheet" href="app/main.css">
+    <style>
+        #dzfwdiv{
+            width: 100%;
+            height: 80%;
+            background: url('../../resources/images/dzfw.png')  no-repeat center;
+            position: relative;
+        }
+        #dzfwzt{
+            text-align:center;
+            height: 8%;
+            font-size:14px;
+            margin-top:20px;
+            text-align: center;
+            text-indent: 2em;
+        }
+        html,body {
+			background: #ffffff;
+		}
+		 .panel-titleLine { margin-bottom: 20px; padding: .3em; border: 1px solid #eeeeee;}
+        .panel-titleLine .panel-titleSpan { position: relative; top: -1em; left: .3em; padding: .2em .5em; background: white }
+        .panel_oneSpan > div { display: block; margin-top: .3em; margin-bottom: .3em; }
+        .panel_twoSpan > div { display: inline-block; width: 49%; margin-top: .3em; margin-bottom: .3em; }
+		#dzfw_map{
+			width: 50%;
+			height: 70%;
+			position: relative;
+			zoom:0.8;
+			float:left;
+		}
+    </style>
+</head>
+<body>
+<!--<div id="dzfwzt">预约车辆功能，客户可以通过互联网或电召服务系统，提前30分钟以上（时间可设置）提交预约订单，订单主要包括时间、地点、人数、车辆数、联系方法等。</div>-->
+<!--<div id="dzfwdiv"></div>-->
+    <div id="dzfwContainer">
+                <div id="dzfw_mLeftCenter" style="width: 30%;float:left;height:70%;overflow: auto;padding-top: 10px;">
+                    <div class="panel-titleLine">
+                        <span class="panel-titleSpan">来电显示</span>
+                        <div class="panel_oneSpan">
+                            <div>
+                                <label for="dzfw_ldhm">来电号码：</label>
+                                <select id="dzfw_ldhm" style="width: 10em;">
+                                    <option>13566778891</option>
+                                </select>
+                                <button id="dzfw_xzbtn">选择</button>
+                                <label>客户等级：<span id="dzfw_khdj">三级</span></label>
+                            </div>
+                            <div>
+                                <label for="dzfw_hb">回拨：</label>
+                                <input id="dzfw_hb" type="text" style="width: 10em; margin-right: 1em;">
+                                <label for="dzfw_fj">分机：</label>
+                                <input id="dzfw_fj" type="text" style="width: 4em;">
+                                <input type="checkbox" id="dzfw_zd">
+                                <label for="dzfw_zd">自动</label>
+                            </div>
+                        </div>
+                        <div class="panel_twoSpan">
+                            <div>
+                                <label style="white-space: nowrap;">上次约车：<span id="dzfw_scycsj">2016-11-01 10:10:00</span></label>
+                            </div>
+                            <div>
+                                <label style="margin-left: 1.5em;">约车/成功/空放：<span id="dzfw_yc">5</span>/<span id="dzfw_cg">2</span>/<span id="dzfw_fk">0</span></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-titleLine">
+                        <span class="panel-titleSpan">详细信息</span>
+                        <div class="panel_oneSpan">
+                            <div>
+                                <label for="dzfw_xxdz">详细地址：</label>
+                                <input id="dzfw_xxdz" type="text" style="width: 16em;">
+                                <button id="dzfw_xzbtn2">选择</button>
+                            </div>
+                            <div>
+                                <label for="dzfw_ckdz">参考地址：</label>
+                                <input id="dzfw_ckdz" type="text" style="width: 10em; margin-right: 4em;">
+                                <input id="dzfw_ckdz2" type="text" style="width: 6em;">
+                            </div>
+                            <div>
+                                <label for="dzfw_ckxm">乘客姓名：</label>
+                                <input id="dzfw_ckxm" type="text" style="width: 10em; margin-right: 1em;">
+                                <label for="dzfw_yy">预约：</label>
+                                <input id="dzfw_yy" type="text" style="width: 6em;">
+                            </div>
+                            <div>
+                                <label for="dzfw_mddd">目的地点：</label>
+                                <input id="dzfw_mddd" type="text" style="width: 16em;">
+                            </div>
+                            <div>
+                                <label for="dzfw_fjxx">附加信息：</label>
+                                <input id="dzfw_fjxx" type="text" style="width: 16em;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-titleLine">
+                        <span class="panel-titleSpan">补充信息</span>
+                        <div class="panel_oneSpan">
+                            <div>
+                                <label for="dzfw_yclx">约车类型：</label>
+                                <select id="dzfw_yclx" style="width: 6em; margin-right: 1em;">
+                                    <option>QQ约车</option>
+                                </select>
+                                <label for="dzfw_qqhm">QQ号码：</label>
+                                <input id="dzfw_qqhm" type="text" style="width: 9em;">
+                            </div>
+                            <div>
+                                <label for="dzfw_jllx">距离类型：</label>
+                                <select id="dzfw_jllx" disabled style="width: 6em; margin-right: 1em;">
+                                    <option>普通</option>
+                                </select>
+                                <label>范围(m)：</label>
+                                <input type="text" style="width: 4em; margin-right: 1em;">
+                            </div>
+                            <div>
+                                <label>距离类型：</label>
+                                <select style="width: 6em; margin-right: 1em;">
+                                    <option>普通约车</option>
+                                </select>
+                                <label>范围(m)：</label>
+                                <select style="width: 6em; margin-right: 1em;">
+                                    <option>所有</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>用车数量：</label>
+                                <input type="text" style="width: 4em; margin-right: 1em;">
+                                <label>乘客人数：</label>
+                                <input type="text" style="width: 4em; margin-right: 1em;">
+                            </div>
+                        </div>
+                    </div>
+                    <button disabled>调度</button>
+                    <button>清空</button>
+                    <button>黑名单</button>
+                </div>
+				<div id="dzfw_map"></div>
+                
+          <div style="width: 20%;float:right;height:70%;overflow: auto;padding-top: 10px;">
+            <div class="panel-titleLine">
+                <span class="panel-titleSpan">车辆查找</span>
+                <div class="panel_oneSpan">
+                    <div>
+                        <select style="width: 8em; margin-right: 1em;">
+                            <option>浙AT2997</option>
+                        </select>
+                        <button>查询</button>
+                    </div>
+                    <div>
+                        <textarea style="width: 100%; height: 100px;"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-titleLine">
+                <span class="panel-titleSpan">地物查找</span>
+                <div class="panel_oneSpan">
+                    <div>
+                        <input style="width: 8em; margin-right: 1em;">
+                        <button>定位</button>
+                    </div>
+                    <div>
+                        <table border="1" cellspacing="0" cellpadding="0" style="width: 100%;">
+                            <thead>
+                            <tr>
+                                <th style="text-align: center; height: 30px;">名称</th>
+                                <th style="text-align: center;">层名</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-titleLine">
+                <span class="panel-titleSpan">近一单业务</span>
+                <div class="panel_oneSpan">
+                    <div>
+                        <label>车牌： 浙ATC206</label>
+                    </div>
+                    <div>
+                        <label>业务编号： 772019</label>
+                        <button>查找</button>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-titleLine">
+                <span class="panel-titleSpan">重要信息</span>
+                <div class="panel_oneSpan">
+                    <div>
+                        <textarea style="width: 100%; height: 100px;"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-titleLine">
+                <span class="panel-titleSpan">重要信息</span>
+             <!-- 导航区 -->  
+			<ul class="nav nav-tabs" role="tablist">  
+				<li role="presentation" class="active">
+					<a href="#home" role="tab" data-toggle="tab">抢单信息</a>
+				</li> 
+				<li role="presentation">
+					<a href="#jkxx" role="tab" data-toggle="tab">监控信息</a>
+				</li> 
+			</ul>    
+			<!-- 面板区 --> 
+			<div class="tab-content">    
+				<div role="tabpanel" class="tab-pane active" id="home"> 
+					<textarea style="width: 100%; height: 100px;"></textarea>
+				</div>
+				<div role="tabpanel" class="tab-pane" id="jkxx">
+					<textarea style="width: 100%; height: 100px;"></textarea>
+				</div>
+			</div>  
+            </div>
+        </div>
+ 
+     <div id="dzfw_mBottomCenter"  style="width: 100%;float:left;height:10%;padding-top:20px;">
+                    <div doLayout="true">
+                     <!-- 导航区 -->  
+					<ul class="nav nav-tabs" role="tablist" >  
+						<li role="presentation" class="active">
+							<a href="#zzdd" role="tab" data-toggle="tab">正在调度</a>
+						</li> 
+						<li role="presentation">
+							<a href="#pcqd" role="tab" data-toggle="tab">派车确定</a>
+						</li> 
+						<li role="presentation">
+							<a href="#ddwc" role="tab" data-toggle="tab">调度完成</a>
+						</li> 
+						<li role="presentation">
+							<a href="#qtyw" role="tab" data-toggle="tab">其他业务</a>
+						</li> 
+					</ul>    
+					<!-- 面板区 --> 
+					<div class="tab-content" >    
+						<div role="tabpanel" class="tab-pane active" id="zzdd"> 
+							<table border="1" cellspacing="0" cellpadding="0" style="width: 100%;float:left;height:10%;padding-top:20px;">
+                                <thead>
+                                <tr>
+                                    <th style="text-align: center; height: 30px;">业务编号</th>
+                                    <th style="text-align: center;">客户姓名</th>
+                                    <th style="text-align: center;">联系电话</th>
+                                    <th style="text-align: center;">上车地点</th>
+                                    <th style="text-align: center;">调度状态</th>
+                                    <th style="text-align: center;">回拨类型/状态</th>
+                                    <th style="text-align: center;">已派车牌号</th>
+                                    <th style="text-align: center;">SIM卡号</th>
+                                    <th style="text-align: center;">调度时间</th>
+                                </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+						</div>
+						<div role="tabpanel" class="tab-pane" id="pcqd">
+							<table border="1" cellspacing="0" cellpadding="0" style="width: 100%;float:left;height:10%;padding-top:20px;">
+                                <thead>
+                                <tr>
+                                    <th style="text-align: center; height: 30px;">业务编号</th>
+                                    <th style="text-align: center;">客户姓名</th>
+                                    <th style="text-align: center;">联系电话</th>
+                                    <th style="text-align: center;">上车地点</th>
+                                    <th style="text-align: center;">调度状态</th>
+                                    <th style="text-align: center;">回拨类型/状态</th>
+                                    <th style="text-align: center;">已派车牌号</th>
+                                    <th style="text-align: center;">SIM卡号</th>
+                                    <th style="text-align: center;">调度时间</th>
+                                </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+						</div>
+						<div role="tabpanel" class="tab-pane" id="ddwc">
+							<table border="1" cellspacing="0" cellpadding="0" style="width: 100%;float:left;height:10%;padding-top:20px;">
+                                <thead>
+                                <tr>
+                                    <th style="text-align: center; height: 30px;">业务编号</th>
+                                    <th style="text-align: center;">客户姓名</th>
+                                    <th style="text-align: center;">联系电话</th>
+                                    <th style="text-align: center;">上车地点</th>
+                                    <th style="text-align: center;">调度状态</th>
+                                    <th style="text-align: center;">回拨类型/状态</th>
+                                    <th style="text-align: center;">已派车牌号</th>
+                                    <th style="text-align: center;">SIM卡号</th>
+                                    <th style="text-align: center;">调度时间</th>
+                                </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+						</div>
+						<div role="tabpanel" class="tab-pane" id="qtyw">
+							<table border="1" cellspacing="0" cellpadding="0" style="width: 100%;float:left;height:10%;padding-top:20px;">
+                                <thead>
+                                <tr>
+                                    <th style="text-align: center; height: 30px;">业务编号</th>
+                                    <th style="text-align: center;">客户姓名</th>
+                                    <th style="text-align: center;">联系电话</th>
+                                    <th style="text-align: center;">上车地点</th>
+                                    <th style="text-align: center;">调度状态</th>
+                                    <th style="text-align: center;">回拨类型/状态</th>
+                                    <th style="text-align: center;">已派车牌号</th>
+                                    <th style="text-align: center;">SIM卡号</th>
+                                    <th style="text-align: center;">调度时间</th>
+                                </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+						</div>
+					</div>           
+                    </div>
+                </div>
+ 
+ 
+</div>
+    <script type="text/javascript">
+        var map = new AMap.Map('dzfw_map', {
+            resizeEnable: true,
+            zoom:11
+        });
+    </script>
+</body>
+</html>

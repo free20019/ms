@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>服务投诉</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+	<script src="./fwts.js"></script>
+	<style>
+		.panel-queryBar {padding: 10px 10px 0;}
+		.form-inline .form-group {margin-bottom: 10px;}
+		.dataListPanel.center {height: calc(100% - 50px);padding: 10px;}
+		[type='calendar'] {width: auto;}
+
+		/* dialog style */
+		#fwts-dialog-dcqk .form-control, #fwts-dialog-tssy .form-control, #fwts-dialog-tsyj .form-control, #fwts-dialog-cljg .form-control {width: 428px;height: 50px;}
+		.modal-body form {}
+		.modal-body .control-label {display: inline-block;width: 6em;text-align: right;}
+		.modal-body .form-control {display: inline-block;}
+		textarea.form-control {resize: none;}
+		.ip-type-input div.form-control, .ip-type-text input.form-control, .ip-type-text select.form-control, .ip-type-text textarea.form-control, .ip-type-text .select2.select2-container {display: none;}
+		.ip-type-text div.form-control {width: 168px;}
+	</style>
+
+</head>
+<body>
+<div class="panel-wrapper" style="position: relative;">
+	<div class="panel-layout" layout="center">
+		<div class="panel-queryBar">
+			<form class="form-inline">
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="iconfont icon-chepai" type="icon"></i>
+						<!--<input type="text" class="form-control input-sm" id="fwts-carNumber" placeholder="车牌号码">-->
+						<select type="text" class="form-control input-sm" id="fwts-carNumber" autocomplete="off" data-placeholder="车牌号码"><option></option></select>
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="ip-iconfont ip-icon-user" type="icon"></i>
+						<input type="text" class="form-control input-sm" id="fwts-siji" placeholder="司机">
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<a class="btn btn-primary btn-sm" id="select_fwts">查询</a>
+					<a class="btn btn-primary btn-sm" id="fwts-reset">重置</a>
+					<a class="btn btn-primary btn-sm" id="fwts-add">添加</a>
+					<a class="btn btn-primary btn-sm" id="fwts-Export">导出</a>
+				</div>
+			</form>
+		</div>
+		<div class="dataListPanel center">
+			<div id="fwtsTable"></div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="fwts-dialog" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">服务违章</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-inline ip-type-input" id="fwts-dialog-form">
+					<div class="form-group form-group-sm" id="fwts-dialog-cphm">
+						<label class="control-label">车牌号码:</label>
+						<input type="text" class="form-control" placeholder="车牌号码" id="fwts_cph1">
+						<div type="text" class="form-control" id="fwts_cph">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="fwts-dialog-bssj">
+						<label class="control-label">被诉司机:</label>
+						<input type="text" class="form-control" placeholder="被诉司机" id="fwts_bsjs1">
+						<div type="text" class="form-control" id="fwts_bsjs">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="fwts-dialog-ccsj">
+						<label class="control-label">乘车时间:</label>
+						<input type="text" class="form-control" placeholder="乘车时间" id="fwts_ccsj1">
+						<div type="text" class="form-control" id="fwts_ccsj">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="fwts-dialog-slsj">
+						<label class="control-label">受理时间:</label>
+						<input type="text" class="form-control" placeholder="受理时间" id="fwts_slsj1">
+						<div type="text" class="form-control" id="fwts_slsj">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="fwts-dialog-lxfs">
+						<label class="control-label">联系方式:</label>
+						<input type="text" class="form-control" placeholder="联系方式" id="fwts_lxfs1">
+						<div type="text" class="form-control" id="fwts_lxfs">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="fwts-dialog-tsre">
+						<label class="control-label">投诉人:</label>
+						<input type="text" class="form-control" placeholder="投诉人" id="fwts_tsr1">
+						<div type="text" class="form-control" id="fwts_tsr">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="fwts-dialog-dcqk">
+						<label class="control-label">调查情况:</label>
+						<textarea type="text" class="form-control" placeholder="调查情况" id="fwts_dcqk1"></textarea>
+						<div type="text" class="form-control" id="fwts_dcqk">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="fwts-dialog-tssy">
+						<label class="control-label">投诉事由:</label>
+						<textarea type="text" class="form-control" placeholder="投诉事由" id="fwts_tssy1"></textarea>
+						<div type="text" class="form-control" id="fwts_tssy">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="fwts-dialog-tsyj">
+						<label class="control-label">投诉人意见:</label>
+						<textarea type="text" class="form-control" placeholder="投诉人意见" id="fwts_tsyj1"></textarea>
+						<div type="text" class="form-control" id="fwts_tsyj">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="fwts-dialog-cljg">
+						<label class="control-label">处理结果:</label>
+						<textarea type="text" class="form-control" placeholder="处理结果" id="fwts_cljg1"></textarea>
+						<div type="text" class="form-control" id="fwts_cljg">&nbsp;</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" id="fwts-dialog-save">提交</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+</body>
+</html>

@@ -1,0 +1,175 @@
+{
+  "hints": [],
+  "groups": [
+    {
+      "sourceType": "com.erxi.ms.config.DataSourceConfig",
+      "name": "mybatis",
+      "sourceMethod": "sqlSessionFactoryBean()",
+      "type": "org.mybatis.spring.SqlSessionFactoryBean"
+    },
+    {
+      "sourceType": "com.erxi.ms.redis.RedisConfig",
+      "name": "redis",
+      "type": "com.erxi.ms.redis.RedisConfig"
+    },
+    {
+      "sourceType": "com.erxi.ms.config.DataSourceConfig",
+      "name": "spring.datasource.db1",
+      "sourceMethod": "dataSource1()",
+      "type": "javax.sql.DataSource"
+    },
+    {
+      "sourceType": "com.erxi.ms.config.DataSourceConfig",
+      "name": "spring.datasource.db2",
+      "sourceMethod": "dataSource2()",
+      "type": "javax.sql.DataSource"
+    }
+  ],
+  "properties": [
+    {
+      "sourceType": "org.mybatis.spring.SqlSessionFactoryBean",
+      "name": "mybatis.cache",
+      "type": "org.apache.ibatis.cache.Cache"
+    },
+    {
+      "sourceType": "org.mybatis.spring.SqlSessionFactoryBean",
+      "name": "mybatis.cache",
+      "type": "org.apache.ibatis.cache.Cache"
+    },
+    {
+      "sourceType": "org.mybatis.spring.SqlSessionFactoryBean",
+      "name": "mybatis.cache",
+      "type": "org.apache.ibatis.cache.Cache"
+    },
+    {
+      "sourceType": "org.mybatis.spring.SqlSessionFactoryBean",
+      "name": "mybatis.cache",
+      "type": "org.apache.ibatis.cache.Cache"
+    },
+    {
+      "sourceType": "org.mybatis.spring.SqlSessionFactoryBean",
+      "name": "mybatis.cache",
+      "type": "org.apache.ibatis.cache.Cache"
+    },
+    {
+      "sourceType": "org.mybatis.spring.SqlSessionFactoryBean",
+      "name": "mybatis.cache",
+      "type": "org.apache.ibatis.cache.Cache"
+    },
+    {
+      "sourceType": "org.mybatis.spring.SqlSessionFactoryBean",
+      "name": "mybatis.cache",
+      "type": "org.apache.ibatis.cache.Cache"
+    },
+    {
+      "sourceType": "org.mybatis.spring.SqlSessionFactoryBean",
+      "name": "mybatis.database-id-provider",
+      "type": "org.apache.ibatis.mapping.DatabaseIdProvider"
+    },
+    {
+      "sourceType": "org.mybatis.spring.SqlSessionFactoryBean",
+      "name": "mybatis.database-id-provider",
+      "type": "org.apache.ibatis.mapping.DatabaseIdProvider"
+    },
+    {
+      "sourceType": "org.mybatis.spring.SqlSessionFactoryBean",
+      "name": "mybatis.database-id-provider",
+      "type": "org.apache.ibatis.mapping.DatabaseIdProvider"
+    },
+    {
+      "sourceType": "org.mybatis.spring.SqlSessionFactoryBean",
+      "name": "mybatis.database-id-provider",
+      "type": "org.apache.ibatis.mapping.DatabaseIdProvider"
+    },
+    {
+      "sourceType": "org.mybatis.spring.SqlSessionFactoryBean",
+      "name": "mybatis.database-id-provider",
+      "type": "org.apache.ibatis.mapping.DatabaseIdProvider"
+    },
+    {
+      "sourceType": "org.mybatis.spring.SqlSessionFactoryBean",
+      "name": "mybatis.database-id-provider",
+      "type": "org.apache.ibatis.mapping.DatabaseIdProvider"
+    },
+    {
+      "sourceType": "org.mybatis.spring.SqlSessionFactoryBean",
+      "name": "mybatis.database-id-provider",
+      "type": "org.apache.ibatis.mapping.DatabaseIdProvider"
+    },
+    {
+      "sourceType": "org.mybatis.spring.SqlSessionFactoryBean",
+      "name": "mybatis.vfs",
+      "type": "java.lang.Class<? extends org.apache.ibatis.io.VFS>"
+    },
+    {
+      "sourceType": "org.mybatis.spring.SqlSessionFactoryBean",
+      "name": "mybatis.vfs",
+      "type": "java.lang.Class<? extends org.apache.ibatis.io.VFS>"
+    },
+    {
+      "sourceType": "org.mybatis.spring.SqlSessionFactoryBean",
+      "name": "mybatis.vfs",
+      "type": "java.lang.Class<? extends org.apache.ibatis.io.VFS>"
+    },
+    {
+      "sourceType": "org.mybatis.spring.SqlSessionFactoryBean",
+      "name": "mybatis.vfs",
+      "type": "java.lang.Class<? extends org.apache.ibatis.io.VFS>"
+    },
+    {
+      "sourceType": "org.mybatis.spring.SqlSessionFactoryBean",
+      "name": "mybatis.vfs",
+      "type": "java.lang.Class<? extends org.apache.ibatis.io.VFS>"
+    },
+    {
+      "sourceType": "org.mybatis.spring.SqlSessionFactoryBean",
+      "name": "mybatis.vfs",
+      "type": "java.lang.Class<? extends org.apache.ibatis.io.VFS>"
+    },
+    {
+      "sourceType": "org.mybatis.spring.SqlSessionFactoryBean",
+      "name": "mybatis.vfs",
+      "type": "java.lang.Class<? extends org.apache.ibatis.io.VFS>"
+    },
+    {
+      "sourceType": "com.erxi.ms.redis.RedisConfig",
+      "name": "redis.host",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.erxi.ms.redis.RedisConfig",
+      "name": "redis.password",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.erxi.ms.redis.RedisConfig",
+      "defaultValue": 0,
+      "name": "redis.pool-max-total",
+      "type": "java.lang.Integer"
+    },
+    {
+      "sourceType": "com.erxi.ms.redis.RedisConfig",
+      "defaultValue": 0,
+      "name": "redis.pool-max-wait",
+      "type": "java.lang.Integer"
+    },
+    {
+      "sourceType": "com.erxi.ms.redis.RedisConfig",
+      "defaultValue": 0,
+      "name": "redis.pool-maxdle",
+      "type": "java.lang.Integer"
+    },
+    {
+      "sourceType": "com.erxi.ms.redis.RedisConfig",
+      "defaultValue": 0,
+      "name": "redis.port",
+      "type": "java.lang.Integer"
+    },
+    {
+      "sourceType": "com.erxi.ms.redis.RedisConfig",
+      "defaultValue": 0,
+      "name": "redis.timeout",
+      "type": "java.lang.Integer"
+    }
+  ]
+}

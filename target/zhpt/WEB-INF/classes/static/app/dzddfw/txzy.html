@@ -1,0 +1,165 @@
+<!-- 业户查询 -->
+<html>
+<head>
+<!-- 	<link rel="stylesheet" href="../../resources/style/reset.css"> -->
+<!-- 	<link rel="stylesheet" href="../../resources/style/iconfont.css"> -->
+<!-- 	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css"> -->
+	<link rel="stylesheet" href="../../resources/script/element-ui/lib/theme-chalk/index.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/vue.min.js"></script>
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/element-ui/lib/index.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/js/transfer.js"></script>
+    <style>
+        #txzydiv{
+            width: 100%;
+            height: 80%;
+            background: url('resources/images/dzdd/txzy.png')  no-repeat center;
+            position: relative;
+        }
+        #txzyzt{
+            text-align:center;
+            height: 8%;
+            margin-top:20px;
+            text-align: left;
+            text-indent: 2em;
+            font-family: '微软雅黑';
+            font-size: 15px;
+            line-height: 20px;
+        }
+        html,body {
+			background: #ffffff;
+		}
+    </style>
+</head>
+<body>
+<!--<div id="txzyzt">向乘客提供出行服务，获取沿途动态交通状况信息，选择最优路线；查询路程花费时间；估计路程费用；查询出发地空车分布、时间分布规律；查询出发地、目的地周边地理情况。</div>-->
+<!--<div id="txzydiv"></div>-->
+<div id="app">
+<el-collapse v-model="activeNames" @change="handleChange" >
+<el-collapse-item title="记录编号[123006]" name="1">
+    <table border="1" cellspacing="0" cellpadding="0" style="width: 100%;">
+        <tbody>
+        <tr>
+            <td rowspan="2">1</td>
+            <td>日期 班次：5/20/2016 上午班</td>
+            <td>车牌号：浙AT1234</td>
+            <td>公司：大众</td>
+            <td>调度员工号：502</td>
+            <td><button>锁定</button> <button>编辑</button> <button>删除</button></td>
+        </tr>
+        <tr>
+            <td colspan="5">
+                备注：<br>
+                司机您好！从虎跑到火车东站路线。
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</el-collapse-item>
+<el-collapse-item title="记录编号[123081]" name="2">
+    <table border="1" cellspacing="0" cellpadding="0" style="width: 100%;">
+        <tbody>
+        <tr>
+            <td rowspan="2">2</td>
+            <td>日期 班次：5/20/2016 上午班</td>
+            <td>车牌号：浙ATE043</td>
+            <td>公司：大众</td>
+            <td>调度员工号：502</td>
+            <td><button>锁定</button> <button>编辑</button> <button>删除</button></td>
+        </tr>
+        <tr>
+            <td colspan="5">
+                备注：<br>
+                司机您好！从火车东站到萧山机场。
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</el-collapse-item>
+<el-collapse-item title="记录编号[123041]" name="3">
+    <table border="1" cellspacing="0" cellpadding="0" style="width: 100%;">
+        <tbody>
+        <tr>
+            <td rowspan="2">3</td>
+            <td>日期 班次：5/20/2016 上午班</td>
+            <td>车牌号：浙AT3455</td>
+            <td>公司：大众</td>
+            <td>调度员工号：502</td>
+            <td><button>锁定</button> <button>编辑</button> <button>删除</button></td>
+        </tr>
+        <tr>
+            <td colspan="5">
+                备注：<br>
+                司机您好！从东站到城战。
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</el-collapse-item>
+<el-collapse-item title="记录编号[123041]" name="4">
+    <table border="1" cellspacing="0" cellpadding="0" style="width: 100%;">
+        <tbody>
+        <tr>
+            <td rowspan="2">4</td>
+            <td>日期 班次：5/20/2016 上午班</td>
+            <td>车牌号：浙AT3567</td>
+            <td>公司：大众</td>
+            <td>调度员工号：502</td>
+            <td><button>锁定</button> <button>编辑</button> <button>删除</button></td>
+        </tr>
+        <tr>
+            <td colspan="5">
+                备注：<br>
+                司机您好！恶劣天气注意安全驾驶。
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</el-collapse-item>
+<el-collapse-item title="记录编号[123041]" name="5">
+    <table border="1" cellspacing="0" cellpadding="0" style="width: 100%;">
+        <tbody>
+        <tr>
+            <td rowspan="2">5</td>
+            <td>日期 班次：5/20/2016 上午班</td>
+            <td>车牌号：浙AT3976</td>
+            <td>公司：大众</td>
+            <td>调度员工号：502</td>
+            <td><button>锁定</button> <button>编辑</button> <button>删除</button></td>
+        </tr>
+        <tr>
+            <td colspan="5">
+                备注：<br>
+                司机您好！暴风雨注意车速。
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</el-collapse-item>
+</el-collapse>
+</div>
+<script>
+var Main = {
+	    data() {
+	      return {
+	        activeNames: ['1']
+	      };
+	    },
+	    methods: {
+	      handleChange(val) {
+	        console.log(val);
+	      }
+	    }
+	  }
+	var Ctor = Vue.extend(Main)
+	new Ctor().$mount('#app')
+</script>
+</body>
+</html>

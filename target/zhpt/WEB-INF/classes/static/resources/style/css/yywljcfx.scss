@@ -1,0 +1,122 @@
+#root {height: 100%;}
+#yywljcfxMap {height: 100%;}
+#clrylxfxEchart {height: calc(100% - 60px);}
+
+[unit]:after {content: attr(unit);}
+[type='number'] {text-align: right;}
+
+.panel {
+  &-wrapper {
+    position: relative;
+    height: calc(100% - 50px);
+    padding: 0 15px 15px;
+  }
+  &-layout {
+    &[layout='header'] {}
+    &[layout='left'] {
+      top: 0;
+      width: calc(100% - 450px);
+      height: calc(100% - 230px);
+      z-index: 1001;
+      transition: width .3s linear, height .3s linear;
+      & ~ .panel-layout[layout='center'] {
+        width: 405px;
+        height: calc(100% - 215px);
+        margin-left: calc(100% - 405px);
+        margin-bottom: 15px;
+      }
+    }
+    &[layout='bottom'] {
+      width: 100%;
+      height: 200px;
+    }
+  }
+}
+
+.dataListPanel {
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.mapTool {
+  &Bar {
+    top: 30px;
+    height: auto;
+    border-radius: 4px;
+  }
+  &Item {
+    padding: 10px;
+    cursor: pointer;
+  }
+}
+.mapFullScreen {
+  top: auto;
+  right: 10px;
+  bottom: 10px;
+  margin-bottom: 0;
+  .mapToolItem {
+    line-height: 16px;
+  }
+}
+
+.fullScreen {
+  width: calc(100% - 30px)!important;
+  height: calc(100% - 15px)!important;
+}
+
+.item {
+  &[type='inline'] {
+    &:first-child {
+      border-bottom: 1px solid #f9f9f9;
+    }
+    .col {
+      display: inline-block;
+      width: 50%;
+      text-align: right;
+      & + .col {
+        text-indent: 2em;
+        text-align: left;
+      }
+    }
+  }
+}
+
+div.form-control {
+  border-color: #66afe9;
+  outline: 0;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+}
+
+.numberBox {
+  width: 140px;
+  font-family: '452-CAI978';
+  font-size: 18px;
+  font-weight: bold;
+  color: #1890ff;
+  & + [unit]:after {
+    color: #1890ff;
+  }
+}
+
+.form-inline .form-group {
+  margin-bottom: 10px;
+}
+
+.modal-body .form-control {
+  width: 100%;
+}
+
+@media screen and (min-height: 600px) {
+  .panel-layout {
+    &[layout='left'] {
+      height: calc(100% - 330px);
+      & ~ .panel-layout[layout='center'] {
+        height: calc(100% - 315px);
+      }
+    }
+    &[layout='bottom'] {
+      height: 300px;
+    }
+  }
+}

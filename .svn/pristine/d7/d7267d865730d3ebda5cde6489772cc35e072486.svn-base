@@ -1,0 +1,146 @@
+package com.erxi.ms.service;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.erxi.ms.access.UserContext;
+import com.erxi.ms.config.DS;
+import com.erxi.ms.controller.CommonAction;
+import com.erxi.ms.dao.CommonDao;
+import com.erxi.ms.domain.User;
+import com.erxi.ms.exception.GlobalException;
+import com.erxi.ms.redis.RedisService;
+import com.erxi.ms.redis.UserKey;
+import com.erxi.ms.result.CodeMsg;
+import com.erxi.ms.result.Result;
+import com.erxi.ms.util.UUIDUtil;
+import com.erxi.ms.vo.LoginVo;
+
+@Service
+public class CommonService {
+	private static Logger log = LoggerFactory.getLogger(CommonAction.class);
+
+	public static final String COOKIE_NAME_TOKEN = "token";
+	@Autowired
+	CommonDao commonDao;
+
+	@Autowired
+	RedisService redisService;
+
+	@DS("datasource1")
+	public Result<List<Map<String, Object>>> fingzfqy() {
+		return Result.success(commonDao.fingzfqy());
+	}
+
+	@DS("datasource1")
+	public Result<List<Map<String, Object>>> fingzfbm() {
+		return Result.success(commonDao.fingzfbm());
+	}
+
+	public User getByUsername(String username) {
+		return commonDao.getByUsername(username);
+	}
+
+	@DS("datasource1")
+//	@DS("datasource2")
+	public String login(HttpServletRequest request,
+			HttpServletResponse response, LoginVo loginVo) {
+		if (loginVo == null) {
+			throw new GlobalException(CodeMsg.SERVER_ERROR);
+		}
+		String username = loginVo.getUsername();
+		String formPass = loginVo.getPassword();
+
+		// 判断用户否存在
+		User user = getByUsername(username);
+		if (user == null) {
+			throw new GlobalException(CodeMsg.USERNAME_NOT_EXIST);
+		}
+
+		// 验证密码
+		String PassDB = user.getPassword();
+		if (!formPass.equals(PassDB)) {
+			log.info("mm error");
+			throw new GlobalException(CodeMsg.PASSWORD_IS_WRONG);
+		}
+		String token = UUIDUtil.Uuid();
+		addCookie(response, token, user);
+		return token;
+	}
+
+	private void addCookie(HttpServletResponse response, String token, User user) {
+		// 生成cookie
+		// log.info(token);
+		redisService.set(UserKey.token, token, user);
+		Cookie cookie = new Cookie(COOKIE_NAME_TOKEN, token);
+		cookie.setMaxAge(UserKey.token.expireSeconds());
+		cookie.setPath("/");
+		response.addCookie(cookie);
+	}
+
+	public User getByToken(HttpServletResponse response, String token) {
+		if (StringUtils.isEmpty(token)) {
+			return null;
+		}
+		User user = redisService.get(UserKey.token, token, User.class);
+		// 延长有效期
+		if (user != null) {
+			addCookie(response, token, user);
+		}
+		return user;
+	}
+
+	public String username() {
+		return UserContext.getUser().getUsername();
+	}
+
+	@DS("datasource2")
+	public void getFile(HttpServletRequest request,
+			HttpServletResponse response, String key) {
+		try {
+			InputStream in = commonDao.getImage(key);
+			if(in == null){
+				System.out.println("pic not found");
+				String path = "d:/nothing.jpg";
+				File pf = new File(path);
+				FileInputStream fin = new FileInputStream(pf);
+				ServletOutputStream fout =  response.getOutputStream();
+				byte bts [] = new byte[fin.available()];
+				fin.read(bts);
+				fout.write(bts);
+				System.out.println("--------------------getFile nothing  ok--------------------");
+				fin.close();
+				fout.close();
+			}else {
+				System.out.println("pic exist");
+				ServletOutputStream fout =  response.getOutputStream();
+				byte[] content = new byte[1024];
+	            int length = 0;
+	            if (in != null) {
+	                while ((length = in.read(content)) != -1) {
+	                	fout.write(content, 0, length);
+	                }
+	            }
+				System.out.println("--------------------getFile something ok--------------------");
+				in.close();
+				fout.close();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}

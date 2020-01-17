@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>多车监控</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<style>
+		.scrollbar-macosx {
+			height: calc(100% - 122px);
+			margin-bottom: 10px;
+		}
+		.list[type='carInfoList'] {
+			height: auto;
+			margin-bottom: 0;
+		}
+		.panel-map[type='screenSplit'] {height: 100%;}
+		.panel-title + .panel-map[type='screenSplit'] {height: calc(100% - 30px);}
+		.panel-map[type='screenSplit'] .mapItem {width: calc(50% - 15px / 2);height: calc(50% - 15px / 2);float: left;margin-right: 15px;margin-bottom: 15px;border: 1px solid #ced4f0;border-radius: 10px;background-color: #ffffff;}
+		.panel-map[type='screenSplit'][screen='4'] .mapItem:nth-of-type(2n) {margin-right: 0;}
+		.panel-map[type='screenSplit'][screen='4'] .mapItem:nth-last-child(1),
+		.panel-map[type='screenSplit'][screen='4'] .mapItem:nth-last-child(2) {margin-bottom: 0;}
+		.panel-map[type='screenSplit'] .mapItem[state='no-map'] {position: relative;background-image: url(../../resources/images/no-map.png);background-position: center;background-repeat: no-repeat; /*font-family:"iconfont" !important;*//*font-style:normal;*//*-webkit-font-smoothing: antialiased;*//*-moz-osx-font-smoothing: grayscale;*/color: #dddddd;}
+		.panel-map[type='screenSplit'] .mapItem[state='no-map']:after {content: '地图';position: absolute;top: calc(50% + 100px);left: 50%;font-size: 30px;transform: translate(-50%, -50%);}
+
+		.panel-map[type='screenSplit'] .mapItem[state='map'] {position: relative;}
+		.mapItem[state='map'] .mapHeader {position: absolute;top: 0;left: 0;width: 100%;height: 50px;box-shadow: 0 1px 5px rgba(56, 74, 147, 0.07);color: #354168;background-color: rgba(255, 255, 255, .6);}
+		.mapItem[state='map'] .mapHeader .title {display: block;line-height: 50px;font-size: 18px;font-weight: bold;text-indent: 1em;}
+		.mapItem[state='map'] .mapHeader .btn-close {position: absolute;top: 50%;right: 20px;font-size: 24px;transform: translate(-50%, -50%);}
+	</style>
+</head>
+<body>
+<div class="panel-wrapper" style="position: relative;">
+	<div class="panel-layout" layout="left">
+		<div class="dataListPanel">
+			<div class="searchBar">
+				<i class="icon-first iconfont icon-car"></i>
+				<input type="text" placeholder="车牌号或企业名查询">
+				<a class="btn btn-primary btn-sm btn-last ip-iconfont ip-icon-search"></a>
+			</div>
+			<div class="scrollbar-macosx">
+				<ul class="list" type="carInfoList">
+					<li class="listItem">
+						<span class="col" type="licensePlate">浙A12345</span>
+						<span class="col btn btn-default btn-xs btn-track" type="button">跟踪</span>
+					</li>
+					<li class="listItem">
+						<span class="col" type="licensePlate">浙A12346</span>
+						<span class="col btn btn-default btn-xs btn-track" type="button">跟踪</span>
+					</li>
+					<li class="listItem">
+						<span class="col" type="licensePlate">浙A12347</span>
+						<span class="col btn btn-default btn-xs btn-track" type="button">跟踪</span>
+					</li>
+					<li class="listItem">
+						<span class="col" type="licensePlate">浙A12348</span>
+						<span class="col btn btn-default btn-xs btn-track" type="button">跟踪</span>
+					</li>
+					<li class="listItem">
+						<span class="col" type="licensePlate">浙A12349</span>
+						<span class="col btn btn-default btn-xs btn-track" type="button">跟踪</span>
+					</li>
+				</ul>
+			</div>
+			<a class="btn btn-primary btn-more">加载更多</a>
+		</div>
+	</div>
+	<div class="panel-layout" layout="center">
+		<div class="panel-map" type="screenSplit" screen="4">
+			<div class="mapItem" state="no-map" id="dcjk-map1" number="1"></div>
+			<div class="mapItem" state="no-map" id="dcjk-map2" number="2"></div>
+			<div class="mapItem" state="no-map" id="dcjk-map3" number="3"></div>
+			<div class="mapItem" state="no-map" id="dcjk-map4" number="4"></div>
+		</div>
+	</div>
+</div>
+<script>
+	(function ($) {
+		var maps = [null, null, null, null];
+		$(function () {
+			$('.scrollbar-macosx').scrollbar();
+			$('.btn-track').on('click', function () {
+				var mapTag = $($('.mapItem[state=no-map]').get(0));
+				maps[parseInt(mapTag.attr('number')) - 1] = new AMap.Map(mapTag.attr('id'), {
+					zoom:11,
+					viewMode:'3D'
+				});
+				mapTag.attr('state', 'map');
+				console.info('maps:', maps, $(this).siblings('.col[type=licensePlate]'))
+				var title = $('<span>').addClass('title').text($(this).siblings('.col[type=licensePlate]').text());
+				var icon = $('<icon>').addClass('btn-close glyphicon glyphicon-remove-circle').on('click', function () {
+					$(this).parents('.mapItem[state=map]').empty().attr('state', 'no-map').removeClass('amap-container').removeAttr('style');
+				});
+				var header = $('<div>').addClass('mapHeader');
+				header.append(title);
+				header.append(icon);
+				header.appendTo(mapTag);
+			});
+		})
+	})(jQuery);
+</script>
+</body>
+</html>

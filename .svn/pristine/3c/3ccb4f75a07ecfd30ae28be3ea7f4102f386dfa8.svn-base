@@ -1,0 +1,132 @@
+<!-- 业户查询 -->
+<html>
+	<head>
+	<meta charset="UTF-8">
+	<title>车辆调度</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+	<style>
+		.cldd_mater{
+			width:100%;
+			height:50px;
+			margin:0 auto;
+		}
+		.cldd_left{
+			width:16%;
+			float:left;
+		}
+		.cldd_gd{
+			width:100%;
+			height:220px;
+			overflow-y: scroll;
+		}
+		.cldd_under{
+			width:16%;
+			float:left;
+		}
+		.cldd_right{
+			width:auto;
+			height:300px;
+			float:left;
+			margin-top:50px;
+		}
+		.cldd_right button{
+			width:60px;
+			height:30px;
+			margin-top: 10px;
+			margin-left: 20px;
+		}
+		.cldd_xxnr{
+			width:100%;
+			clear: both;
+		}
+	</style>
+	</head>
+	<body style="background: #ffffff;">
+		<div class="cldd_mater">
+			<div class="cldd_left" >
+						<p>所有车辆</p>
+						<div style="border:1px solid #D3D3D3">
+							<div class="cldd_gd" style="height:450px">
+								<p>测108865165456</p>
+								<p>测22323</p>
+								<p>测2312</p>
+								<p>测0202</p>
+								<p>测2545</p>
+								<p>测564</p>
+								<p>测458456</p>
+							</div>
+<!-- 							车牌：<input type="text" style="margin-bottom: 5px"> -->
+						</div>
+<!-- 						车队：<input type="text" style="margin-top: 5px"> -->
+					</div><div style="width:5%;height:272px;float:left;margin-top: 50px;padding-left: 40px;">
+					<button> >> </button><br>
+					<br>
+					<button> > </button><br>
+					<br>
+					<button> < </button><br>
+					<br><br><br>
+					<button> > </button><br>
+					<br>
+					<button> < </button><br>
+				</div>
+			<div class="cldd_under">
+					<p>消息车辆</p>
+					<div style="width:100%;height:450px;border:1px solid #D3D3D3">
+						浙AT3056
+					</div>
+				</div>
+			<div class="cldd_right">
+				<button>发送</button>
+				<br>
+				<button>关闭</button>
+			</div>
+			<div style="width:400px;float:left;" >
+				<div class="cldd_xxnr">
+					<p>消息内容</p>
+					<a href="#">请输入需要发送的消息:</a>
+					<div style="width:300px;height:200px;border:1px solid #5E616D;clear: both">
+						<p>你好，乘客改变上车地点，请到****出接乘客，谢谢！</p>
+					</div>
+				</div>
+				<div style="width:100%;">
+					<p>定制内容</p>
+					<a href="#">请需要发送的定制内容</a>
+					<div style="width:400px;height:200px;border:1px solid #D3D3D3;" >
+						<div>
+							<p>不好意思，乘客坐错车了，请你不用再等了！</p>
+							<p>不好意思，乘客取消用车，请你不用过去了！</p>
+							<p>对不起，你的位置太远，请不用过去了！</p>
+							<p>你好，乘客电话打不通，未通知车号，请你先确认乘客是否还需要用车</p>
+							<p>对不起，中心暂时联系不上乘客，请你做其他生意吧！</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

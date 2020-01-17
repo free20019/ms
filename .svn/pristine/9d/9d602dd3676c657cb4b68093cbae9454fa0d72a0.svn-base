@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>车辆分布</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<style>
+		#clfbMap {
+			height: 100%;
+			border: 1px solid #c4d4fb;
+			border-radius: 10px;
+		}
+
+		.toolBar {
+			background-color: #ffffff;
+		}
+
+		.item,
+		.item[type='number'],
+		.item[title]:before,
+		.item[unit]:after {color: #a1a6b6;}
+		.item:hover{
+			width: calc(100% + 8px);
+			margin-left: -4px;
+			background-color: #1492ff;
+		}
+		.item[type='number']:hover {
+			padding-left: calc(3.6em - 4px);
+			padding-right: calc(2em + 4px);
+		}
+		.item[title]:hover:before {
+			left: calc(.6em + 4px);
+		}
+		.item[unit]:hover:after {
+			right: calc(.6em + 4px);
+		}
+		.item:hover,
+		.item[title]:hover:before,
+		.item[unit]:hover:after {color: #ffffff;}
+	</style>
+</head>
+<body>
+<div class="panel-wrapper">
+	<div id="clfbMap"></div>
+	<ul class="mapToolBar">
+		<li class="mapToolItem">
+			<a class="mapToolTitle">运行统计</a>
+			<ul class="toolBar">
+				<li class="toolItem item" type="number" title="总数" unit="辆">3421</li>
+				<li class="toolItem item" type="number" title="在线" unit="辆">421</li>
+				<li class="toolItem item" type="number" title="离线" unit="辆">1200</li>
+				<li class="toolItem item" type="number" title="重车" unit="辆">700</li>
+				<li class="toolItem item" type="number" title="空车" unit="辆">1100</li>
+			</ul>
+		</li>
+		<li class="mapToolItem">
+			<a class="mapToolTitle">营运状态分布</a>
+			<ul class="toolBar">
+				<li class="toolItem item" type="number" title="在线" unit="辆">421</li>
+				<li class="toolItem item" type="number" title="离线" unit="辆">1200</li>
+				<li class="toolItem item" type="number" title="重车" unit="辆">700</li>
+				<li class="toolItem item" type="number" title="空车" unit="辆">1100</li>
+			</ul>
+		</li>
+		<li class="mapToolItem">
+			<a class="mapToolTitle">离线时长分布</a>
+			<ul class="toolBar">
+				<li class="toolItem item" style="text-align: center; cursor:pointer;">大于24小时</li>
+				<li class="toolItem item" style="text-align: center; cursor:pointer;">小于24小时</li>
+			</ul>
+		</li>
+	</ul>
+</div>
+<script>
+	(function ($) {
+		$(function () {
+			$('.mapToolBar .mapToolTitle').on('click', function () {
+				var mapToolItem = $(this).parent();
+				if (mapToolItem.hasClass('active')) {
+					mapToolItem.removeClass('active');
+				} else {
+					mapToolItem.addClass('active').siblings('.active').removeClass('active');
+				}
+			});
+
+			var map = new AMap.Map('clfbMap', {
+				zoom:11,
+				// center: [116.397428, 39.90923],
+				viewMode:'3D'
+			});
+		})
+	})(jQuery)
+</script>
+</body>
+</html>

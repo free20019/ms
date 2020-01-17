@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>行业总览</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="./hyzl.js"></script>
+	<script src="../../main.js"></script>
+	<style>
+		.scrollbar-macosx {
+			height: 100%;
+		}
+		.table {
+			margin-bottom: 10px;
+		}
+		caption.tableCaptionLabel {
+			line-height: 16px;
+			margin-top: -14px;
+			margin-bottom: -4px;
+			padding-top: 3px;
+			padding-bottom: 3px;
+			text-align: left;
+			color: #c8cbd2;
+		}
+		.table>thead>tr>th,
+		.table>tbody>tr>th,
+		.table>tbody>tr>td {
+			height: 16px;
+			line-height: 16px;
+			padding: 6px;
+		}
+		[class^='col-'] > .panel-heading {
+			margin-top: -8px;
+			padding: 5px 0;
+		}
+
+		.table > tbody > tr > th.ip-ranking,
+		.table > tbody > tr > td.ip-ranking,
+		.ip-count a, .ip-count {
+			/*text-align: center;*/
+			/*text-align: right;*/
+			color: #ff598c;
+			cursor: pointer;
+		}
+		.ip-count:hover {
+			text-decoration: underline;
+			color: #ff598c;
+		}
+		.table > tbody > tr:first-child > th.ip-ranking,
+		.table > tbody > tr:first-child > td.ip-ranking {
+			position: relative;
+		}
+		.table > tbody > tr:first-child > th.ip-ranking:before,
+		.table > tbody > tr:first-child > td.ip-ranking:before {
+			content: '1';
+			position: absolute;
+			/*top: 50%;left: 50%;*/
+			left: 0;
+			display: inline-block;
+			width: 20px;
+			height: 20px;
+			line-height: 20px;
+			/*margin: -10px;*/
+			border-radius: 50%;
+			text-align: center;
+			text-indent: 0;
+			color: #fff;
+			background-color: #ff598c;
+		}
+
+
+		/*第一行*/
+		.panel-hyzl .panel-content {
+			width: 90%;
+			min-width: 284px;
+		}
+		.panel-hyzl .panel-content > .panel-heading,
+		.panel-hyyxzk > .ip-item > .panel-heading,
+		.panel-hyyyzk > .ip-item > .panel-heading,
+		.panel-czsbzk > .ip-item > .panel-heading {
+			margin-top: -7px;
+			padding-top: 5px;
+			padding-bottom: 5px;
+		}
+
+		/*第三行-左边*/
+		#hyzl-echarts_clzxzl, #hyzl-echarts_clzkzl {
+			width: 100%;
+			height: 284px;
+		}
+		.panel-hyyxzk .ip-item {
+			width: calc(50% - 7.5px);
+		}
+		.panel-hyyxzk .panel {
+			margin-bottom: 0;
+		}
+		.panel-hyyxzk .ip-item:last-child {
+			margin-right: 0;
+		}
+		.panel-hyyxzk .list-group-item {
+			line-height: 16px;
+			margin-left: 4px;
+			margin-right: 4px;
+			padding: 5px 15px;
+		}
+		.panel-hyyxzk .list-group-item:last-child {
+			border-bottom: none;
+		}
+		@media (min-width: 992px) {
+			.panel-wrapper > .row > [class^='col-']:not(:last-child) {
+				padding-right: 0;
+			}
+			.panel-hyzl .panel-content .panel {
+				margin-bottom: 0;
+			}
+		}
+		@media (min-width: 992px) and (max-width: 2048px) {
+			#hyzl-echarts_clzxzl, #hyzl-echarts_clzkzl {
+				height: 167px;
+			}
+			.panel-hyyxzk .panel {
+				margin-bottom: 15px;
+			}
+			.panel-hyyxzk .ip-item {
+				width: 100%;
+			}
+			.panel-hyyxzk .ip-item:last-child .panel {
+				margin-bottom: 0;
+			}
+		}
+
+		/*第三行-右边*/
+		#hyzl-echarts_ddzl, #hyzl-echarts_jyzl {
+			width: 100%;
+			height: 217px;
+		}
+		.panel-hyyyzk .ip-item.ip-item-c2 .panel {
+			margin-bottom: 0;
+		}
+		.panel-hyyyzk .ip-item.ip-item-c3 .panel {
+			height: 34px;
+			line-height: 34px;
+			margin-bottom: 0;
+			text-align: center;
+		}
+		@media (min-width: 992px) and (max-width: 2048px) {
+			#hyzl-echarts_ddzl, #hyzl-echarts_jyzl {
+				height: 417px;
+			}
+		}
+
+		/*第二行-左边*/
+		.panel-czsbzk .ip-item .panel {
+			margin-bottom: 0;
+		}
+
+		/*第二行-右边*/
+		#hyzl-echarts_tsxxpm ,#hyzl-echarts_yjjwtzb {
+			height: 207px;
+			margin-bottom: 10px;
+		}
+
+		.panel-body > .panel-heading {
+			margin-top: -10px;
+		}
+		.panel-heading {
+			position: relative;
+		}
+
+		.ip-tool[ip-align] {
+			position: absolute;
+			top: 50%;
+			display: inline-block;
+			margin-bottom: 0;
+			transform: translateY(-50%);
+		}
+		.ip-tool[ip-align='right'] {
+			right: 10px;
+		}
+		.ip-tool .ip-toolItem {
+			display: inline-block;
+			width: 22px;
+			text-align: center;
+			cursor: pointer;
+		}
+		.ip-tool .ip-toolItem:hover {
+			color: #7685fc;
+		}
+
+		.panel-position-right {
+			position: absolute;
+			top: 20px;
+			right: 30px;
+			padding: 2px 20px;
+		}
+		.table th, .table td {
+		    width: auto;
+		}
+	</style>
+</head>
+<body>
+<div class="scrollbar-macosx">
+	<div class="panel-wrapper" style="overflow-x: hidden;">
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-sm-2"><label style="margin-bottom: 0; margin-right: 5px;">车辆总数:</label><span class="clzs ip-count" href="javascript:;">0</span></div>
+						<div class="col-sm-2"><label style="margin-bottom: 0; margin-right: 5px;">在线车辆数:</label><span class="zaix ip-count" href="javascript:;">0</span></div>
+						<div class="col-sm-2"><label style="margin-bottom: 0; margin-right: 5px;">总营运次数:</label><span class="zyycs ip-count" href="javascript:;">0</span></div>
+						<div class="col-sm-2"><label style="margin-bottom: 0; margin-right: 5px;">营运车辆数:</label><span class="yycl ip-count" href="javascript:;">0</span></div>
+						<div class="col-sm-2"><label style="margin-bottom: 0; margin-right: 5px;">实载率:</label><span class="szl ip-count" href="javascript:;">0</span></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row"  style="margin-bottom: 15px;">
+			<div class="col-md-4">
+				<div class="panel panel-default" style="margin-bottom: 0;">
+					<div class="panel-body panel-hyyxzk">
+						<div class="panel-heading"><span class="title">行业运行状况</span></div>
+						<div class="ip-item">
+							<div class="panel-heading" style="padding: 5px 15px 0;">车辆在线总览</div>
+							<div class="panel panel-default">
+								<ul class="list-group">
+									<li class="list-group-item">
+										车辆在线数：<a class="ip-highlight-orange" id="hyyxqk_clzxs" href="javascript:;">0</a>&nbsp;辆
+									</li>
+									<li class="list-group-item">
+										车辆在线率：<a class="ip-highlight-green" id="hyyxqk_clzxl" href="javascript:;">0</a>&nbsp;%
+									</li>
+								</ul>
+								<div class="panel-body">
+									<div id="hyzl-echarts_clzxzl"></div>
+								</div>
+							</div>
+						</div>
+						<div class="ip-item">
+							<div class="panel-heading" style="padding: 5px 15px 0;">车辆载客总览</div>
+							<div class="panel panel-default">
+								<ul class="list-group">
+									<li class="list-group-item">
+										载客车辆数：<a class="ip-highlight-orange" id="hyyxqk_clzks" href="javascript:;">0</a>&nbsp;辆
+									</li>
+									<li class="list-group-item">
+										车辆载客率：<a class="ip-highlight-green" id="hyyxqk_clzkl" href="javascript:;">0</a>&nbsp;%
+									</li>
+								</ul>
+								<div class="panel-body">
+									<div id="hyzl-echarts_clzkzl"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-8">
+				<div class="panel panel-default" style="margin-bottom: 0;">
+					<div class="panel-body panel-hyyyzk">
+						<div class="panel-heading"><span class="title">行业营运状况</span></div>
+						<div class="panel-heading" style="padding: 5px 15px 0;">运营总览</div>
+						<div class="panel panel-default">
+							<div class="panel-body">
+								<div class="ip-item ip-item-c2" style="text-align: center; line-height: 30px;">
+									<div class="panel panel-default">
+										营运平均里程：<a class="ip-highlight ip-count" id="zlc" href="javascript:;">0</a>&nbsp;公里
+									</div>
+								</div>
+								<div class="ip-item ip-item-c2" style="text-align: center; line-height: 30px;">
+									<div class="panel panel-default">
+										营运平均时长：<a class="ip-highlight-red ip-count" id="zsc" href="javascript:;">0</a>&nbsp;小时
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="ip-item ip-item-c2" style="margin-right: 15px;">
+							<div class="panel-heading" style="padding: 5px 15px 0;">订单总览</div>
+							<div class="panel panel-default">
+								<div class="panel-body" style="position: relative;">
+									<div id="hyzl-echarts_ddzl"></div>
+									<div class="panel panel-default panel-position-right">
+										当日总订单量：<a class="ip-highlight ip-count" id="zdd" href="javascript:;">0</a>&nbsp;单
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="ip-item ip-item-c2" style="margin-right: 0;">
+							<div class="panel-heading" style="padding: 5px 15px 0;">交易总览</div>
+							<div class="panel panel-default">
+								<div class="panel-body" style="position: relative;">
+									<div id="hyzl-echarts_jyzl"></div>
+									<div class="panel panel-default panel-position-right">
+										当日交易总金额：<a class="ip-highlight ip-count" id="zje" href="javascript:;">0</a>&nbsp;元
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="panel panel-default">
+			<div class="panel-body panel-hyzl">
+				<div class="panel-heading"><span class="title">行业基本状况</span></div>
+				<div class="row">
+					<div class="col-md-4">
+						<div class="panel-content">
+							<div class="panel-heading">业户总览</div>
+							<div class="panel panel-default">
+								<div class="panel-heading clearfix" style="padding: 6px 15px;">
+									<div class="ip-item ip-item-c2 col-itemTitle">业户总数</div>
+									<div class="ip-item ip-item-c2 col-itemTitle">
+										<a class="ip-highlight-red ip-count" id="qycx" href="javascript:;">0</a>&nbsp;家
+									</div>
+								</div>
+								<div class="panel-body">
+									<table class="table" id="compzl">
+										<thead>
+										<tr>
+											<th style="width: 80%;">业户名称</th>
+											<th >车辆数量</th>
+										</tr>
+										</thead>
+										<tbody>
+										<tr>
+											<td>Mark</td>
+											<td class="ip-count"><a href="javascript:;">0</a></td>
+										</tr>
+										<tr>
+											<td>Jacob</td>
+											<td class="ip-count"><a href="javascript:;">0</a></td>
+										</tr>
+										<tr>
+											<td>Larry</td>
+											<td class="ip-count"><a href="javascript:;">0</a></td>
+										</tr>
+										<tr>
+											<td>Larry</td>
+											<td class="ip-count"><a href="javascript:;">0</a></td>
+										</tr>
+										<tr>
+											<td>Larry</td>
+											<td class="ip-count"><a href="javascript:;">0</a></td>
+										</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="panel-content">
+							<div class="panel-heading">
+								<span>车辆总览</span>
+								<ul class="ip-tool" id="hyzl-gstype" ip-align="right">
+									<li class="ip-toolItem iconfont icon-a-left" name="clpp" style="display: none;"></li>
+									<li class="ip-toolItem iconfont icon-a-right" name="clnx"></li>
+								</ul>
+							</div>
+							<div class="panel panel-default">
+								<div class="panel-heading clearfix" style="padding: 6px 15px;">
+									<div class="ip-item ip-item-c2 col-itemTitle">车辆总数</div>
+									<div class="ip-item ip-item-c2 col-itemTitle">
+										<a class="ip-highlight-red ip-count" id="clcx" href="javascript:;">0</a>&nbsp;辆
+									</div>
+								</div>
+								<div class="panel-body" name="clpp">
+									<table class="table" id="vehizl">
+										<thead>
+										<tr>
+											<th style="width: 30%;">品牌</th>
+											<th style="width: 50%;">车型</th>
+											<th >数量</th>
+										</tr>
+										</thead>
+										<tbody>
+ 										<tr>
+ 											<td>Mark</td>
+											<td class="ip-count"><a href="javascript:;">0</a></td>
+										</tr>
+ 										<tr>
+ 											<td>Jacob</td>
+											<td class="ip-count"><a href="javascript:;">0</a></td>
+										</tr>
+ 										<tr>
+ 											<td>Larry</td>
+											<td class="ip-count"><a href="javascript:;">0</a></td>
+										</tr>
+ 										<tr>
+ 											<td>Larry</td>
+											<td class="ip-count"><a href="javascript:;">0</a></td>
+										</tr>
+ 										<tr>
+ 											<td>Larry</td>
+											<td class="ip-count"><a href="javascript:;">0</a></td>
+										</tr>
+										</tbody>
+									</table>
+								</div>
+								<div class="panel-body" name="clnx" style="display: none;">
+									<table class="table" id="vehizl1">
+										<thead>
+										<tr>
+											<th style="width: 80%;">年限</th>
+											<th >数量</th>
+										</tr>
+										</thead>
+										<tbody>
+ 										<tr>
+ 											<td>Mark</td>
+											<td class="ip-count"><a href="javascript:;">0</a></td>
+										</tr>
+ 										<tr>
+ 											<td>Jacob</td>
+											<td class="ip-count"><a href="javascript:;">0</a></td>
+										</tr>
+ 										<tr>
+ 											<td>Larry</td>
+											<td class="ip-count"><a href="javascript:;">0</a></td>
+										</tr>
+ 										<tr>
+ 											<td>Larry</td>
+											<td class="ip-count"><a href="javascript:;">0</a></td>
+										</tr>
+ 										<tr>
+ 											<td>Larry</td>
+											<td class="ip-count"><a href="javascript:;">0</a></td>
+										</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="panel-content">
+							<div class="panel-heading">
+								<span>驾驶员总览</span>
+								<ul class="ip-tool" id="hyzl-jsytype" ip-align="right">
+									<li class="ip-toolItem iconfont icon-a-left" name="jsypp" style="display: none;"></li>
+									<li class="ip-toolItem iconfont icon-a-right" name="jsynx"></li>
+								</ul>
+							</div>
+							<div class="panel panel-default">
+								<div class="panel-heading clearfix" style="padding: 6px 15px;">
+									<div class="ip-item ip-item-c2 col-itemTitle">驾驶员总数</div>
+									<div class="ip-item ip-item-c2 col-itemTitle">
+										<a class="ip-highlight-red ip-count" id="jsycx" href="javascript:;">0</a>&nbsp;人
+									</div>
+								</div>
+								<div class="panel-body" name="jsypp">
+									<table class="table" id="perzl">
+										<thead>
+										<tr>
+											<th style="width: 80%;">驾龄</th>
+											<th >数量</th>
+										</tr>
+										</thead>
+										<tbody>
+ 										<tr>
+ 											<td>Mark</td>
+											<td class="ip-count"><a href="javascript:;">0</a></td>
+										</tr>
+ 										<tr>
+ 											<td>Jacob</td>
+											<td class="ip-count"><a href="javascript:;">0</a></td>
+										</tr>
+ 										<tr>
+ 											<td>Larry</td>
+											<td class="ip-count"><a href="javascript:;">0</a></td>
+										</tr>
+ 										<tr>
+ 											<td>Larry</td>
+											<td class="ip-count"><a href="javascript:;">0</a></td>
+										</tr>
+ 										<tr>
+ 											<td>Larry</td>
+											<td class="ip-count"><a href="javascript:;">0</a></td>
+										</tr>
+										</tbody>
+									</table>
+								</div>
+									<div class="panel-body" name="jsynx" style="display: none;">
+									<table class="table" id="perzl1">
+										<thead>
+										<tr>
+											<th style="width: 80%;">年龄</th>
+											<th >数量</th>
+										</tr>
+										</thead>
+										<tbody>
+ 										<tr>
+ 											<td>Mark</td>
+											<td class="ip-count"><a href="javascript:;">0</a></td>
+										</tr>
+ 										<tr>
+ 											<td>Jacob</td>
+											<td class="ip-count"><a href="javascript:;">0</a></td>
+										</tr>
+ 										<tr>
+ 											<td>Larry</td>
+											<td class="ip-count"><a href="javascript:;">0</a></td>
+										</tr>
+ 										<tr>
+ 											<td>Larry</td>
+											<td class="ip-count"><a href="javascript:;">0</a></td>
+										</tr>
+ 										<tr>
+ 											<td>Larry</td>
+											<td class="ip-count"><a href="javascript:;">0</a></td>
+										</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-7">
+				<div class="panel panel-default" style="margin-bottom: 0;">
+					<div class="panel-body panel-czsbzk">
+						<div class="panel-heading"><span class="title">车载设备状况</span></div>
+						<div>
+							<div class="ip-item ip-item-c2">
+								<div class="panel-heading" style="padding: 5px 15px 0;">车载设备总览</div>
+								<div class="panel panel-default">
+									<div class="panel-heading clearfix" style="padding: 6px 15px;">
+										<div class="ip-item ip-item-c2 col-itemTitle">已安装终端数量</div>
+										<div class="ip-item ip-item-c2 col-itemTitle">
+											<a class="ip-highlight-red ip-count" id="czsbcx" href="javascript:;">0</a>&nbsp;辆
+										</div>
+									</div>
+									<div class="panel-body">
+										<table class="table" id="czzl">
+											<thead>
+											<tr>
+												<th >排名</th>
+												<th style="width: 70%;">终端类型</th>
+												<th>数量</th>
+											</tr>
+											</thead>
+											<tbody>
+											<tr>
+												<th class="ip-ranking">1</th>
+												<td>Mark</td>
+												<td width="90">0</td>
+											</tr>
+											<tr>
+												<th class="ip-ranking">2</th>
+												<td>Jacob</td>
+												<td>0</td>
+											</tr>
+											<tr>
+												<th class="ip-ranking">3</th>
+												<td>Larry</td>
+												<td>0</td>
+											</tr>
+											<tr>
+												<th class="ip-ranking">4</th>
+												<td>Larry</td>
+												<td>0</td>
+											</tr>
+											<tr>
+												<th class="ip-ranking">5</th>
+												<td>Larry</td>
+												<td>0</td>
+											</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+							<div class="ip-item ip-item-c2">
+								<div class="panel-heading" style="padding: 5px 15px 0;">故障设备总览</div>
+								<div class="panel panel-default">
+									<div class="panel-heading clearfix" style="padding: 6px 15px;">
+										<div class="ip-item ip-item-c2 col-itemTitle">故障设备总数</div>
+										<div class="ip-item ip-item-c2 col-itemTitle">
+											<a class="ip-highlight-red ip-count" id="gzsbcx" href="javascript:;">0</a>&nbsp;起
+										</div>
+									</div>
+									<div class="panel-body">
+										<table class="table" id="gzzl">
+											<thead>
+											<tr>
+												<th>排名</th>
+												<th style="width: 70%;">业户名称</th>
+												<th>故障数量</th>
+											</tr>
+											</thead>
+											<tbody>
+											<tr>
+												<th class="ip-ranking">1</th>
+												<td>Mark</td>
+												<td width="90">0</td>
+											</tr>
+											<tr>
+												<th class="ip-ranking">2</th>
+												<td>Jacob</td>
+												<td>0</td>
+											</tr>
+											<tr>
+												<th class="ip-ranking">3</th>
+												<td>Larry</td>
+												<td>0</td>
+											</tr>
+											<tr>
+												<th class="ip-ranking">4</th>
+												<td>Larry</td>
+												<td>0</td>
+											</tr>
+											<tr>
+												<th class="ip-ranking">5</th>
+												<td>Larry</td>
+												<td>0</td>
+											</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-5">
+				<div class="panel panel-default" style="margin-bottom: 0;">
+					<div class="panel-body panel-tsxxzl">
+						<div class="panel-heading"><span class="title">投诉信息总览</span></div>
+						<div>
+							<div class="ip-item ip-item-c2">
+								<div class="panel-heading" style="padding: 5px 15px 0;">本月投诉类型排名 <a class="ip-count" href="javascript:;" id="tszs"></a></div>
+								<div class="panel panel-default" style="margin-bottom: 0;">
+									<div class="panel-body">
+										<div id="hyzl-echarts_tsxxpm"></div>
+<!-- 										<div class="panel panel-default panel-position-right"> -->
+<!-- 										总数：<a class="ip-highlight ip-count" id="tszs" href="javascript:;">0</a>&nbsp;次 -->
+<!-- 									</div> -->
+									</div>
+								</div>
+							</div>
+							<div class="ip-item ip-item-c2">
+								<div class="panel-heading" style="padding: 5px 15px 0;">本月已解决问题占比 <a class="ip-count" href="javascript:;" id="tsyjj"></a></div>
+								<div class="panel panel-default" style="margin-bottom: 0;">
+									<div class="panel-body">
+										<div id="hyzl-echarts_yjjwtzb"></div>
+<!-- 										<div class="panel panel-default panel-position-right"> -->
+<!-- 										已解决占比：<a class="ip-highlight ip-count" id="tsyjj" href="javascript:;">0</a>&nbsp;% -->
+<!-- 									</div> -->
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+</div>
+</body>
+</html>

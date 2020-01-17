@@ -1,0 +1,124 @@
+<!-- 业户查询 -->
+<html>
+	<head>
+	<style>
+		.clyytj_cltj{
+			width:100%;
+			margin:0 auto;
+			border:1px solid #D3D3D3;
+		}
+		.clyytj_cltj p{
+			width:100%;
+			height:30px;
+			text-align: center;
+			font-weight:bold;
+			font-size: 24px;
+			background:#ddd;
+			color:#000;
+			margin:0;
+			line-height: 30px;
+		}
+		.clyytj_over{
+			width:100%;
+			text-align:center;
+			margin-top:10px;
+		}
+		.clyytj_over input{
+			width:20px;
+		}
+		.clyytj_top span{
+			height:30px;
+			line-height: 30px;
+/* 			font-size: 20px; */
+			font-weight:bold;
+			color:#5E616D;
+		}
+		.clyytj_top input{
+			height:30px;
+			line-height: 30px;
+		}
+		.clyytj_top select{
+			width:205px;
+			height:30px;
+		}
+		.clyytj_top button{
+			width:60px;
+			height:30px;
+			line-height: 30px;
+			margin-top: 5px;
+		}
+		.clyytj_cltj table{
+			width:100%;
+		}
+		.clyytj_cltj table tr td{
+			height:40px;
+			text-align: center;
+			border-top:1px solid #D3D3D3;
+			border-right:1px solid #D3D3D3;
+			border-bottom:1px solid #D3D3D3;
+		}
+		.clyytj_sl{
+			font-weight:bold;
+		}
+		html,body {
+			background: #ffffff;
+		}
+	</style>
+	</head>
+	<body>
+		<div class="clyytj_cltj">
+			<p>车辆统计</p>
+			<div class="clyytj_top">
+				<span>开始时间：</span>
+				<input type="text" value="2016-12-6 00:00:00">
+				<span>结束时间：</span>
+				<input type="text" value="2016-12-7 23:59:59">
+				<select>
+					<option>选择公司</option>
+				</select>
+				<select>
+					<option>选择分公司</option>
+				</select>
+				<button>查询</button>
+				<button>导出</button>
+			</div>
+			<table cellspacing="0px" style="margin-top:10px;">
+				<tr class="clyytj_sl">
+					<td>序号</td>
+					<td>所属公司</td>
+					<td>所属分公司</td>
+					<td>车号</td>
+					<td>金额</td>
+					<td>次数</td>
+					<td>计程</td>
+					<td>空驶</td>
+					<td>总里程</td>
+					<td>实在率</td>
+					<td>载客时间</td>
+					<td>载客等待时间</td>
+				</tr>
+				<tr>
+					<td>1</td>
+					<td>杭州旅游外事汽车集团有限公司</td>
+					<td>杭州旅游外事汽车集团有限公司</td>
+					<td>浙AT5924</td>
+					<td>644</td>
+					<td>23</td>
+					<td>170.60</td>
+					<td>62.80</td>
+					<td>233.40</td>
+					<td>73.09%</td>
+					<td>6.00</td>
+					<td>1.48</td>
+				</tr>
+			</table>
+			<div class="clyytj_over">
+				共有1条记录 第1/1页 <a href="#">首页</a>
+				<a href="#">上一页</a>/
+				<a href="#">下一页</a>
+				<a href="#">末页</a> 转到第<input type="text">页
+				<a href="#">go</a>
+			</div>
+		</div>
+	</body>
+</html>

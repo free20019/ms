@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>车载设备故障查询</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer,AMap.MouseTool"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+
+<!-- 	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script> -->
+<!-- 	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script> -->
+    <script src="../../resources/script/jsgrid/jsgrid.core.js"></script>
+    <script src="../../resources/script/jsgrid/jsgrid.load-indicator.js"></script>
+    <script src="../../resources/script/jsgrid/jsgrid.load-strategies.js"></script>
+    <script src="../../resources/script/jsgrid/jsgrid.sort-strategies.js"></script>
+    <script src="../../resources/script/jsgrid/jsgrid.field.js"></script>
+
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="./sbgzcstj.js"></script>
+
+	<style>
+		.panel-layout[layout='left'] {
+			width: 100%;
+		}
+		.panel-layout[layout='left'] ~ .panel-layout[layout='center'] {
+			width: calc(100% - 500px);
+			margin-left: 500px;
+		}
+
+		.panel-title {
+			height: calc(100% - 20px);
+		}
+
+		.list-header[type='fluid'] {
+			line-height: 47px;
+			display: flex;
+			padding: 0 10px;
+			border-bottom: 1px solid #9aa3fd;
+		}
+		.list-bodyer[type='fluid'] {
+			padding: 0 10px;
+			margin-bottom: 0;
+		}
+		.list-bodyer[type='fluid'] .listItem {
+			display: flex;
+		}
+		.list-bodyer[type='fluid'] .listItem:not(:last-child) {
+			border-bottom: 1px solid #ccd1fe;
+		}
+		.list-header[type='fluid'] .item-col,
+		.list-bodyer[type='fluid'] .item-col {
+			align-items: end;
+			display: flex;
+			flex: .65;
+			justify-content:center;
+		}
+		.list-header[type='fluid'] .item-col[type='vehicleNum'],
+		.list-bodyer[type='fluid'] .item-col[type='vehicleNum'] {
+			align-items: end;
+			display: flex;
+			flex: .35;
+			justify-content:center;
+		}
+		.list-bodyer[type='fluid'] .item-col {
+			height: 30px;
+			line-height: 30px;
+		}
+		.list-header[type='fluid'] .item-col:not(:last-child),
+		.list-bodyer[type='fluid'] .item-col:not(:last-child) {
+			position: relative;
+		}
+		.list-header[type='fluid'] .item-col:not(:last-child):after,
+		.list-bodyer[type='fluid'] .item-col:not(:last-child):after {
+			content: '';
+			position: absolute;
+			top: 50%;
+			right: 0;
+			border-right: 1px solid #9aa3fd;
+			transform: translate(-50%, -50%);
+		}
+		.list-header[type='fluid'] .item-col:not(:last-child):after {
+			top: 58%;
+			height: 40%;
+		}
+		.list-bodyer[type='fluid'] .item-col:not(:last-child):after {
+			height: 45%;
+		}
+		.list-header[type='fluid'] .item-col[type='labelName'],
+		.list-bodyer[type='fluid'] .item-col[type='labelName'] {
+			flex: 1;
+			width: 130px;
+		}
+		.list-bodyer[type='fluid'] .item-col[type='labelName'] {
+			justify-content: left;
+			overflow: hidden;
+			font-size: 14px;
+		}
+		.list-bodyer[type='fluid'] .item-col.icon-location:before {
+			margin-left: -2px;
+			margin-right: 2px;
+			font-size: 16px;
+			color: #fe5c87;
+		}
+		.list-header[type='fluid'] .item-col[type='vehicleNum'],
+		.list-bodyer[type='fluid'] .item-col[type='vehicleNum'] {
+		}
+		.list-header[type='fluid'] .item-col[type='alarmsNum'],
+		.list-bodyer[type='fluid'] .item-col[type='alarmsNum'] {
+		}
+		.scrollbar-macosx {
+			height: calc(100% - 45px);
+		}
+		.item-col{
+			overflow: hidden;
+			white-space: nowrap;
+		}
+		#sbgzcstjTable {margin-top: 10px;}
+
+		/* dialog style */
+		#sbgzcstj-dialog .modal-dialog {width: 900px;}
+		.modal-body form {}
+		.modal-body .panel-heading + .panel-body {padding-bottom: 0;}
+		.modal-body .control-label {display: inline-block;width: 7em;text-align: right;}
+		.modal-body .control-label, .modal-body .form-control {display: inline-block;margin-bottom: 15px;}
+		textarea.form-control {resize: none;}
+		.ip-type-input div.form-control, .ip-type-text input.form-control, .ip-type-text select.form-control, .ip-type-text textarea.form-control, .ip-type-text .select2.select2-container {display: none;}
+		.ip-type-text div.form-control {width: 168px;}
+		#sbgzcstj-dialog textarea.form-control, #sbgzcstj-dialog textarea.form-control + div.form-control {
+			width: calc(100% - 104px);
+			height: 50px;
+		}
+	</style>
+</head>
+<body>
+<div class="panel-wrapper" id="sbgzcstjPanel" style="position: relative;">
+	<div class="panel-layout" layout="center">
+		<div class="dataListPanel" style="padding: 15px;">
+			<div class="card panel-queryBar" border="left" color="red">
+				<!--<span class="title">起点时间</span>-->
+				<div class="form-inline">
+					<div class="form-group form-group-sm">
+						<select id="sbgzcstj_cph" class="select2" style="width: 150px;" data-placeholder="车牌号"><option/></select>
+<!-- 						<input type="text" class="form-control" style="width: 150px;" placeholder="车牌号"  id="sbgzcstj_cph"> -->
+<!-- 						<select id="sbgzcstj_xm" class="select2" style="width: 200px;" data-placeholder="业户名称"><option/></select> -->
+<!-- 						<input type="text" class="form-control" style="width: 150px;" placeholder="业户名称"  id="sbgzcstj_xm"> -->
+<!-- 						<select class="form-control" id="sbgzcstj_yc" style="width: 150px;" data-placeholder="异常状态"><option></select> -->
+						<select class="form-control" id="sbgzcstj_gz" style="width: 150px;" data-placeholder="故障类型"><option></select>
+						<input type="text" class="form-control" id="sbgzcstj-datetimeStart" placeholder="开始时间">
+						<input type="text" class="form-control" id="sbgzcstj-datetimeEnd" placeholder="结束时间">
+<!-- 						<input type="text" class="form-control" style="width: 150px;" placeholder="道路运输证号"  id="sbgzcstj_yszh"> -->
+<!-- 						<input type="text" class="form-control" style="width: 150px;" placeholder="经营许可证号"  id="sbgzcstj_jyxkzh"> -->
+<!-- 						<select class="form-control" id="sbgzcstj_status" data-placeholder="证照状态"><option></select> -->
+						<a class="btn btn-primary btn-sm" id="sbgzcstj_cx">查询</a>
+						<a class="btn btn-primary btn-sm" id="sbgzcstj_dc">导出</a>
+<!-- 						<a class="btn btn-primary btn-sm" id="sbgzcstj-add">添加</a> -->
+					</div>
+				</div>
+			</div>
+			<div id="sbgzcstjTable"></div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

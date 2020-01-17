@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>应急预案</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<link rel="stylesheet" href="../../resources/style/css/yjzhcz/emergencyPlan.css">
+	<script src="../../resources/script/vue.min.js"></script>
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="../../resources/script/moment.min.js"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.min.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/wangEditor-3.1.1/wangEditor.min.js"></script>
+	<!--<script src="https://cdn.jsdelivr.net/npm/vue-mce@latest/dist/vue-mce.web.js"></script>-->
+</head>
+<body>
+<div class="template-wrapper" id="root">
+	<div class="tw-layout" style="">
+		<div class="tw-layout-left">
+			<div class="dataListPanel center">
+				<div class="header">
+					<button type="button" class="btn btn-primary btn-sm glyphicon glyphicon-plus" @click="handleAddClick"></button>
+				</div>
+				<div class="content">
+					<div class="scrollbar-macosx">
+						<div class="base-item text-clear" v-for="item in emergencyPlanList" :key="item.id" @click="handleListItemClick(item)">
+							<div class="item-title" v-text="item.title"></div>
+							<div class="item-tool">
+								<button type="button" class="btn btn-primary btn-sm glyphicon glyphicon-pencil"></button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="tw-layout-main">
+			<div class="dataListPanel center" style="padding: 0;">
+				<div class="header" v-text="emergencyPlan.title">
+				</div>
+				<div class="content">
+					<div class="scrollbar-macosx">
+						<div v-text="emergencyPlan.content"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="dialog" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title" v-text="dialog.title"></h4>
+				</div>
+				<div class="modal-body">
+					<form>
+						<div class="form-group">
+							<label>预案标题</label>
+							<input type="text" class="form-control" id="dialog.form.title" placeholder="预案标题">
+						</div>
+						<div class="form-group">
+							<label>预案内容</label>
+							<div id="editor"></div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+					<button type="button" class="btn btn-primary" @click="handleSaveClick">保存</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+</div>
+<script>
+	(function (Vue, _, moment, $) {
+		var vm = new Vue({
+			el: '#root',
+			data: function () {
+				return {
+					emergencyPlanList: [],
+					emergencyPlan: {
+						title: '出租汽车行业突发事件应急预案',
+						content: ''
+					},
+					editor: {
+						option: [
+							'head',  // 标题
+							'bold',  // 粗体
+							'fontSize',  // 字号
+							'fontName',  // 字体
+							'italic',  // 斜体
+							'underline',  // 下划线
+							'strikeThrough',  // 删除线
+							'foreColor',  // 文字颜色
+							'backColor',  // 背景颜色
+							'link',  // 插入链接
+							'list',  // 列表
+							'justify',  // 对齐方式
+							'quote',  // 引用
+							'emoticon',  // 表情
+							'undo',  // 撤销
+							'redo'  // 重复
+						],
+						tag: null
+					},
+					dialog: {
+						title: '',
+						content: ''
+					}
+				}
+			},
+			mounted: function () {
+				var _this = this;
+				this.$nextTick(function () {
+					$('.scrollbar-macosx').scrollbar();
+					_this.editor.tag = new wangEditor('#editor');
+					_this.editor.tag.customConfig.menus = _this.editor.option;
+					_this.editor.tag.create();
+					$('#dialog').on('hidden.bs.modal', function () {
+						// do something...
+					})
+					_this.getEmergencyPlanList();
+				})
+			},
+			methods: {
+				// 接口
+				getEmergencyPlanList: function() {
+					var _this = this;
+					$.ajax({
+						url:'http://115.236.61.148:9085/zhpt/yjzh/yjya/getAllNames',
+						type: 'GET',
+						dataType: 'json'
+					}).then(function (res) {
+						console.info('getEmergencyPlanList:', res)
+						_this.emergencyPlanList = _.map(res, function (item) {
+							return {id: item[0], title: item[1]}
+						});
+					})
+				},
+				getEmergencyPlanContent: function(id) {
+					var _this = this;
+					$.ajax({
+						url:'http://115.236.61.148:9085/zhpt/yjzh/yjya/getContent',
+						type: 'GET',
+						dataType: 'html',
+						data: {
+							id: id
+						}
+					}).then(function (res) {
+						console.info('getEmergencyPlanContent:', res)
+						_this.emergencyPlan.content = res;
+					})
+				},
+				// 事件
+				handleAddClick: function() {
+					$('#dialog').modal('show');
+				},
+				handleListItemClick: function(item) {
+					this.getEmergencyPlanContent(item.id);
+				},
+				handleSaveClick: function() {
+					console.info(this.editor.tag.txt.html())
+				}
+			}
+		})
+	})(Vue, _, moment, jQuery);
+</script>
+</body>
+</html>

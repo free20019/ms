@@ -1,0 +1,342 @@
+(function (Vue, _, jQuery) {
+		var vm = new Vue({
+			el: '#root',
+			data: function () {
+				return {
+					tab: {
+						active: 1,
+//						datetime: '',
+//						licensePlate: ''
+					},
+					table: {
+						fields: [
+							{name: 'vehicle', title: '车牌号码', width: 100, align: 'center'},
+							{name: 'time', title: '时间', width: 150, align: 'center'},
+							{name: 'address', title: '地点', width: 180, align: 'left'}
+						]
+					},
+					map: {
+						amap: null,
+						loading: false
+					},
+					focusList:null,
+					faultList:null,
+					//高德地图海量点ui
+					PointSimplifier:null,
+					pointSimplifierIns:null,
+					groupStyleMap:{},
+				}
+			},
+			mounted() {
+				var _this = this;
+				this.$nextTick(function () {
+//					var search = _this.searchToJson(location.search.substring(1));
+//					_this.tab.active = parseInt(search.type);
+					// console.info(search)
+					titlePanelScaling('#root', {width: 530});
+					$('#focusMonitorTable').jsGrid({
+						width: '100%',
+						height: '100%',
+						editing: true,
+						sorting: true,
+						paging: false,
+						autoload: true,
+						rowClick:this.handleJumpVehicleClick,
+						fields: _this.table.fields
+					});
+//					var datetime = $('#datetime');
+//					datetime.datetimepicker(dateDefaultOption).on('changeDate', function (event) {
+//						_this.tab.datetime = event.date;
+//					});
+//					datetime.val(new Date().Format('yyyy-MM-dd'));
+					$('#faultMonitorTable').jsGrid({
+						width: '100%',
+						height: 'calc(100%)',
+						editing: true,
+						sorting: true,
+						paging: false,
+						autoload: true,
+						rowClick:this.handleJumpVehicleClick,
+						fields: _this.table.fields
+					});
+
+					var position = new AMap.LngLat(120.16378, 30.25840);//创建中心点坐标
+					_this.map.amap = new AMap.Map('map', {
+						center : position,
+						level : 14,
+						resizeEnable : true
+					});
+					var vehicle = _this.getQueryString("vehicle");
+					var type = _this.getQueryString("type");
+//					alert(vehicle+"  "+type);
+					if(type==='1'||type==='2'){
+						_this.tab.active = parseInt(type);	
+						_this.handleTabItemClick(_this.tab.active);
+						if(type==='1'){
+							setTimeout(function(){
+								_this.vehicleMarker(vehicle);
+							},1000);		
+						}else if(type==='2'){
+							setTimeout(function(){
+								_this.vehicleMarker(vehicle);
+							},1000);
+						}
+					}else{						
+						_this.handleTabItemClick(1);
+					}
+				})
+			},
+			methods: {
+				getQueryString: function(name) {
+				    var result = window.location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
+				    if (result == null || result.length < 1) {
+				        return "";
+				    }else{
+				    }
+				    return decodeURI(result[1]);
+				},
+				getFocusMonitorList: function() {
+					var _this=this;
+					jqxhr=$.ajax({
+			     		type: "POST",
+			 	        url:"../../claq/focusMonitor",
+			 	        data:{},
+			 	        dataType: 'json',
+			 			timeout : 3600000,
+			 			success:function(json){
+			 				console.log(json);
+			 				if(json == null){
+			 					$('#focusMonitorTable').jsGrid({
+									data: []
+								});
+			 				}else{
+			 					//重点抓拍车辆
+			 					var focus = json.zdzp;	 
+			 					for(var i=0;i<focus.length;i++){
+			 						focus[i].vehicle=focus[i].VEHICLE_NO;
+			 						focus[i].time=focus[i].GET_TIME==null?"":(new Date(focus[i].GET_TIME)).Format("yyyy-MM-dd hh:mm:ss");
+			 						focus[i].address=focus[i].GET_LOCATION;
+			 					}
+			 					_this.focusList=focus;
+			 					$('#focusMonitorTable').jsGrid({
+									data:focus
+								});
+			 					var arr= new Array();
+			 					_.each(focus, function (item, index) {
+									var s = {};
+				 					if(item.hasOwnProperty('PX')&&item.hasOwnProperty('PY')){	
+				 						s.lnglat = [item.PX,item.PY];
+										s.name = item.VEHI_NO;
+										s.groupId = 11;
+										arr.push(s);		
+				 					}
+								});
+			 					_this.markvehi(arr);
+			 				}
+			 			}
+					});
+				},
+				getFaultMonitorList: function() {
+					var _this=this;
+					jqxhr=$.ajax({
+			     		type: "POST",
+			 	        url:"../../claq/faultMonitor",
+			 	        data:{},
+			 	        dataType: 'json',
+			 			timeout : 3600000,
+			 			success:function(json){
+			 				console.log(json);
+			 				if(json.hasOwnProperty('code')){
+			 					alert(1);
+			 					$('#faultMonitorTable').jsGrid({
+									data: []
+								});
+			 				}else{
+			 					//重点抓拍车辆
+			 					var fault = json.gzzp;	 					
+			 					for(var i=0;i<fault.length;i++){
+			 						fault[i].vehicle=fault[i].VEHI_NO;
+			 						fault[i].time=fault[i].SUBSCRIBE_TIME==null?"":(new Date(fault[i].SUBSCRIBE_TIME)).Format("yyyy-MM-dd hh:mm:ss");
+			 						fault[i].address=fault[i].SUBSCRIBE_PLACE;
+			 					}
+			 					_this.faultList=fault;
+			 					$('#faultMonitorTable').jsGrid({
+									data:fault
+								});
+			 					var arr= new Array();
+			 					_.each(fault, function (item, index) {
+									var s = {};
+				 					if(item.hasOwnProperty('PX')&&item.hasOwnProperty('PY')){	
+				 						s.lnglat = [item.PX,item.PY];
+										s.name = item.VEHI_NO;
+										s.groupId = 5;
+										arr.push(s);		
+				 					}
+								});
+			 					_this.markvehi(arr);
+			 				}
+			 			}
+					});
+				},
+				//打印
+				markvehi: function (obj){
+					var _this = this;
+					if(_this.pointSimplifierIns){
+						_this.pointSimplifierIns.setData(null);
+					}
+					AMapUI.load(['ui/misc/PointSimplifier', 'lib/$'], function(PointSimplifier, $) {
+				        if (!PointSimplifier.supportCanvas) {
+				            alert('当前环境不支持 Canvas！');
+				            return;
+				        }
+				        for (var i = 1; i <= 11; i++) {
+				        	_this.groupStyleMap[i] = {
+								    pointStyle: {
+								        content: PointSimplifier.Render.Canvas.getImageContent("../../resources/images/"+(i+400)+".png"),
+								        width: 16,
+								        height: 16,
+								        offset: ['-50%', '-50%'],
+								        fillStyle: null
+								    }
+								};
+						}
+				        _this.pointSimplifierIns = new PointSimplifier({
+				            zIndex: 40,
+				            map: _this.map.amap, // 所属的地图实例
+				            getPosition: function(item) {
+			            		return item.lnglat;
+				            },
+				            getHoverTitle: function(dataItem, idx) {
+				                return '车牌: ' + dataItem.name;
+				            },
+				            // 使用GroupStyleRender
+				            renderConstructor: PointSimplifier.Render.Canvas.GroupStyleRender,
+				            renderOptions: {
+				            	pointStyle: {
+				            		width: 5,
+				                    height: 5,
+							        fillStyle: null
+				                },
+				                //鼠标hover时的title信息
+				                hoverTitleStyle: {
+				                	
+				                },
+				                getGroupId: function(item, idx) {
+				                	return item.groupId;
+				                },
+				                groupStyleOptions: function(gid) {
+				                	return _this.groupStyleMap[gid];
+				                }
+				            }
+				        });
+				    	//监听事件
+				        _this.pointSimplifierIns.on('pointClick', function(e, record) {
+				        	_this.vehicleMarker(record.data.name);
+				        });
+				        _this.pointSimplifierIns.setData(obj);
+				        _this.map.amap.setZoomAndCenter(13,[120.209561,30.245278])
+				    });
+								
+				},
+				/* 点击车辆图标,在地图上显示该车辆的当前信息 */
+				vehicleMarker: function (vehicle) {
+					var _this = this;
+					if(_this.tab.active===1){
+						var item=_.filter(_this.focusList, function (item) {
+							if (item.VEHI_NO.indexOf(vehicle) > -1) return true;
+						});
+						_this.addMapMarker(item[0]);
+					}else{
+						var item=_.filter(_this.faultList, function (item) {
+							if (item.VEHI_NO.indexOf(vehicle) > -1) return true;
+						});
+						_this.addMapMarker(item[0]);
+					}
+				},
+				/* 将单个车辆的位置信息显示在地图上 */
+				addMapMarker: function(item) {
+					var _this = this;
+					if(!(item.hasOwnProperty('PX')&&item.hasOwnProperty('PY'))){	
+						layer.msg("该车辆无定位！");
+						return false;
+					}
+					if(_this.mapMarker) _this.mapMarker.setMap(null);
+					var markerContent = document.createElement('div');
+					markerContent.className = 'txtstyle';
+					//点标记中的图标
+					var markerImg = document.createElement('img');
+					markerImg.className = 'markerlnglat';
+					//区分
+					var txt = "";
+					if(_this.tab.active===1){
+						markerImg.src='../../resources/images/411.png';
+						txt += "<table><tr><td><b style='color:#3399FF'>"+item.VEHI_NO+"</b></td>" +
+							"<td></td></tr><tr><td><b>[所属业户]</b>："+item.COMP_NAME+"</td></tr>" +
+							"<tr><td><b>[车辆商标]</b>："+item.VT_NAME+"</td></tr>" +
+							"<tr><td><b>[车辆颜色]</b>："+item.VC_NAME+"</td></tr>" +
+							"<tr><td><b>[SIM卡]</b>："+item.SIM_NUM+"</td></tr>" +
+							"<tr><td><b>[车辆所属人]</b>："+(item.OWN_NAME==null?"":item.OWN_NAME)+"</td></tr>" +
+							"<tr><td><b>[联系电话]</b>："+(item.OWN_TEL==null?"":item.OWN_TEL)+"</td></tr>" +
+							"<tr><td><b>[经度]</b>："+item.PX+"</td></tr><tr><td><b>[纬度]</b>："+item.PY+"</td></tr>" +
+							"<tr><td><b>[抓拍地点]</b>："+(item.GET_LOCATION==null?"":item.GET_LOCATION)+"</td></tr>" +
+							"<tr><td><b>[抓拍时间]</b>："+(item.GET_TIME==null?"":(new Date(item.GET_TIME)).Format("yyyy-MM-dd hh:mm:ss"))+"</td></tr>" +
+							"";
+					}else{
+						markerImg.src='../../resources/images/405.png';
+						txt += "<table><tr><td><b style='color:#3399FF'>"+item.VEHI_NO+"</b></td>" +
+							"<td></td></tr><tr><td><b>[所属业户]</b>："+item.COMP_NAME+"</td></tr>" +
+							"<tr><td><b>[车辆商标]</b>："+item.VT_NAME+"</td></tr>" +
+							"<tr><td><b>[车辆颜色]</b>："+item.VC_NAME+"</td></tr>" +
+							"<tr><td><b>[SIM卡]</b>："+item.SIM_NUM+"</td></tr>" +
+							"<tr><td><b>[车辆所属人]</b>："+(item.OWN_NAME==null?"":item.OWN_NAME)+"</td></tr>" +
+							"<tr><td><b>[联系电话]</b>："+(item.OWN_TEL==null?"":item.OWN_TEL)+"</td></tr>" +
+							"<tr><td><b>[经度]</b>："+item.PX+"</td></tr><tr><td><b>[纬度]</b>："+item.PY+"</td></tr>" +
+							"<tr><td><b>[故障类型]</b>：视频异常</td></tr>" +
+							"<tr><td><b>[抓拍地点]</b>："+(item.SUBSCRIBE_PLACE==null?"":item.SUBSCRIBE_PLACE)+"</td></tr>" +
+							"<tr><td><b>[抓拍时间]</b>："+(item.SUBSCRIBE_TIME==null?"":(new Date(item.SUBSCRIBE_TIME)).Format("yyyy-MM-dd hh:mm:ss"))+"</td></tr>" +
+							"";
+					}
+					markerContent.appendChild(markerImg);
+					_this.mapMarker = new AMap.Marker({
+						map: _this.map.amap,
+						position: new AMap.LngLat(item.PX, item.PY),
+						offset: new AMap.Pixel(-7,-10), //相对于基点的偏移位置
+						draggable: false,  //是否可拖动
+						content: markerContent   //自定义点标记覆盖物内容
+					});
+					_this.map.amap.setCenter(new AMap.LngLat(item.PX,item.PY));
+					var info = [];
+					info.push(txt);
+					var inforWindowone = new AMap.InfoWindow({
+						offset: new AMap.Pixel(3, 0),
+						content: info.join("</table>")
+					});
+					inforWindowone.open(_this.map.amap, _this.mapMarker.getPosition());
+					AMap.event.addListener(this.mapMarker, "click", function (e) {
+						inforWindowone.open(_this.map.amap, _this.mapMarker.getPosition());
+					});
+				},
+				handleTabItemClick: function(key) {
+					this.tab.active = key;
+					if(key===1){						
+						this.getFocusMonitorList();
+					}else if(key===2){						
+						this.getFaultMonitorList();
+					}
+				},
+//				handleQueryClick: function() {},
+				handleJumpVehicleClick: function (item) {
+					this.addMapMarker(item.item);
+				},
+//				searchToJson: function(string) {
+//					var json = {};
+//					var list = string.toString().split('&');
+//					for (var i = 0; i < list.length; i++) {
+//						var item = list[i].split('=');
+//						json[item[0]] = item[1];
+//					}
+//					return json
+//				}
+			}
+		})
+	})(Vue, _, jQuery)

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>重点区域上线率分析</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/style/css/zdqysxlfx.css">
+	<script src="../../resources/script/vue.min.js"></script>
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue-select2@0.2.6/dist/vue-select.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/moment.min.js"></script>
+	<script src="../../resources/script/iPeakUI/bootstrap-template/bs-table.js"></script>
+	<script src="../../resources/script/util.js"></script>
+</head>
+<body>
+<div class="template-wrapper" id="root">
+	<div class="query-bar">
+		<form class="form-inline form-group-sm">
+			<div class="form-group">
+				<div class="control-box">
+					<i class="prefix iconfont icon-clfb"></i>
+					<select type="text" v-model="query.area" id="areaName" data-placeholder="区域">
+						<option></option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="control-box">
+					<i class="prefix glyphicon glyphicon-calendar"></i>
+					<input type="text" v-model="query.date" class="form-control" id="datetime" placeholder="日期">
+				</div>
+			</div>
+			<div class="form-group">
+				<a class="btn btn-primary btn-sm" @click="handleQueryClick">查询</a>
+				<a class="btn btn-primary btn-sm" @click="handleExportClick">导出</a>
+			</div>
+		</form>
+	</div>
+	<div class="template-main">
+		<div class="panel-box">
+			<div class="scrollbar-macosx">
+				<div class="table-box">
+					<div class="scrollbar-macosx">
+						<bs-table :fields="tableFields" :data="tableData"></bs-table>
+					</div>
+				</div>
+				<div class="chart-box" id="charts"></div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	(function(Vue, _, $, BSTable) {
+		var vm = new Vue({
+			el: '#root',
+			data: function() {
+				return {
+					query: {
+						area: '',
+						date: '',
+						csz: '',
+						
+					  	jt:[],
+			            zt:[],
+			            qt:[],
+			            sztb:[],
+			            szpj:[],
+			            qbyzd:[],
+			            qbyzx:[],
+			            sytb:[],
+			            sntb:[]
+					},
+					tableFields: [
+						{id: 'DATE', title: '时间', width: 160, align: 'center', whiteSpace: 'nowrap'},
+						{id: 'a0', title: '0:00', width: 120},
+						{id: 'a1', title: '1:00', width: 120},
+						{id: 'a2', title: '2:00', width: 120},
+						{id: 'a3', title: '3:00', width: 120},
+						{id: 'a4', title: '4:00', width: 120},
+						{id: 'a5', title: '5:00', width: 120},
+						{id: 'a6', title: '6:00', width: 120},
+						{id: 'a7', title: '7:00', width: 120},
+						{id: 'a8', title: '8:00', width: 120},
+						{id: 'a9', title: '9:00', width: 120},
+						{id: 'a10', title: '10:00', width: 120},
+						{id: 'a11', title: '11:00', width: 120},
+						{id: 'a12', title: '12:00', width: 120},
+						{id: 'a13', title: '13:00', width: 120},
+						{id: 'a14', title: '14:00', width: 120},
+						{id: 'a15', title: '15:00', width: 120},
+						{id: 'a16', title: '16:00', width: 120},
+						{id: 'a17', title: '17:00', width: 120},
+						{id: 'a18', title: '18:00', width: 120},
+						{id: 'a19', title: '19:00', width: 120},
+						{id: 'a20', title: '20:00', width: 120},
+						{id: 'a21', title: '21:00', width: 120},
+						{id: 'a22', title: '22:00', width: 120},
+						{id: 'a23', title: '23:00', width: 120},
+					],
+					tableData: []
+				}
+			},
+			mounted: function() {
+				var _this = this;
+				this.$nextTick(function () {
+					$('.scrollbar-macosx').scrollbar();
+					$('#areaName').select2({
+			            language: "zh-CN",
+			            width: '206px',
+			            allowClear: true,
+			            data: []
+			          }).on('change', function() {
+			            _this.query.area = this.value;
+			          });
+					$('#datetime').datetimepicker(dateDefaultOption).on('changeDate', function (e) {
+						_this.query.date = moment(e.date).format('YYYY-MM-DD');
+					});
+					_this.query.date = moment().format('YYYY-MM-DD');
+
+					_this.getAreaList();
+					_this.getSxlList();
+				});
+			},
+			methods: {
+				getAreaList: function() {
+					var _this = this;
+					$.ajax({
+						type: 'POST',
+						url: '../../claq/qyarea',
+						dataType: 'json',
+						timeout: 3600000
+					}).then(function(res) {
+						 console.log(res)
+						select2('#areaName', {
+							width: '206px',
+							allowClear: true,
+							data: _.map(res.dataarea, function (item) {
+								return {id: item.id, text: item.name}
+							}) || []
+						});
+					})
+				},
+				getSxlList: function() {
+					var _this = this;
+					var query = this.query;
+					$.ajax({
+						type: 'POST',
+						url: '../../otta/sxl',
+						data: {
+							postData: JSON.stringify({
+								baid: query.area,
+								time: query.date
+							})
+						},
+						dataType: 'json',
+						timeout: 3600000
+					}).then(function (res) {
+						 console.log(res)
+						_this.tableData = _.map(res.data[0].datas, function (item) {
+							_.each(item, function (val, key) {
+								item[key] = val.length > 0 && parseInt(val) == val ? val + '%' : val;
+							});
+							return item
+						}) || [];
+						 if(res.DATA.length != 0){
+							 for (var i = 0; i < res.DATA.length; i++) {
+				  					if(i==0){
+				  						_this.jt=_this.tjnr(res.DATA[0]);
+				  					}else if(i==1){
+				  						_this.zt=_this.tjnr(res.DATA[1]);
+				  					}else if(i==2){
+				  						_this.qt=_this.tjnr(res.DATA[2]);
+				  					}else if(i==3){
+				  						_this.sztb=_this.tjnr(res.DATA[3]);
+				  					}else if(i==4){
+				  						_this.szpj=_this.tjnr(res.DATA[4]);
+				  					}else if(i==5){
+				  						_this.qbyzd=_this.tjnr(res.DATA[5]);
+				  					}else if(i==6){
+				  						_this.qbyzx=_this.tjnr(res.DATA[6]);
+				  					}else if(i==7){
+				  						_this.sytb=_this.tjnr(res.DATA[7]);
+				  					}else if(i==8){
+				  						_this.sntb=_this.tjnr(res.DATA[8]);
+				  					}
+				  				}
+			        	  }
+						 _this.echarts();
+					})
+				},
+				tjnr: function(list){
+		        	var zhsz=[];
+		        	for(var i=0;i<48;i++){
+		        		if(list['a'+i]!=null){
+		        			if(list['a'+i]==""){
+		        				zhsz.push(0);
+		        			}
+		        			zhsz.push((parseFloat(list['a'+i].split("%")[0])/100).toFixed(2));
+		        		}
+		        	}
+		        	return zhsz;
+		        },
+				echarts:function(){
+					var _this = this;
+					_this.charts = echarts.init(document.getElementById('charts'));
+					_this.charts.setOption({
+						title: {
+							text: ''
+						},
+						tooltip: {
+							trigger: 'axis'
+						},
+						legend: {
+							 data:['今天','昨天','前天','上周同比','上周平均','前半月最大','前半月最小','上月同比','上年同比']
+						},
+						grid: {
+							left: '3%',
+							right: '4%',
+							bottom: '3%',
+							containLabel: true
+						},
+						toolbox: {
+							feature: {
+								saveAsImage: {}
+							}
+						},
+						xAxis: {
+							type: 'category',
+							boundaryGap: false,
+							 data: ['0:00','0:30','1:00','1:30','2:00','2:30','3:00','3:30','4:00','4:30','5:00','5:30','6:00','6:30','7:00','7:30','8:00','8:30','9:00','9:30','10:00','10:30','11:00','11:30','12:00'
+				                     ,'12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30','20:00','20:30','21:00','21:30','22:00','22:30','23:00','23:30']
+						},
+						yAxis: {
+							type: 'value'
+						},
+						series: [
+							  {
+				                name:'今天',
+				                type:'line',
+				                stack: '总量',
+				                data:_this.jt
+				              },
+				              {
+				                name:'昨天',
+				                type:'line',
+				                stack: '总量',
+				                data:_this.zt
+				              },
+				              {
+				                name:'前天',
+				                type:'line',
+				                stack: '总量',
+				                data:_this.qt
+				              },
+				              {
+				                name:'上周同比',
+				                type:'line',
+				                stack: '总量',
+				                data:_this.sztb
+				              },
+				              {
+				                name:'上周平均',
+				                type:'line',
+				                stack: '总量',
+				                data:_this.szpj
+				              },
+				              {
+				                name:'前半月最大',
+				                type:'line',
+				                stack: '总量',
+				                data:_this.qbyzd
+				              },
+				              {
+				                name:'前半月最小',
+				                type:'line',
+				                stack: '总量',
+				                data:_this.qbyzx
+				              },
+				              {
+				                name:'上月同比',
+				                type:'line',
+				                stack: '总量',
+				                data:_this.sytb
+				              },
+				              {
+				                name:'上年同比',
+				                type:'line',
+				                stack: '总量',
+				                data:_this.sntb
+				              }
+						]
+					});
+
+					window.onresize = function() {
+						_this.charts.resize();
+					};
+				},
+				handleQueryClick: function() {
+					this.getSxlList();
+				},
+				handleExportClick: function() {
+					// 导出
+					var data = {
+						postData: JSON.stringify({
+							time: query.date
+						})
+					};
+					url = "../../otta/sxlexcle?data=" + JSON.stringify(data) , window.open(url);
+				}
+			},
+			components: {
+				'bs-table': BSTable
+			}
+		});
+	})(Vue, _, jQuery, BSTable);
+</script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+$bodyHeight: 295px;
+.panel {
+  &-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: calc(100% - #{$bodyHeight});
+    padding: 10px 15px 0;
+    box-sizing: border-box;
+    z-index: 10;
+    transition: height .3s ease;
+    .dataListPanel {
+      overflow: hidden;
+    }
+  }
+  &-body {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: $bodyHeight;
+    padding: 0 15px 15px;
+    transition: height .3s ease;
+  }
+  &-queryBar {
+    padding: 10px 10px 0;
+  }
+  &-map {
+    height: 100%;
+  }
+}
+
+.form-inline .form-group {margin-bottom: 10px;}
+.dataListPanel.center {height: 230px;padding: 10px;transition: height .3s ease;}
+
+.modal-body {
+  label {
+    padding-left: 12px;
+  }
+  .form-control {
+    width: 100%;
+  }
+  textarea.form-control {
+    resize: none;
+  }
+}
+
+.mapTool {
+  &Bar {
+    height: auto;
+    border-radius: 4px;
+  }
+  &Item {
+    padding: 10px;
+    cursor: pointer;
+  }
+}
+
+.mapFullScreen {
+  top: auto;
+  right: 25px;
+  bottom: 10px;
+  margin-bottom: 0;
+  .mapToolItem {
+    line-height: 16px;
+  }
+}
+
+.fullScreen {
+  width: 100%!important;
+  height: calc(100% - 15px)!important;
+}
+
+@media screen and (min-height: 750px) {
+  $bodyHeight: 395px;
+  .panel {
+    &-top {
+      height: calc(100% - #{$bodyHeight});
+    }
+    &-body {
+      height: $bodyHeight;
+    }
+  }
+  .dataListPanel.center {
+    height: 330px;
+    padding: 10px;
+  }
+}

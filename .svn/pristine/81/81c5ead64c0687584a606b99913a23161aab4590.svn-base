@@ -1,0 +1,61 @@
+
+package com.erxi.ms.controller;
+
+
+import com.erxi.ms.result.DownloadAct;
+import com.erxi.ms.service.YjzhServics;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 应急指挥处置系统
+ * @author xianlehuang
+ * @date 2018/1/9 
+ */
+@RequestMapping("/Yjzh")
+@RestController
+public class YjzhAction {
+
+    private DownloadAct downloadAct = new DownloadAct();
+
+    @Autowired
+    private YjzhServics Yjzhservics;
+
+	/**
+	 * 下拉栏
+	 * @param request
+	 * @param table
+	 * @param field
+	 * @return
+	 */
+	@RequestMapping("/xll")
+	@ResponseBody
+	public String findxll(HttpServletRequest request,@RequestParam("table") String table,@RequestParam("field") String field) {
+		String msg = Yjzhservics.findxll(table,field);
+		return msg;
+	}
+	
+	/**
+	 * 值班
+	 * @return
+	 */
+	@RequestMapping("/findzbb")
+	@ResponseBody
+	public String findzbb(HttpServletRequest request) {
+		String msg = Yjzhservics.findzbb();
+		return msg;
+	}
+	
+}
+

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>重点关注车辆</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="../../resources/script/jquery.form.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer,AMap.OverView"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+	<script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+	<script src="./zdgzcl.js"></script>
+	<style>
+		#zdgzclMap {
+			height: 100%;
+			border: 1px solid #c4d4fb;
+			border-radius: 10px;
+		}
+		.scrollbar-macosx {
+			height: calc(100% - 273px);
+			margin-bottom: 15px;
+		}
+		.list[type='carInfoList'] {
+			height: auto;
+			margin-bottom: 0;
+		}
+	</style>
+</head>
+<body>
+<div class="panel-wrapper" style="position: relative;">
+	<div class="panel-layout" layout="left">
+		<div class="dataListPanel">
+			<form action="" method="post" id="form_cl" enctype="multipart/form-data">
+				<div class="searchBar" type="searchAndExcel">
+					<i class="icon-first iconfont icon-car"></i>
+					<input type="text" placeholder="请输入完整车牌号" id="zdgzclcphm">
+					<a class="btn btn-primary btn-sm btn-last ip-iconfont ip-icon-search" id="zdgzcl-oneButton"></a>
+					<a class="btn btn-primary btn-sm btn-last iconfont icon-excel"></a>
+				</div>
+			</form>
+			<div class="list" id="searchCarItem" type="searchCarItem" style="height: 45px;">
+				<!--<span class="col" type="licensePlate">浙A12345</span>-->
+				<!--<span class="col btn-heart iconfont icon-attention-all-empty" type="button"></span>-->
+			</div>
+			<div class="list list-header item carevehi" type="number" title="关注车辆" unit="辆">0</div>
+			
+				<div class="searchBar">
+					<i class="icon-first iconfont icon-car"></i>
+					<input type="text" placeholder="输入三位以上车牌号" id="zdgzclcph" >
+					<a class="btn btn-primary btn-sm btn-last ip-iconfont ip-icon-search"></a>
+				</div>
+			
+			<div class="scrollbar-macosx">
+				<ul class="list" id="zdgzcl-heartCarList" type="carInfoList">
+<!-- 					<li class="listItem"> -->
+<!-- 						<span class="col" type="licensePlate">浙A12345</span> -->
+<!-- 						<span class="col iconfont icon-attention-all" type="button"></span> -->
+<!-- 					</li> -->
+<!-- 					<li class="listItem"> -->
+<!-- 						<span class="col" type="licensePlate">浙A12346</span> -->
+<!-- 						<span class="col iconfont icon-attention-all" type="button"></span> -->
+<!-- 					</li> -->
+<!-- 					<li class="listItem"> -->
+<!-- 						<span class="col" type="licensePlate">浙A12347</span> -->
+<!-- 						<span class="col iconfont icon-attention-all" type="button"></span> -->
+<!-- 					</li> -->
+<!-- 					<li class="listItem"> -->
+<!-- 						<span class="col" type="licensePlate">浙A12348</span> -->
+<!-- 						<span class="col iconfont icon-attention-all" type="button"></span> -->
+<!-- 					</li> -->
+<!-- 					<li class="listItem"> -->
+<!-- 						<span class="col" type="licensePlate">浙A12349</span> -->
+<!-- 						<span class="col glyphicon glyphicon-heart" type="button"></span> -->
+<!-- 					</li> -->
+				</ul>
+			</div>
+			<a class="btn btn-primary btn-clear clearVehi" id="clearVehi" style="display:none">清除</a>
+		</div>
+	</div>
+	<div class="panel-layout" layout="center">
+		<div id="zdgzclMap"></div>
+	</div>
+</div>
+</body>
+</html>

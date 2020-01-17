@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>出租乘运分析</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+	<style>
+		#czckfxMap {
+			height: 100%;
+			border: 1px solid #c4d4fb;
+			border-radius: 10px;
+		}
+		.list[type='rankingList'] .col[type='area'] {
+		    width: calc(100% - 50px);
+		}
+		.listItem.active {
+			background: #c8e49d;
+		}
+		.listItem {
+			cursor: pointer;
+		}
+		.scrollbar-macosx{
+			height: calc(100% - 50px);
+		}
+		.lxtl {
+			    position: absolute;
+			    bottom: 20px;
+			    right: 23px;
+			    height: 38px;
+			    width: 19px;
+			    background-color: white;
+			    z-index: 1111;
+			    box-shadow: 0 0 5px white;
+		}
+		.lxtp {
+			position: absolute;
+		    bottom: 20px;
+		    right: 47px;
+		    height: 38px;
+		    width: 174px;
+		    background-color: white;
+		    z-index: 1111;
+		    box-shadow: 0 0 5px white;
+		}
+	</style>
+</head>
+<body>
+<div class="panel-wrapper" style="position: relative;">
+	<div class="panel-layout" layout="left">
+		<div class="dataListPanel">
+			<div class="ip-tabWrapper" type="tab">
+				<div class="ip-tabPanelItem" id="czckfx-rmlyd" d-title="热门来源地">
+					<div type="calendar" style="width: calc(100% - 20px); margin: 10px;">
+						<i class="glyphicon glyphicon-calendar" type="icon"></i>
+						<input type="text" class="form-control input-sm" id="czckfx-lydDatetimeStart" placeholder="选择日期">
+					</div>
+					<div class="scrollbar-macosx">
+						<ul class="list qdrm" type="rankingList">
+<!-- 							<li class="headerItem"><span class="col" type="ranking"></span><span class="col" type="area">热门地区</span><span class="col" type="proportion">数量</span></li> -->
+<!-- 							<li class="listItem" style="background: #c8e49d;"><span class="col" type="ranking" number="1"></span><span class="col" type="area">西湖文化广场</span><span class="col" type="proportion">7.34</span></li> -->
+<!-- 							<li class="listItem"><span class="col" type="ranking" number="2"></span><span class="col" type="area">文三路东部软件园</span><span class="col" type="proportion">6.2</span></li> -->
+<!-- 							<li class="listItem"><span class="col" type="ranking" number="3"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li> -->
+<!-- 							<li class="listItem"><span class="col" type="ranking" number="4"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li> -->
+<!-- 							<li class="listItem"><span class="col" type="ranking" number="5"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li> -->
+<!-- 							<li class="listItem"><span class="col" type="ranking" number="6"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li> -->
+<!-- 							<li class="listItem"><span class="col" type="ranking" number="7"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li> -->
+<!-- 							<li class="listItem"><span class="col" type="ranking" number="8"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li> -->
+<!-- 							<li class="listItem"><span class="col" type="ranking" number="9"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li> -->
+						</ul>
+					</div>
+				</div>
+				<div class="ip-tabPanelItem" id="czckfx-rmmdd" d-title="热门目的地">
+					<div type="calendar" style="width: calc(100% - 20px); margin: 10px;">
+						<i class="glyphicon glyphicon-calendar" type="icon"></i>
+						<input type="text" class="form-control input-sm" id="czckfx-mddDatetimeStart" placeholder="选择日期">
+					</div>
+					<div class="scrollbar-macosx">
+						<ul class="list zdrm" type="rankingList">
+<!-- 							<li class="headerItem"><span class="col" type="ranking"></span><span class="col" type="area">热门地区</span><span class="col" type="proportion">数量</span></li> -->
+<!-- 							<li class="listItem"><span class="col" type="ranking" number="1"></span><span class="col" type="area">西湖文化广场</span><span class="col" type="proportion">7.34</span></li> -->
+<!-- 							<li class="listItem"><span class="col" type="ranking" number="2"></span><span class="col" type="area">文三路东部软件园</span><span class="col" type="proportion">6.2</span></li> -->
+<!-- 							<li class="listItem"><span class="col" type="ranking" number="3"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li> -->
+<!-- 							<li class="listItem"><span class="col" type="ranking" number="4"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li> -->
+<!-- 							<li class="listItem"><span class="col" type="ranking" number="5"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li> -->
+<!-- 							<li class="listItem"><span class="col" type="ranking" number="6"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li> -->
+<!-- 							<li class="listItem"><span class="col" type="ranking" number="7"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li> -->
+<!-- 							<li class="listItem"><span class="col" type="ranking" number="8"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li> -->
+<!-- 							<li class="listItem"><span class="col" type="ranking" number="9"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li> -->
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="panel-layout" layout="center">
+		<div id="czckfxMap"></div>
+		<div class="lxtl"><img src="../../resources/images/tl.png"></div>
+		<div class="lxtp"><img id="lxtltp" src="../../resources/images/ly.png"></div>
+	</div>
+</div>
+<script>
+	var qdlist = [];
+	var zdlist = [];
+	var qdname;
+	var zdname;
+	var flat = true;
+	(function ($) {
+		$(function () {
+			$('#czckfx-lydDatetimeStart').val(getNowFormatDate());
+			$('#czckfx-mddDatetimeStart').val(getNowFormatDate());
+			$('.ip-tabWrapper').Tab({},{
+				onTabItemClick:function(item){
+					flat = true;
+					$('.lxtp').show();
+					if(item.title == '热门来源地'){
+						$("#lxtltp").attr('src','../../resources/images/ly.png'); 
+					}else if(item.title == '热门目的地'){
+						$("#lxtltp").attr('src','../../resources/images/md.png'); 
+					}
+				}
+			});
+			$('#czckfx-lydDatetimeStart').datetimepicker(dateDefaultOption).on('changeDate', function(event){
+				map.clearMap();
+				qdlyc();
+			});
+			$('#czckfx-mddDatetimeStart').datetimepicker(dateDefaultOption).on('changeDate', function(event){
+				map.clearMap();
+				zdlyc();
+			});
+			$('#czckfx-mddDatetimeStart').datetimepicker(dateDefaultOption);
+			$('.scrollbar-macosx').scrollbar();
+			var map = new AMap.Map('czckfxMap', {
+				zoom:11,
+				viewMode:'3D'
+			});
+			function compare(pro) { 
+			    return function (obj1, obj2) { 
+			        var val1 = obj1[pro]; 
+			        var val2 = obj2[pro]; 
+			        if (val1 < val2 ) { //正序
+			            return 1; 
+			        } else if (val1 > val2 ) { 
+			            return -1; 
+			        } else { 
+			            return 0; 
+			        } 
+			    } 
+			} 
+			qdlyc();
+			function qdlyc(){
+				jqxhr=$.ajax({
+					url :basePath +"sbwx/cklxfx",
+					type :'post',
+					dataType :'json',
+					data:{'time':$('#czckfx-lydDatetimeStart').val(),'table':'tb_taxi_odgraph'},
+					success:function(data){
+						console.log('qd:',data)
+						qdlist = data;
+						var qdarr1 = [];
+						var yzjl = false;
+						for(var i=0; i<data.length; i++){
+							yzjl = false;
+							for(var j=0; j<qdarr1.length; j++){
+								if(qdarr1[j].area_name === data[i].area_name){
+									qdarr1[j].order_count += data[i].order_count;
+									yzjl = true;
+								}
+							}
+							if(qdarr1.length == 0 || !yzjl){
+								qdarr1.push(data[i]);
+							}
+						}
+						qdarr1.sort(compare('order_count'));
+						console.log("dfd:",qdarr1)
+						var qdarr2 = qdarr1;
+						$('.qdrm').empty();
+						for(var i=0;i<qdarr2.length;i++){
+							var zfcdsb = $('<li class="listItem"><span class="col" type="ranking" number="'+(i+1)+'"></span><span class="col" type="area">'+qdarr2[i].area_name+'</span></li>').on('click', function(){
+								$(this).addClass('active').siblings('.active').removeClass('active');
+								qdname = $(this)[0].innerText;
+								map.clearMap();
+								for(var j=0; j<qdlist.length; j++){
+									if($(this)[0].innerText == qdlist[j].area_name){
+										odlxt(qdlist[j].area_coordinates,qdlist[j].area_name,'0','0','0');
+										odlxt(qdlist[j].area_coordinates1,qdlist[j].zdarea_name,qdlist[j].order_count,'1','0');
+									}
+								}
+								map.setFitView();
+							});
+							if(i == 0){
+								zfcdsb.addClass('active');
+								$('.qdrm').append(zfcdsb);
+								qdname = qdarr2[i].area_name;
+								for(var j=0; j<qdlist.length; j++){
+									if(qdarr2[0] == qdlist[j].area_name){
+										odlxt(qdlist[j].area_coordinates,qdlist[j].area_name,'0','0','0');
+										odlxt(qdlist[j].area_coordinates1,qdlist[j].zdarea_name,qdlist[j].order_count,'1','0');
+									}
+								}
+								map.setFitView();
+							}else{
+								$('.qdrm').append(zfcdsb);
+							}
+						}
+					}
+				})
+			}
+			
+			$('#czckfx-mddDatetimeStart').datetimepicker(dateDefaultOption);
+			zdlyc()
+			function zdlyc(){
+				jqxhr=$.ajax({
+					url :basePath +"sbwx/cklxfx",
+					type :'post',
+					dataType :'json',
+					data:{'time':$('#czckfx-mddDatetimeStart').val(),'table':'tb_taxi_odgraph2'},
+					success:function(data){
+						console.log('qd:',data)
+						zdlist = data;
+						var qdarr1 = [];
+						var yzjl = false;
+						for(var i=0; i<data.length; i++){
+							yzjl = false;
+							for(var j=0; j<qdarr1.length; j++){
+								if(qdarr1[j].area_name === data[i].area_name){
+									qdarr1[j].order_count += data[i].order_count;
+									yzjl = true;
+								}
+							}
+							if(qdarr1.length == 0 || !yzjl){
+								qdarr1.push(data[i]);
+							}
+						}
+						qdarr1.sort(compare('order_count'));
+						console.log("dfd:",qdarr1)
+						var qdarr2 = qdarr1;
+						$('.zdrm').empty();
+						for(var i=0;i<qdarr2.length;i++){
+							var zfcdsb = $('<li class="listItem"><span class="col" type="ranking" number="'+(i+1)+'"></span><span class="col" type="area">'+qdarr2[i].area_name+'</span></li>').on('click', function(){
+								$(this).addClass('active').siblings('.active').removeClass('active');
+								qdname = $(this)[0].innerText;
+								map.clearMap();
+								for(var j=0; j<zdlist.length; j++){
+									if($(this)[0].innerText == zdlist[j].area_name){
+										odlxt(zdlist[j].area_coordinates,zdlist[j].area_name,'0','0','1');
+										odlxt(zdlist[j].area_coordinates1,zdlist[j].zdarea_name,zdlist[j].order_count,'1');
+									}
+								}
+								map.setFitView();
+							});
+							$('.zdrm').append(zfcdsb);
+						}
+					}
+				})
+			}
+			
+			
+			function odlxt(obj,name,num,type,info){
+				var polygonArr=new Array();//多边形覆盖物节点坐标数组
+				var zbs = obj.split(";");
+				for(var i=0;i<zbs.length;i++){
+					var zb = zbs[i].split(",");
+					polygonArr.push(new AMap.LngLat(zb[0],zb[1]));   
+				}
+				var txt = "",ys="";
+			  	if(type == '0'){
+			  		txt = "区域名："+qdname;
+			  		if(info == '0')
+			  			ys = "#7b1fa2";
+			  		else ys = "#ff5722";
+			  	}else{
+			  		txt = qdname+"  至     "+name+"<br>数量："+num;
+					if(info == '0')
+			  			ys = "#1976d2";
+			  		else ys = "#1dee85";
+			  	}
+			  	var  polygon = new AMap.Polygon({
+			        path: polygonArr,//设置多边形边界路径
+			        strokeColor: "white", //线颜色
+			        strokeOpacity: 0.8, //线透明度
+			        strokeWeight: 0.8,    //线宽
+			        fillColor: ys, //填充色
+			        fillOpacity: 0.7//填充透明度
+			    });
+				polygon.setMap(map);  
+				polygon.on('mouseover', function() {
+			        var info = [];
+// 			        var jd = zhongxin.split(',')[0];
+// 			        var wd = zhongxin.split(',')[1];
+			        info.push(txt);
+			        infoWindow = new AMap.InfoWindow({
+			            content: info.join("<br/>")  //使用默认信息窗体框样式，显示信息内容
+			        });
+			        infoWindow.open(map, [obj.split(";")[0].split(",")[0], obj.split(";")[0].split(",")[1]]);
+			    });
+				polygon.on('mouseout', function() {
+					infoWindow.close();
+			    });
+			}
+			function getNowFormatDate() {
+		        var date = new Date();
+		        var seperator1 = "-";
+		        var year = date.getFullYear();
+		        var month = date.getMonth() + 1;
+		        var strDate = date.getDate();
+		        if (month >= 1 && month <= 9) {
+		            month = "0" + month;
+		        }
+		        if (strDate >= 0 && strDate <= 9) {
+		            strDate = "0" + strDate;
+		        }
+		        var currentdate = year + seperator1 + month + seperator1 + strDate;
+		        return currentdate;
+		    }
+			$('.lxtl').on('click', function() {
+				if(flat){
+					$('.lxtp').hide();
+					flat = false;
+				}else{
+					flat = true;
+					$('.lxtp').show();
+				}
+			})
+		})
+	})(jQuery)
+</script>
+</body>
+</html>

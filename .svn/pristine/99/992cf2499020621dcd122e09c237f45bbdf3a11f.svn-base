@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>行车事故</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+<script src="../../resources/script/layer/layer.js"></script>
+	<script src="./xcsg.js"></script>
+	<style>
+		.panel-queryBar {padding: 10px 10px 0;}
+		.form-inline .form-group {margin-bottom: 10px;}
+		.dataListPanel.center {height: calc(100% - 50px);padding: 10px;}
+		[type='calendar'] {width: auto;}
+
+		/* dialog style */
+		#bljl-dialog-wzdd .form-control, #bljl-dialog-wfnr .form-control , #bljl-dialog-cljg .form-control {width: 442px;height: 50px;}
+		.modal-body form {}
+		.modal-body .control-label {display: inline-block;width: 7em;text-align: right;}
+		.modal-body .form-control {display: inline-block;}
+		textarea.form-control {resize: none;}
+		.ip-type-input div.form-control, .ip-type-text input.form-control, .ip-type-text select.form-control, .ip-type-text textarea.form-control, .ip-type-text .select2.select2-container {display: none;}
+		.ip-type-text div.form-control {width: 168px;}
+	</style>
+
+</head>
+<body>
+<div class="panel-wrapper" style="position: relative;">
+	<div class="panel-layout" layout="center">
+		<div class="panel-queryBar">
+			<form class="form-inline">
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="iconfont icon-chepai" type="icon"></i>
+					<!--	<input type="text" class="form-control input-sm" id="xcgs-cphm" placeholder="车牌号">-->
+						<select type="text" class="form-control input-sm select2" id="xcgs-cphm" autocomplete="off" data-placeholder="车牌号" style="width: 160px;"><option/></select>
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="ip-iconfont ip-icon-user" type="icon"></i>
+						<input type="text" class="form-control input-sm" id="xcgs-ximi" placeholder="司机姓名"/>
+					</div>
+					<a class="btn btn-primary btn-sm" id="select_xcsg">查询</a>
+<!-- 					<a class="btn btn-primary btn-sm" id="xcgs-reset">重置</a> -->
+					<a class="btn btn-primary btn-sm" id="xcgs-add">添加</a>
+					<a class="btn btn-primary btn-sm" id="xcgs-Export">导出</a>
+				</div>
+			</form>
+		</div>
+		<div class="dataListPanel center">
+			<div id="xcgsTable"></div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="xcgs-dialog" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">行车事故</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-inline ip-type-input" id="xcgs-dialog-form">
+					<div class="form-group form-group-sm" id="xcgs-dialog-cphm">
+						<label class="control-label">车牌号:</label>
+						<input type="text" class="form-control" placeholder="车牌号" id="xcsg_cph1">
+						<div type="text" class="form-control" id="xcsg_cph">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="xcgs-dialog-ximi">
+						<label class="control-label">姓名:</label>
+						<input type="text" class="form-control" placeholder="姓名" id="xcsg_xm1">
+						<div type="text" class="form-control" id="xcsg_xm">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="xcgs-dialog-fsrq">
+						<label class="control-label">发生日期:</label>
+						<input type="text" class="form-control" placeholder="发生日期" id="xcsg_fsrq1">
+						<div type="text" class="form-control" id="xcsg_fsrq">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="xcgs-dialog-barq">
+						<label class="control-label">报案日期:</label>
+						<input type="text" class="form-control" placeholder="报案日期" id="xcsg_barq1">
+						<div type="text" class="form-control" id="xcsg_barq">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="xcgs-dialog-bccs">
+						<label class="control-label">本车车损:</label>
+						<input type="text" class="form-control" placeholder="本车车损" id="xcsg_bccs1">
+						<div type="text" class="form-control" id="xcsg_bccs">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="xcgs-dialog-dfss">
+						<label class="control-label">对方损失:</label>
+						<input type="text" class="form-control" placeholder="对方损失" id="xcsg_dfss1">
+						<div type="text" class="form-control" id="xcsg_dfss">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="xcgs-dialog-sgze">
+						<label class="control-label">事故总额:</label>
+						<input type="text" class="form-control" placeholder="事故总额" id="xcsg_sgze1">
+						<div type="text" class="form-control" id="xcsg_sgze">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="xcgs-dialog-sglx">
+						<label class="control-label">事故类别:</label>
+						<select type="text" class="form-control" data-placeholder="事故类别" id="xcsg_sglb1"><option></option></select>
+						<div type="text" class="form-control" id="xcsg_sglb">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="xcgs-dialog-sgfz">
+						<label class="control-label">事故责任:</label>
+						<input type="text" class="form-control" placeholder="事故责任" id="xcsg_sgzr1">
+						<div type="text" class="form-control" id="xcsg_sgzr">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="xcgs-dialog-sgdd" style="width: 100%;">
+						<label class="control-label">事故地点:</label>
+						<textarea type="text" class="form-control" placeholder="事故地点" id="xcsg_sgdd1" style="width: calc(100% - 126px);"></textarea>
+						<div type="textarea" class="form-control" id="xcsg_sgdd" style="width: calc(100% - 126px);">&nbsp;</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer"> 
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" id="xcgs-dialog-save">提交</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!-- <script>
+	(function ($) {
+		var xcgsFields = [
+			{name: 'CPH', title: '车牌号', width: 120},
+			{name: 'XM', title: '姓名', width: 120},
+			{name: 'FSRQ', title: '发生日期', width: 150},
+			{name: 'BARQ', title: '报案日期', width: 150},
+			{name: 'SGDD', title: '事故地点', width: 250},
+			{name: 'SGLB', title: '事故类别', width: 250},
+			{name: 'BCCS', title: '本车车损', width: 120},
+			{name: 'DFSS', title: '对方损失', width: 250},
+			{name: 'SGZE', title: '事故总额', width: 250},
+			{name: 'SGZR', title: '事故责任', width: 250},
+			{name: 'caozuo', title: '操作',
+				itemTemplate: function (_,item) {
+					var style = {marginRight: '4px'};
+					return [
+						$('<a>').addClass('btn btn-primary btn-xs').text('详情').css(style).on('click', function () {
+							$('#xcgs-dialog').modal('show');
+							$('#xcgs-dialog .modal-title').text('详情');
+							$('#xcgs-dialog-form').addClass('ip-type-text').removeClass('ip-type-input');
+							$('#xcgs-dialog-save').hide();
+							
+							$("#xcsg_cph").text(item.CPH);
+							$("#xcsg_xm").text(item.XM);
+							$("#xcsg_fsrq").text(item.FSRQ);
+							$("#xcsg_barq").text(item.BARQ);
+							$("#xcsg_bccs").text(item.BCCS);
+							$("#xcsg_dfss").text(item.DFSS);
+							$("#xcsg_sgze").text(item.SGZE);
+							$("#xcsg_sglb").text(item.SGLB);
+							$("#xcsg_sgzr").text(item.SGZR);
+							$("#xcsg_sgdd").text(item.SGDD);
+							
+						}),
+						$('<a>').addClass('btn btn-primary btn-xs').text('修改').css(style).on('click', function () {
+							$('#xcgs-dialog').modal('show');
+							$('#xcgs-dialog .modal-title').text('修改');
+							$('#xcgs-dialog-form').addClass('ip-type-input').removeClass('ip-type-text');
+							$('#xcgs-dialog-save').show();
+							
+							$("#xcsg_cph1").val(item.CPH);
+							$("#xcsg_xm1").val(item.XM);
+							$("#xcsg_fsrq1").val(item.FSRQ);
+							$("#xcsg_barq1").val(item.BARQ);
+							$("#xcsg_bccs1").val(item.BCCS);
+							$("#xcsg_dfss1").val(item.DFSS);
+							$("#xcsg_sgze1").val(item.SGZE);
+							$("#xcsg_sglb1").val(item.SGLB);
+							$("#xcsg_sgzr1").val(item.SGZR);
+							$("#xcsg_sgdd1").val(item.SGDD);
+							
+							
+
+							$("#xcgs-dialog-save").off('click').on('click',function(){
+								$.ajax({
+									url:basePath + "getUpdatexcsg",
+									type : 'post',
+									dataType : 'json',
+									data:{
+										"bid":item.BID,
+										"cph":$("#xcsg_cph1").val(),
+										"xm":$("#xcsg_xm1").val(),
+										"fsrq":$("#xcsg_fsrq1").val(),
+										"barq":$("#xcsg_barq1").val(),
+										"bccs":$("#xcsg_bccs1").val(),
+										"dfss":$("#xcsg_dfss1").val(),
+										"sgze":$("#xcsg_sgze1").val(),
+										"sglb":$("#xcsg_sglb1").val(),
+										"sgzr":$("#xcsg_sgzr1").val(),
+										"sgdd":$("#xcsg_sgdd1").val(),
+										
+									},
+									timeout:180000,
+									success:function(data){
+										$('#xcgs-dialog').modal('hide');
+										Hxcgs();
+										
+									}
+								});
+							});
+							
+							
+							$('#xcgs-dialog-fsrq input.form-control').datetimepicker(dateDefaultOption);
+							$('#xcgs-dialog-barq input.form-control').datetimepicker(dateYearDefaultOption);
+						}),
+						$('<a>').addClass('btn btn-danger btn-xs').text('删除').on('click', function () {
+							$.ajax({
+								url:basePath + "getDeletexcsg",
+								type:'post',
+								dataType:'json',
+								data:{"bid":item.BID},
+								timeout:180000,
+								success:function(data){
+									if(data>0){
+										console.info(1);
+										Hxcgs();
+									}else{
+										alert('删除失败');
+									}
+								}
+							});
+							
+							
+							
+							
+							
+						})
+					];
+				}, width: 135}
+		];
+		var xcgsData = [
+			{cphm: '车牌号1', pdrq: '姓名1', wzsj: '违章时间1', wzdd: '违章地点1', wznr: '违章内容1', cljg: '处理结果1', kouf: '扣分1', zffk: '执法机关罚款1', gsfk: '公司罚款1'},
+			{cphm: '车牌号2', pdrq: '姓名2', wzsj: '违章时间2', wzdd: '违章地点2', wznr: '违章内容2', cljg: '处理结果2', kouf: '扣分2', zffk: '执法机关罚款2', gsfk: '公司罚款2'},
+			{cphm: '车牌号3', pdrq: '姓名3', wzsj: '违章时间3', wzdd: '违章地点3', wznr: '违章内容3', cljg: '处理结果3', kouf: '扣分3', zffk: '执法机关罚款3', gsfk: '公司罚款3'},
+			{cphm: '车牌号4', pdrq: '姓名4', wzsj: '违章时间4', wzdd: '违章地点4', wznr: '违章内容4', cljg: '处理结果4', kouf: '扣分4', zffk: '执法机关罚款4', gsfk: '公司罚款4'},
+			{cphm: '车牌号5', pdrq: '姓名5', wzsj: '违章时间5', wzdd: '违章地点5', wznr: '违章内容5', cljg: '处理结果5', kouf: '扣分5', zffk: '执法机关罚款5', gsfk: '公司罚款5'},
+		];
+		var resetQueryConditions = function (e) {
+			$('#xcgs-cphm, #xcgs-ximi').val('');
+		};
+		var addxcgs = function (e) {
+			$('#xcgs-dialog').modal('show');
+			$('#xcgs-dialog .modal-title').text('添加');
+			$('#xcgs-dialog-form').addClass('ip-type-input').removeClass('ip-type-text');
+			$('#xcgs-dialog-save').show();
+			$('#xcgs-dialog-fsrq input.form-control').datetimepicker(dateDefaultOption);
+			$('#xcgs-dialog-barq input.form-control').datetimepicker(dateYearDefaultOption);
+			
+			//添加
+			$("#xcgs-dialog-save").off('click').on('click',function(){
+				console.info(1);
+				$.ajax({
+					url:basePath + "getInsertxcsg",
+					type:'post',
+					dataType:'json',
+					data:{
+						"cph":$("#xcsg_cph1").val(),
+						"xm":$("#xcsg_xm1").val(),
+						"fsrq":$("#xcsg_fsrq1").val(),
+						"barq":$("#xcsg_barq1").val(),
+						"bccs":$("#xcsg_bccs1").val(),
+						"dfss":$("#xcsg_dfss1").val(),
+						"sgze":$("#xcsg_sgze1").val(),
+						"sglb":$("#xcsg_sglb1").val(),
+						"sgzr":$("#xcsg_sgzr1").val(),
+						"sgdd":$("#xcsg_sgdd1").val(),
+						
+					},
+					timeout:180000,
+					success:function(data){
+						if(data>0){
+							console.info(1);
+							$('#xcgs-dialog').modal('hide');
+							Hxcgs();
+						}else{
+							alert('添加失败')
+						}
+					}
+				});
+			});
+		};
+		
+		function Hxcgs(){
+			var url=basePath;
+			var data={};
+			var cphs=$("#xcgs-cphm").val();   
+			var xms=$("#xcgs-ximi").val();
+			
+			if(!cphs && !xms){
+				url+="getSelectFindAll";
+				
+			}else{
+				url+="getSelectNamexcsg";
+				data.cph=cphs;
+				data.xm=xms;
+			}
+			$.ajax({
+			url:url,
+			type :'post',
+			dataType :'json',
+			data:data,
+			timeout :180000,
+			success:function(data){
+				datas=data.data;
+				for(var i=0;i<datas.length;i++){
+					var item=datas[i];
+					item.gridId=i+1;
+				}
+				$('#xcgsTable').jsGrid({
+					width: 'calc(100% - 2px)',
+					height: 'calc(100% - 2px)',
+					editing: true,
+					sorting: true,
+					paging: false,
+					autoload: true,
+					data: datas,
+					fields: xcgsFields
+				});
+			}
+			});
+			
+		}
+		
+		//搜索
+		$("#select_xcsg").off('click').on('click',function(){
+			Hxcgs();
+		});
+		
+		
+		
+		
+		$(function () {
+			Hxcgs();
+			$('.addTimePeriod, .period').on('click', function () {
+				if ($(this).hasClass('addTimePeriod')) $(this).addClass('period').removeClass('addTimePeriod');
+				else if ($(this).hasClass('period')) $(this).addClass('addTimePeriod').removeClass('period');
+			});
+			$('#xcgs-wzxz').select2({
+				language: 'zh-CN',
+				width: '160',
+				minimumResultsForSearch: -1,
+				data: [
+					{id: '1', text: '违章性质1'},
+					{id: '2', text: '违章性质2'}
+				]
+			});
+			/* $('#xcgs-dialog-sglx select.form-control').select2({
+				language: 'zh-CN',
+				width: '168',
+				minimumResultsForSearch: -1,
+				data: [
+					{id: '1', text: '事故类别1'},
+					{id: '2', text: '事故类别2'}
+				]
+			}); */
+			$('#xcgs-reset').on('click', resetQueryConditions);
+			$('#xcgs-add').on('click', addxcgs);
+			$('#xcgs-dialog').on('hidden.bs.modal', function (e) {
+				$(this).find('input[type=text].form-control, textarea.form-control').val('');
+				$(this).find('select.form-control').val('').trigger('change');
+				$(this).find('div.form-control').text('');
+			});
+			$('#xcgsTable').jsGrid({
+				width: 'calc(100% - 2px)',
+				height: 'calc(100% - 2px)',
+				editing: true,
+				sorting: true,
+				paging: false,
+				autoload: true,
+				data: [],
+				fields: xcgsFields
+			});
+			$('.scrollbar-macosx').scrollbar();
+			
+			$.ajax({
+				url :basePath + "getSelectFindAllSglb",
+				type : 'post',
+				dataType: 'json',
+				timeout : 180000,
+				success:function(data){
+					var data=data.data;
+					var datas=new Array();
+					for(var i=0;i<data.length;i++){
+						datas.push({id:data[i].BID,text:data[i].SGLB})
+					}
+					
+					$('#xcgs-dialog-sglx select.form-control').select2({
+						language: 'zh-CN',
+						width: '168',
+						minimumResultsForSearch: -1,
+						data:datas 
+							/* [
+							{id: '1', text: '违章性质1'},
+							{id: '2', text: '违章性质2'}
+							] */
+					});
+					
+				}
+				
+			});
+			
+		})
+	})(jQuery)
+</script> -->
+</body>
+</html>

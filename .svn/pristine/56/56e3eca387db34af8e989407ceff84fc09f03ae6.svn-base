@@ -1,0 +1,295 @@
+
+var xxfb = (function($) {
+    var all = 0,re;
+    $(function () {
+    	
+    	$("#xxfb-datetimeStart").datetimepicker(dateDefaultOption);
+        $("#xxfb-datetimeEnd").datetimepicker(dateDefaultOption);
+        $("#xxfb_fbrq").datetimepicker(dateDefaultOption);
+        
+        var xxfbFields = [
+            {name: 'gridId', title: '序号', width: 60, align: 'center'},
+            { name: 'BT', title: '标题',  width: 140,align: 'center' },
+            {name: 'NR', title: '内容', width: 280,align: 'center' },
+            { name: 'FBRQ', title: '发布日期', width: 160 ,align: 'center'},
+            { name: 'LB', title: '类别', width: 120},
+            {name: 'caozuo', title: '操作',
+                itemTemplate: function (_,item) {
+                    var style = {marginRight: '4px'};
+                    return [
+                        $('<a>').addClass('btn btn-primary btn-xs').text('详情').css(style).on('click', function () {
+                            $('#xxfb-dialog').modal('show');
+                            $('#xxfb-dialog .modal-title').text('详情');
+                            $('#xxfb-dialog-form').addClass('ip-type-text').removeClass('ip-type-input');
+                            $('#tijiao').hide();
+                            $('#xxfb_bt').val(item.BT);
+                            $('#xxfb_nr').val(item.NR);
+                            $('#xxfb_fbrq').val(item.FBRQ);
+                            $('#xxfb_lb').val(item.LB).trigger('change');
+
+
+
+
+                        }),
+                        $('<a>').addClass('btn btn-primary btn-xs').text('修改').css(style).on('click', function () {
+                            $('#xxfb-dialog').modal('show');
+                            $('#xxfb-dialog .modal-title').text('修改');
+                            $('#xxfb-dialog-form').addClass('ip-type-input').removeClass('ip-type-text');
+                            $('#xxfb_bt').val(item.BT);
+                            $('#xxfb_nr').val(item.NR);
+                            $('#xxfb_fbrq').val(item.FBRQ);
+                            $('#xxfb_lb').val(item.LB).trigger('change');
+
+                            $("#tijiao").off('click').on('click',function () {
+                                jqxhr=$.ajax({
+                                    url:"../../jxxfb/getUpdatexxfb",
+                                    type:'post',
+                                    dataType:'json',
+                                    data:{"id":item.BID,
+                                        "bt":$('#xxfb_bt').val(),
+                                        "nr":nr=$('#xxfb_nr').val(),
+                                        "fbrq":fbrq=$('#xxfb_fbrq').val(),
+                                        "lb":$('#xxfb_lb').val()
+                                    },
+                                    timeout:180000,
+                                    success:function (data) {
+                                        if(data>0){
+                                            $('#xxfb-dialog').modal('hide');
+                                            hxx();
+                                           layer.msg('修改成功',{icon:1})
+                                        }else{
+                                            layer.msg('修改失败',{icon:2})
+                                        }
+                                    }
+                                });
+                            });
+                            $('#xxfb-dialog-pdrq input.form-control').datetimepicker(dateDefaultOption);
+                        }),
+                        $('<a>').addClass('btn btn-danger btn-xs').text('删除').on('click', function () {
+                            layer.confirm('确认删除吗？',
+                                {
+                                    btn: ['确认','取消'] //按钮
+                                }, function(){
+                                    jqxhr=$.ajax({
+                                        url :"../../jxxfb/getDeletexxfb",
+                                        type :'post',
+                                        dataType :'json',
+                                        data:{"id":item.BID},
+                                        success:function(data){
+                                            if(data>0){
+                                                hxx();
+                                                layer.msg('删除成功', {icon: 1});
+                                            }else{
+                                                layer.msg('删除失败', {icon: 2});
+                                            }
+                                        }
+                                    });
+
+                                }, function(){
+                                    layer.msg('已取消', {icon: 1});
+                                });
+
+
+
+                        })
+                    ];
+                }, width: 135}
+        ];
+        var resetQueryConditions = function (e) {
+            $('#xxfb-siji').val('');
+            $("#xxfb-cphm").select2('val','0')
+
+        };
+        var addxxfb = function (e) {
+            $('#xxfb-dialog').modal('show');
+            $('#xxfb-dialog .modal-title').text('添加');
+            $('#xxfb-dialog-form').addClass('ip-type-input').removeClass('ip-type-text');
+            $('#xxfb-dialog-save').show();
+            $('#xxfb_fbrq1 input.form-control').datetimepicker(dateDefaultOption);
+            $('#xxfb-dialog-shij input.form-control').datetimepicker(dateYearDefaultOption);
+
+            //添加
+            $("#tijiao").off('click').on('click',function () {
+                var bt = $("#xxfb_bt").val();
+                var nr = $("#xxfb_nr").val();
+                var fbrq = $("#xxfb_fbrq").val();
+                var lb = $("#xxfb_lb").val();
+                jqxhr=$.ajax({
+                    url:"../../jxxfb/getInsertxxfb",
+                    type:'post',
+                    dataType:'json',
+                    data:{'bt':bt,'nr':nr,'fbrq':fbrq,'lb':lb},
+                    Timeout:180000,
+                    success:function (data) {
+                        if(data>0){
+                            layer.msg('添加成功',{icon:1});
+                            $('#xxfb-dialog').modal('hide');
+                            hxx();
+                        }else{
+                            layer.msg('添加失败',{icon:2});
+                        }
+                    }
+                });
+            })
+
+        };
+
+
+
+
+
+        function hxx(){
+            $('#cxycfxTable').jsGrid({
+                width: '100%',
+                height: 'calc(100% - 55px)',
+                autoload: true,
+                paging: true,
+                pageLoading: true,
+                pageSize: 15,
+                pageIndex: 1,
+                controller: {
+                    loadData: function(filter) {
+                        var d = $.Deferred();
+                        var a = res(filter, function(item){
+                            d.resolve(item);
+                        })
+                        return d.promise();
+                    }
+                },
+
+                pagerContainer: null,
+                pageButtonCount: 5,
+                pagerFormat: "{first} {prev} {pages} {next} {last} {pageIndex} of {pageCount}",
+                pagePrevText: "上一页",
+                pageNextText: "下一页",
+                pageFirstText: "首页",
+                pageLastText: "末页",
+                pageNavigatorNextText: ">",
+                pageNavigatorPrevText: "<"
+            });
+        }
+
+        function res(filter, callback){
+            var startIndex = (filter.pageIndex - 1) * filter.pageSize;
+            jqxhr=$.ajax({
+                url:"../../jxxfb/find",
+                data:{
+                    "datetimeStart" : $("#xxfb-datetimeStart").val(),
+                    "datetimeEnd" : $("#xxfb-datetimeEnd").val(),
+                    "type" : $("#xxfb-type option:selected").html(),
+                    "pageIndex" : filter.pageIndex,
+                    "pageSize" : filter.pageSize
+                },
+                dataType: 'json'
+            }).done(function(json) {
+                var xxfbData = [];
+                console.log(json)
+                all = json.data[0].count;
+                re = json.data[0].datas;
+
+                for (var i = 0; i < re.length; i++) {
+
+                    var item = re[i];
+                    item.gridId = i + 1;
+                }
+                console.log(all)
+                if(json.code == 0){
+                    /*for(var i = 0; i< re.length ;i++){
+                        var rs={};
+                        rs.title =  re[i].BT;
+                        rs.content =  re[i].NR;
+                          rs.datetime =  re[i].FBRQ;
+                        rs.type =  re[i].LB;
+                        xxfbData.push(rs);
+                    }*/
+                    return callback({
+                        data: re,
+                        itemsCount: all
+                    });
+                }else{
+                }
+            }).fail(function() {
+//                alert("数据异常");
+            });
+        }
+
+
+
+
+        $(function () {
+        	$(".select2").select2({  
+			  	language: "zh-CN",  //设置 提示语言
+		        tags:true,  
+		        createTag:function (decorated, params) {  
+		            return null;  
+		        },  
+		    });
+            $('.addTimePeriod, .period').on('click', function () {
+                if ($(this).hasClass('addTimePeriod')) $(this).addClass('period').removeClass('addTimePeriod');
+                else if ($(this).hasClass('period')) $(this).addClass('addTimePeriod').removeClass('period');
+            });
+
+            $('#xxfb-reset').on('click', resetQueryConditions);
+            $('#xxfb-add').on('click', addxxfb);
+            $('#xxfb-dialog').on('hidden.bs.modal', function (e) {
+                $(this).find('input[type=text].form-control, textarea.form-control').val('');
+                $(this).find('select.form-control').val('').trigger('change');
+                $(this).find('div.form-control').text('');
+            });
+
+            $('#xxfb-type').select2({
+                language : 'zh-CN',
+                width : 160,
+                minimumResultsForSearch : -1,
+                allowClear: true,
+                data: [{ id: '1', text: '通知公告' },
+                    { id: '2', text: '文件资料' },
+                    { id: '3', text: '咨询反馈' }
+                ]
+            });
+
+            $('#xxfb_lb').select2({
+                language : 'zh-CN',
+                width : '100%',
+                minimumResultsForSearch : -1,
+                allowClear: true,
+                data: [
+                    {id: '通知公告', text: '通知公告'},
+                    {id: '文件资料', text: '文件资料'},
+                    {id: '咨询反馈', text: '咨询反馈'}
+                ]
+            });
+
+            $('#cxycfxTable').jsGrid({
+                width: 'calc(100% - 2px)',
+                height: 'calc(100% - 2px)',
+                editing: true,
+                sorting: true,
+                paging: false,
+                autoload: true,
+                data: [],
+                fields: xxfbFields
+            });
+            $('.scrollbar-macosx').scrollbar();
+
+            //查询
+            hxx();
+            $("#xxfb-select").on('click', function() {
+                hxx();
+            });
+
+            //导出
+            $("#xxfb_Export").on('click',function() {
+
+                layer.confirm('确认导出吗?',{btn:['确认','取消']
+                },function () {
+                    layer.msg('导出成功',{icon:1});
+                    window.open("../../jxxfb/getExportFindhxx?datetimeStart=" + $("#xxfb-datetimeStart").val() + "&datetimeEnd=" + $("#xxfb-datetimeEnd").val() + "&type=" + $("#xxfb-type option:selected").html())
+                },function () {
+                    layer.msg('已取消导出',{icon:2});
+                })
+
+            });
+        });
+    });
+})(jQuery);

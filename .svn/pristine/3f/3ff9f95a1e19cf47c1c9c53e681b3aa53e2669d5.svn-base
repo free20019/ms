@@ -1,0 +1,264 @@
+package com.erxi.ms.service;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.erxi.ms.config.DS;
+import com.erxi.ms.dao.ZpsjDao;
+import com.erxi.ms.result.FastJsonUtil;
+
+@Service
+public class ZpsjService {
+	@Autowired
+	ZpsjDao zpsjdao;
+	private Map<String, Object> map;
+	
+	 @DS("datasource1")
+	public String findxll(String field,String table) {
+		List<Map<String, Object>> list = zpsjdao.findxll(field,table);
+		return FastJsonUtil.toJSONString(list);
+	}
+	 @DS("datasource1")
+	public String findzpsjcx(String stime,String etime,String vehicle,String address, Integer pageIndex, Integer pageSize) {
+		 List<Map<String, Object>> list = zpsjdao.findzpsjcx(stime,etime,vehicle,address,pageIndex,pageSize);
+			int count = 0;
+			if( list!=null && list.size() >0){
+				count = Integer.parseInt(String.valueOf(list.get(0).get("COUNT")));
+			}
+			List<Map<String, Object>> lists = new ArrayList<Map<String,Object>>();
+			map = new HashMap<String, Object> ();
+			map.put("count", count);
+			map.put("datas",list);
+			lists.add(map);
+			return FastJsonUtil.toJSONString(lists);
+	}
+	 @DS("datasource1")
+	public List<Map<String, Object>> findzpsjcxdc(String stime,String etime,String vehicle,String address) {
+		List<Map<String, Object>> list = zpsjdao.findzpsjcxdc(stime,etime,vehicle,address);
+		return list;
+	} 
+	 
+	 @DS("datasource1")
+		public String findczlltj(String stime,String etime,String address, Integer pageIndex, Integer pageSize) {
+			 List<Map<String, Object>> list = zpsjdao.findczlltj(stime,etime,address,pageIndex,pageSize);
+				int count = 0;
+				if( list!=null && list.size() >0){
+					count = Integer.parseInt(String.valueOf(list.get(0).get("COUNT")));
+				}
+				List<Map<String, Object>> lists = new ArrayList<Map<String,Object>>();
+				map = new HashMap<String, Object> ();
+				map.put("count", count);
+				map.put("datas",list);
+				lists.add(map);
+				return FastJsonUtil.toJSONString(lists);
+		}
+	 @DS("datasource1")
+	public List<Map<String, Object>> findczlltjdc(String stime,String etime,String address) {
+		List<Map<String, Object>> list = zpsjdao.findczlltjdc(stime,etime,address);
+		return list;
+	} 
+	 @DS("datasource1")
+		public String findrlltj(String stime,String etime,String address, Integer pageIndex, Integer pageSize) {
+			 List<Map<String, Object>> list = zpsjdao.findrlltj(stime,etime,address,pageIndex,pageSize);
+				int count = 0;
+				if( list!=null && list.size() >0){
+					count = Integer.parseInt(String.valueOf(list.get(0).get("COUNT")));
+				}
+				List<Map<String, Object>> lists = new ArrayList<Map<String,Object>>();
+				map = new HashMap<String, Object> ();
+				map.put("count", count);
+				map.put("datas",list);
+				lists.add(map);
+				return FastJsonUtil.toJSONString(lists);
+		}
+	 @DS("datasource1")
+	public List<Map<String, Object>> findrlltjdc(String stime,String etime,String address) {
+		List<Map<String, Object>> list = zpsjdao.findrlltjdc(stime,etime,address);
+		return list;
+	} 
+	 @DS("datasource1")
+		public String findfdlltj(String time,String address, Integer pageIndex, Integer pageSize) {
+			 List<Map<String, Object>> list = zpsjdao.findfdlltj(time,address,pageIndex,pageSize);
+				int count = 0;
+				if( list!=null && list.size() >0){
+					count = Integer.parseInt(String.valueOf(list.get(0).get("COUNT")));
+					int c0 = 0,c1=0,c2=0,c3=0,c4=0,c5=0,c6=0,c7=0,c8=0,c9=0,c10=0,c11=0;
+					for(int i=0;i<list.size();i++){
+						if(list.get(i).get("c0")!=null){
+							c0 +=Integer.parseInt(String.valueOf(list.get(i).get("c0")));							
+						}else{
+							list.get(i).put("c0", 0);
+						}
+						if(list.get(i).get("c1")!=null){
+							c1 +=Integer.parseInt(String.valueOf(list.get(i).get("c1")));							
+						}else{
+							list.get(i).put("c1", 0);
+						}
+						if(list.get(i).get("c2")!=null){
+							c2 +=Integer.parseInt(String.valueOf(list.get(i).get("c2")));							
+						}else{
+							list.get(i).put("c2", 0);
+						}
+						if(list.get(i).get("c3")!=null){
+							c3 +=Integer.parseInt(String.valueOf(list.get(i).get("c3")));							
+						}else{
+							list.get(i).put("c3", 0);
+						}
+						if(list.get(i).get("c4")!=null){
+							c4 +=Integer.parseInt(String.valueOf(list.get(i).get("c4")));							
+						}else{
+							list.get(i).put("c4", 0);
+						}
+						if(list.get(i).get("c5")!=null){
+							c5 +=Integer.parseInt(String.valueOf(list.get(i).get("c5")));							
+						}else{
+							list.get(i).put("c5", 0);
+						}
+						if(list.get(i).get("c6")!=null){
+							c6 +=Integer.parseInt(String.valueOf(list.get(i).get("c6")));							
+						}else{
+							list.get(i).put("c6", 0);
+						}
+						if(list.get(i).get("c7")!=null){
+							c7 +=Integer.parseInt(String.valueOf(list.get(i).get("c7")));							
+						}else{
+							list.get(i).put("c7", 0);
+						}
+						if(list.get(i).get("c8")!=null){
+							c8 +=Integer.parseInt(String.valueOf(list.get(i).get("c8")));							
+						}else{
+							list.get(i).put("c8", 0);
+						}
+						if(list.get(i).get("c9")!=null){
+							c9 +=Integer.parseInt(String.valueOf(list.get(i).get("c9")));							
+						}else{
+							list.get(i).put("c9", 0);
+						}
+						if(list.get(i).get("c10")!=null){
+							c10 +=Integer.parseInt(String.valueOf(list.get(i).get("c10")));							
+						}else{
+							list.get(i).put("c10", 0);
+						}
+						if(list.get(i).get("c11")!=null){
+							c11 +=Integer.parseInt(String.valueOf(list.get(i).get("c11")));							
+						}else{
+							list.get(i).put("c11", 0);
+						}
+					}
+					Map<String, Object> map1 = new HashMap<String, Object> ();
+					map1.put("ADDRESS", "总量");
+					map1.put("c0", c0);
+					map1.put("c1", c1);
+					map1.put("c2", c2);
+					map1.put("c3", c3);
+					map1.put("c4", c4);
+					map1.put("c5", c5);
+					map1.put("c6", c6);
+					map1.put("c7", c7);
+					map1.put("c8", c8);
+					map1.put("c9", c9);
+					map1.put("c10", c10);
+					map1.put("c11", c11);
+					list.add(list.size(), map1);
+				}
+				List<Map<String, Object>> lists = new ArrayList<Map<String,Object>>();
+				map = new HashMap<String, Object> ();
+				map.put("count", count);
+				map.put("datas",list);
+				lists.add(map);
+				return FastJsonUtil.toJSONString(lists);
+		}
+	 @DS("datasource1")
+	public List<Map<String, Object>> findfdlltjdc(String time,String address) {
+		List<Map<String, Object>> list = zpsjdao.findfdlltjdc(time,address);
+		if( list!=null && list.size() >0){
+			int c0 = 0,c1=0,c2=0,c3=0,c4=0,c5=0,c6=0,c7=0,c8=0,c9=0,c10=0,c11=0;
+			for(int i=0;i<list.size();i++){
+				if(list.get(i).get("c0")!=null){
+					c0 +=Integer.parseInt(String.valueOf(list.get(i).get("c0")));							
+				}else{
+					list.get(i).put("c0", 0);
+				}
+				if(list.get(i).get("c1")!=null){
+					c1 +=Integer.parseInt(String.valueOf(list.get(i).get("c1")));							
+				}else{
+					list.get(i).put("c1", 0);
+				}
+				if(list.get(i).get("c2")!=null){
+					c2 +=Integer.parseInt(String.valueOf(list.get(i).get("c2")));							
+				}else{
+					list.get(i).put("c2", 0);
+				}
+				if(list.get(i).get("c3")!=null){
+					c3 +=Integer.parseInt(String.valueOf(list.get(i).get("c3")));							
+				}else{
+					list.get(i).put("c3", 0);
+				}
+				if(list.get(i).get("c4")!=null){
+					c4 +=Integer.parseInt(String.valueOf(list.get(i).get("c4")));							
+				}else{
+					list.get(i).put("c4", 0);
+				}
+				if(list.get(i).get("c5")!=null){
+					c5 +=Integer.parseInt(String.valueOf(list.get(i).get("c5")));							
+				}else{
+					list.get(i).put("c5", 0);
+				}
+				if(list.get(i).get("c6")!=null){
+					c6 +=Integer.parseInt(String.valueOf(list.get(i).get("c6")));							
+				}else{
+					list.get(i).put("c6", 0);
+				}
+				if(list.get(i).get("c7")!=null){
+					c7 +=Integer.parseInt(String.valueOf(list.get(i).get("c7")));							
+				}else{
+					list.get(i).put("c7", 0);
+				}
+				if(list.get(i).get("c8")!=null){
+					c8 +=Integer.parseInt(String.valueOf(list.get(i).get("c8")));							
+				}else{
+					list.get(i).put("c8", 0);
+				}
+				if(list.get(i).get("c9")!=null){
+					c9 +=Integer.parseInt(String.valueOf(list.get(i).get("c9")));							
+				}else{
+					list.get(i).put("c9", 0);
+				}
+				if(list.get(i).get("c10")!=null){
+					c10 +=Integer.parseInt(String.valueOf(list.get(i).get("c10")));							
+				}else{
+					list.get(i).put("c10", 0);
+				}
+				if(list.get(i).get("c11")!=null){
+					c11 +=Integer.parseInt(String.valueOf(list.get(i).get("c11")));							
+				}else{
+					list.get(i).put("c11", 0);
+				}
+			}
+			Map<String, Object> map1 = new HashMap<String, Object> ();
+			map1.put("ADDRESS", "总量");
+			map1.put("c0", c0);
+			map1.put("c1", c1);
+			map1.put("c2", c2);
+			map1.put("c3", c3);
+			map1.put("c4", c4);
+			map1.put("c5", c5);
+			map1.put("c6", c6);
+			map1.put("c7", c7);
+			map1.put("c8", c8);
+			map1.put("c9", c9);
+			map1.put("c10", c10);
+			map1.put("c11", c11);
+			list.add(list.size(), map1);
+		}
+		return list;
+	} 
+}

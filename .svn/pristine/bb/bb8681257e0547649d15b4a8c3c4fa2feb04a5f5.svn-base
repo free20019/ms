@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>报警管理</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.css">
+	<script src="../../resources/script/vue.min.js"></script>
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/My97DatePicker/WdatePicker.js"></script>
+	<style>
+		.panel-queryBar {padding: 10px 10px 0;}
+		.form-inline .form-group {margin-bottom: 10px;}
+		.dataListPanel.center {height: calc(100% - 50px);padding: 10px;}
+	</style>
+
+
+</head>
+<body>
+<div class="template-wrapper__full" id="root">
+	<div class="panel-queryBar">
+		<form class="form-inline">
+			<div class="form-group form-group-sm">
+				<div type="calendar">
+					<i class="iconfont icon-chepai" type="icon"></i>
+					<select id="allcp" class="select2" style="width: 150px;" data-placeholder="车牌号"><option/></select>
+					<!--<input type="text" class="form-control input-sm" v-model="query.cphm" placeholder="车牌号码">-->
+				</div>
+			</div>
+			<div class="form-group form-group-sm">
+				<div type="calendar">
+					<i class="glyphicon glyphicon-calendar" type="icon"></i>
+					<input type="text" class="form-control" id="bjgl-datetimeStart" :value="query.dateStart"  placeholder="开始时间">
+				</div>
+				<label > - </label>
+				<div type="calendar">
+					<i class="glyphicon glyphicon-calendar" type="icon"></i>
+					<input type="text" class="form-control" id="bjgl-datetimeEnd" :value="query.dateEnd" placeholder="结束时间">
+				</div>
+				<a class="btn btn-primary btn-sm" @click="handleQueryClick">查询</a>
+			</div>
+		</form>
+	</div>
+	<div class="dataListPanel center">
+		<div id="bjglTable"></div>
+	</div>
+</div>
+<script>
+(function (Vue, _, $) {
+	var vm = new Vue({
+		el: '#root',
+		data: function () {
+			return {
+				query: {
+					dateStart: '',
+					dateEnd: '',
+					cphm: '',
+					allcp:[]
+				},
+				table: {
+					fields: [
+						{name: 'ID', title: '序号', width: 40, align: 'center'},
+						{name: 'VEHICLE_NO', title: '车牌号码', width: 100, align: 'center'},
+						{name: 'COMP_NAME', title: '业户名称', width: 160, align: 'center'},
+						{name: 'DBTIME', title: '故障时间', width: 160, align: 'center'},
+						{name: 'LOW_VOLTAGE', title: '终端主电源欠压', itemTemplate: this.formatMalfunction,  width: 100, align: 'center'},
+						{name: 'NO_POWER', title: '终端主电源掉电', itemTemplate: this.formatMalfunction, width: 100, align: 'center'},
+						{name: 'NO_GPS', title: '无定位数据', itemTemplate: this.formatMalfunction, width: 100, align: 'center'},
+						{name: 'NO_UPLOAD', title: '无数据上传', itemTemplate: this.formatMalfunction, width: 100, align: 'center'}
+					]
+				}
+			}
+		},
+		created: function () {
+			var _this = this;
+			this.$nextTick(function () {
+				_this.getAllcp();
+			});
+		},
+		mounted: function () {
+			var _this = this;
+			this.$nextTick(function () {
+// 				console.log("mounted")
+				$('#bjgl-datetimeStart').datetimepicker(datetimeDefaultOption).on('change', function () {
+						_this.query.dateStart = $(this).val();
+				});
+				$('#bjgl-datetimeEnd').datetimepicker(datetimeDefaultOption).on('change', function () {
+					_this.query.dateEnd = $(this).val();
+				});
+				setTimeout(function(){
+					_this.query.dateStart=new Date(new Date().getTime()-3600*1000*2).Format('yyyy-MM-dd hh:mm:ss');
+					_this.query.dateEnd=new Date().Format('yyyy-MM-dd hh:mm:ss');
+					_this.getAlarmManageList();
+				},0)
+			});
+		},
+		methods: {
+			getAllcp: function(){
+				var _this = this;
+// 				console.log("getAllcp")
+				$(".select2").select2({  
+				  	language: "zh-CN",  //设置 提示语言
+			        tags:true,  
+			        createTag:function (decorated, params) {  
+			            return null;  
+			        },  
+			    });
+				jqxhr=$.ajax({
+					type: "POST",
+					url:"../../claq/qyveh",
+					data:{},
+					dataType: 'json',
+					timeout : 3600000,
+					success:function(json){
+						console.log(json);
+						var data= json.dataveh;
+						for (var i = 0; i < data.length; i++) {
+							data[i].id=data[i].PLATE_NUMBER;
+							data[i].text=data[i].PLATE_NUMBER;
+						}
+						var qb={};
+						qb.id='0';
+						qb.text='全部';
+						data.unshift(qb);
+						$('#allcp').select2({
+							data: data,
+							language:'zh-CN',
+		                    minimumInputLength: 3,
+							allowClear: true
+							});
+					}
+				});
+			},
+			getAlarmManageList:function(){
+// 				console.log("getAlarmManageList")
+// 				console.log(2)
+				var _this=this;
+				$('#bjglTable').jsGrid({
+					width: '100%',
+					height: '100%',
+					autoload: true,
+					pageSize: 15,
+					pageIndex: 1,
+					paging: true,
+					pageLoading: true,
+					controller: {
+	                    loadData: function(filter) {
+	                    	var d = $.Deferred();
+	                    	var a = _this.init(filter, function(item){
+	                    		d.resolve(item);
+	                    	})
+	                    	return d.promise();
+	                    }
+	                },
+					fields: _this.table.fields,
+					pagerContainer: null,
+				    pageButtonCount: 5,
+				    pagerFormat: "{first} {prev} {pages} {next} {last} {pageIndex} of {pageCount}",
+				    pagePrevText: "上一页",
+				    pageNextText: "下一页",
+				    pageFirstText: "第一页",
+				    pageLastText: "末页",
+				    pageNavigatorNextText: ">",
+				    pageNavigatorPrevText: "<"
+				});
+			},
+			init: function (filter,callback) {
+// 				console.log("init")
+				var startIndex = (filter.pageIndex - 1) * filter.pageSize;
+				var startTime = this.query.dateStart;
+				var endTime = this.query.dateEnd;
+// 				var cphm = '';
+				var cphm = $('#allcp').select2('data')[0].text ;
+				console.log(startTime,endTime,cphm);
+				jqxhr=$.ajax({
+					type: "POST",
+					url:"../../claq/bjgl",
+					data:{
+						stime:startTime,
+						etime:endTime,
+						cp:cphm,
+						"pageIndex":filter.pageIndex,
+	     				"pageSize":filter.pageSize
+					},
+					dataType: 'json',
+					timeout : 3600000,
+					success:function(json){
+						console.log(json);
+						var bjglData = [];
+	            		all = json.data[0].count;
+	     				re = json.data[0].datas;
+	         			if(json.code == 0){
+	         				for(var i = 0; i< re.length ;i++){
+	         					var rs={};
+	         					rs.ID = startIndex+i+1;
+	         					rs.VEHICLE_NO =  re[i].VEHICLE_NO;
+	         					rs.COMP_NAME =  re[i].COMP_NAME;
+	           					rs.DBTIME =  formatYYYYMMDDHHMISS(re[i].DBTIME);
+	         					rs.LOW_VOLTAGE =  re[i].LOW_VOLTAGE;
+	         					rs.NO_POWER =  re[i].NO_POWER;
+	         					rs.NO_GPS =  re[i].NO_GPS;
+	         					rs.NO_UPLOAD =  re[i].NO_UPLOAD;
+	         					bjglData.push(rs);
+	         				}
+	         				return callback({
+	                            data: bjglData,
+	                            itemsCount: all
+	                        });
+	         			}else{
+	        			}
+					}
+				});
+			},
+			handleQueryClick: function () {
+				this.getAlarmManageList();
+			},
+			formatMalfunction: function (val) {
+				if (val === 0) return $('<span class="malfunction-no">');
+				else if (val === 1) return $('<span class="malfunction-yes">');
+				else return '';
+			}
+		}
+	})
+})(Vue, _, jQuery);
+</script>
+</body>
+</html>

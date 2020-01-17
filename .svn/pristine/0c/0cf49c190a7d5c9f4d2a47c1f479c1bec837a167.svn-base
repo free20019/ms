@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>区域应急指令</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<link rel="stylesheet" href="../../resources/style/css/qyyjzl.css">
+	<script src="../../resources/script/vue.min.js"></script>
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<!-- UI组件库 1.0 -->
+	<script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+	<style>
+
+	</style>
+</head>
+<body>
+<div class="template-wrapper__full" id="root">
+	<div class="panel-top" :class="{fullScreen: mapFullScreen}">
+		<div class="dataListPanel">
+			<div class="panel-map" id="qyyjzlMap"></div>
+			<ul class="mapToolBar">
+				<li class="mapToolItem glyphicon glyphicon-plus" @click="handleDrawAreaClick"></li>
+			</ul>
+			<ul class="mapToolBar mapFullScreen">
+				<li class="mapToolItem iconfont" :class="[mapFullScreen ? 'icon-exit-fullscreen' : 'icon-fullscreen']" @click="handleMapFullScreenClick"></li>
+			</ul>
+		</div>
+	</div>
+	<div class="panel-body">
+		<div class="panel-queryBar">
+			<form class="form-inline">
+				<div class="form-group form-group-sm">
+					&emsp;区域内车辆&emsp;
+					<a class="btn btn-primary btn-sm" @click="handleSendMsgClick">消息发送</a>
+				</div>
+			</form>
+		</div>
+		<div class="dataListPanel center">
+			<div id="spglTable"></div>
+		</div>
+	</div>
+	<div class="modal" id="qyyjz-dialog" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title" v-text="dialog.title"></h4>
+				</div>
+				<div class="modal-body">
+					<form>
+						<div class="form-group">
+							<label>消息内容</label>
+							<textarea class="form-control" rows="6" v-model="dialog.form.center" placeholder="消息内容"></textarea>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+					<button type="button" class="btn btn-primary" @click="handleSandMsgSubmitClick">发送</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+</div>
+<script>
+	var polygonOption = {
+		strokeColor: "#000033",
+		strokeOpacity: 1,
+		strokeWeight: 2
+	};
+	(function (Vue, _, $) {
+		var vm = new Vue({
+			el: '#root',
+			data: function () {
+				return {
+					map: null,
+					mapFullScreen: false,
+					mouseTool: null,
+					darwarea:null,
+					table: {
+						fields: [
+							{name: 'gridId', title: '序号', width: 60, align: 'center'},
+							{name: 'name', title: '车牌号码', width: 100,align: 'center'},
+							{name: 'kzc', title: '空重车', width: 100, align: 'center'},
+							{name: 'speedtime', title: '定位时间', width: 180,align: 'center'}
+						],
+						data:[]
+					},
+					dialog: {
+						title: '消息发送',
+						form: {
+							center: ''
+						}
+					},
+					PointSimplifier:null,
+					pointSimplifierIns:null,
+					groupStyleMap:{},
+					zxcllist:[]
+				}
+			},
+			created: function () {
+				var _this = this;
+				this.$nextTick(function () {
+					_this.map = new AMap.Map('qyyjzlMap', {
+						zoom:11,
+						// center: [116.397428, 39.90923],
+						viewMode:'3D'
+					});
+
+					$('#spglTable').jsGrid({
+						width: '100%',
+						height: '100%',
+						editing: true,
+						sorting: true,
+						paging: false,
+						autoload: true,
+						data: [],
+						fields: _this.table.fields
+					});
+					$('#qyyjz-dialog').on('hidden.bs.modal', function (e) {
+						// do something...
+					});
+
+
+				});
+			},
+			mounted: function () {
+				var _this = this;
+				this.$nextTick(function () {
+					_this.init();
+					_this.setMap();
+				})
+			},
+			methods: {
+				init:function(){
+					var _this=this;
+					AMapUI.load(['ui/misc/PointSimplifier', 'lib/$'], function(PointSimplifier, $) {
+						if (!PointSimplifier.supportCanvas) {
+							alert('当前环境不支持 Canvas！');
+							return;
+						}
+						for (var i = 0; i < 8; i++) {
+							_this.groupStyleMap[(i+1)] = {
+								pointStyle: {
+									content: PointSimplifier.Render.Canvas.getImageContent("../../resources/images/car/z"+(i+1)+".png"),
+									width: 20,
+									height: 20,
+									offset: ['-50%', '-50%'],
+									fillStyle: null
+								}
+							};
+							_this.groupStyleMap[(i+9)] = {
+								pointStyle: {
+									content: PointSimplifier.Render.Canvas.getImageContent("../../resources/images/car/l"+(i+1)+".png"),
+									width: 20,
+									height: 20,
+									offset: ['-50%', '-50%'],
+									fillStyle: null
+								}
+							};
+							_this.groupStyleMap[(i+17)] = {
+								pointStyle: {
+									content: PointSimplifier.Render.Canvas.getImageContent("../../resources/images/car/k"+(i+1)+".png"),
+									width: 20,
+									height: 20,
+									offset: ['-50%', '-50%'],
+									fillStyle: null
+								}
+							};
+						}
+						_this.pointSimplifierIns = new PointSimplifier({
+							zIndex: 300,
+							map: _this.map, // 所属的地图实例
+							getPosition: function(item) {
+								return item.lnglat;
+							},
+							getHoverTitle: function(dataItem, idx) {
+// 								_this.remark(dataItem);
+// 				            	return null;
+							},
+							// 使用GroupStyleRender
+							renderConstructor: PointSimplifier.Render.Canvas.GroupStyleRender,
+							renderOptions: {
+								pointStyle: {
+									width: 5,
+									height: 5,
+									fillStyle:'#A2D0FA'
+								},
+								getGroupId: function(item, idx) {
+									return item.groupId;
+								},
+								groupStyleOptions: function(gid) {
+									return _this.groupStyleMap[gid];
+								}
+							}
+						});
+						_this.pointSimplifierIns.on("pointClick",function(e,p){
+							_this.remark(p.data);
+				    	});
+					});
+				},
+
+				setSandMsg: function(zds,nr) {
+					jqxhr=$.ajax({
+						type: "POST",
+						// url:"../../claq/sendmsg",
+						url:"http://115.236.61.148:9083/fzxpt/common/zlxf",
+						data:{
+							zds: zds.join(','),
+							nr: nr
+						},
+						dataType: 'json',
+						timeout : 3600000,
+						success:function(data){
+							console.log(data)
+							layer.msg(data.msg);
+							$('#qyyjz-dialog').modal('hide');
+						}
+					});
+				},
+				handleDrawAreaClick: function () {
+					// 地图画区域
+					var _this=this;
+					if(_this.darwarea){
+						_this.map.remove(_this.darwarea);
+						_this.darwarea=null;
+					}
+					_this.table.data=[];
+					if (_this.mouseTool != null) {
+						layer.msg('鼠标在地图上点击绘制多边形，单击右键或者双击左键结束绘制');
+					} else {
+
+						_this.map.plugin(["AMap.MouseTool"], function () {
+							_this.mouseTool = new AMap.MouseTool(_this.map);
+							_this.mouseTool.polygon(polygonOption);   //使用鼠标工具绘制多边形
+							layer.msg('鼠标在地图上点击绘制多边形，单击右键或者双击左键结束绘制');
+							AMap.event.addListener(_this.mouseTool, "draw", function (e) {
+								_this.darwarea = e.obj;
+								var ind=1;
+								for (var i = 0; i < _this.zxcllist.length; i++) {
+									if(_this.darwarea.contains(_this.zxcllist[i].lnglat)){
+										_this.zxcllist[i].gridId=ind++;
+										_this.table.data.push(_this.zxcllist[i]);
+									}
+								}
+								$('#spglTable').jsGrid({
+									data: _this.table.data
+								});
+								_this.mouseTool.close();
+								_this.mouseTool = null;
+							});
+						});
+					}
+				},
+				handleSendMsgClick: function () {
+					if(this.table.data.length==0){
+						layer.alert('当前没有可发送车辆！');
+					}else{
+						$('#qyyjz-dialog').modal('show');
+					}
+
+				},
+				handleSandMsgSubmitClick: function() {
+					var _this=this;
+					var center = _this.dialog.form.center;
+					if (center=='') {
+						layer.alert('请输入消息内容');
+						return false;
+					}
+					var mdtnos = [];
+					for (var i = 0; i < _this.table.data.length; i++) {
+						mdtnos.push(_this.table.data[i].mdt_no)
+					}
+					this.setSandMsg(mdtnos,center);
+				},
+				handleMapFullScreenClick() {
+					this.mapFullScreen = !this.mapFullScreen;
+				},
+				 markvehi:function(obj){
+					var _this=this;
+
+				_this.pointSimplifierIns.setData(obj);
+				_this.map.setZoomAndCenter(13,[120.209561,30.245278]);
+				},
+				setMap:function(){
+					var _this=this;
+					jqxhr=$.ajax({
+						type: "POST",
+						url:"../../claq/qyjk",
+						data:{},
+						dataType: 'json',
+						timeout : 3600000,
+						success:function(data){
+							// console.log(data)
+							if(data == null){
+// 								console.log("数据异常");
+							}else{
+								clgzvehilist = data.vehilist;
+								var all=[];
+
+								for (var i = 0; i < clgzvehilist.length; i++) {
+									var ve  = clgzvehilist[i];
+									var s = {};
+									s.lnglat = [ve.longi,ve.lati];
+									s.name = ve.vehino;
+									s.compname = ve.compname;
+									s.simka = ve.simka;
+									s.mdt_no=ve.mdt_no;
+									s.ownname = ve.ownname;
+									s.owntel = ve.owntel;
+									s.longi = ve.longi;
+									s.lati = ve.lati;
+									s.speed = ve.speed;
+									s.speedtime=ve.dateTime.split('.')[0];
+									s.heading = fxzh(ve.heading);
+									s.carStatus = ve.carStatus;
+									if (ve.onoffstate=="1") {
+										if (ve.carStatus=="0") {
+											s.kzc='空车';
+											s.groupId = _this.dirc("empty",ve.heading);
+											_this.zxcllist.push(s);
+										}else{
+											s.kzc='重车';
+											s.groupId = _this.dirc("busy",ve.heading);
+										}
+									}else{
+										s.kzc='离线';
+										s.groupId = _this.dirc("off",ve.heading);
+									}
+									all.push(s);
+								}
+								_this.markvehi(all);
+							}
+							setTimeout(function(){
+								_this.setMap();
+							},30000);
+						}
+					});
+				},
+				remark:function(obj){
+					var _this=this;
+					var inforWindow = new AMap.InfoWindow({
+					    offset:new AMap.Pixel(0,0)
+					});
+					var t = obj.carStatus == "1"?"":"(非精确)";
+					var txt = '<div class="mapInfo-body">'+
+									'<div class="mapInfo-title">'+obj.name+t+'</div>'+
+									'<div class="mapInfo-item" type="mapInfoItem" title="所属公司">'+obj.compname+'</div>'+
+									'<div class="mapInfo-item" type="mapInfoItem" title="SIM卡">'+obj.simka+'</div>'+
+									'<div class="mapInfo-item" type="mapInfoItem" title="终端号">'+obj.mdt_no+'</div>'+
+									'<div class="mapInfo-item" type="mapInfoItem" title="车辆所属人">'+obj.ownname+'</div>'+
+									'<div class="mapInfo-item" type="mapInfoItem" title="联系电话">'+obj.owntel+'</div>'+
+									'<div class="mapInfo-item" type="mapInfoItem" title="经度">'+obj.longi+'</div>'+
+									'<div class="mapInfo-item" type="mapInfoItem" title="纬度">'+obj.lati+'</div>'+
+									'<div class="mapInfo-item" type="mapInfoItem" title="速度">'+obj.speed+'</div>'+
+									'<div class="mapInfo-item" type="mapInfoItem" title="方向">'+obj.heading+'</div>'+
+									'<div class="mapInfo-item" type="mapInfoItem" title="状态">'+obj.kzc+'</div>'+
+									'<div class="mapInfo-item" type="mapInfoItem" title="GPS时间">'+obj.speedtime+'</div>'+
+								'</div>';
+					inforWindow.setContent(txt);
+					inforWindow.open(_this.map,new AMap.LngLat(obj.longi,obj.lati));
+				},
+				//判断方向
+				dirc:function(e,obj){
+			if(e == "busy"){
+				if(obj==0||obj==360){
+					return 1;
+				}else if(obj==90){
+					return 2;
+				}else if(obj==180){
+					return 3;
+				}else if(obj==270){
+					return 4;
+				}else if(obj>0&&obj<90){
+					return 5;
+				}else if(obj>90&&obj<180){
+					return 6;
+				}else if(obj>180&&obj<270){
+					return 7;
+				}else if(obj>270&&obj<360){
+					return 8;
+				}
+			}else if(e == "off"){
+				if(obj==0||obj==360){
+					return 9;
+				}else if(obj==90){
+					return 10;
+				}else if(obj==180){
+					return 11;
+				}else if(obj==270){
+					return 12;
+				}else if(obj>0&&obj<90){
+					return 13;
+				}else if(obj>90&&obj<180){
+					return 14;
+				}else if(obj>180&&obj<270){
+					return 15;
+				}else if(obj>270&&obj<360){
+					return 16;
+				}
+			}else{
+				if(obj==0||obj==360){
+					return 17;
+				}else if(obj==90){
+					return 18;
+				}else if(obj==180){
+					return 19;
+				}else if(obj==270){
+					return 20;
+				}else if(obj>0&&obj<90){
+					return 21;
+				}else if(obj>90&&obj<180){
+					return 22;
+				}else if(obj>180&&obj<270){
+					return 23;
+				}else if(obj>270&&obj<360){
+					return 24;
+				}
+			}
+		}
+			}
+		})
+	})(Vue, _, jQuery);
+</script>
+</body>
+</html>

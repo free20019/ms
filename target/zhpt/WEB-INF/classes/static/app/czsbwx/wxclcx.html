@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>维修车辆查询</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+	<script src="./wxclcx.js"></script>
+	<style>
+		.panel-queryBar {padding: 10px 10px 0;}
+		.form-inline .form-group {margin-bottom: 10px;}
+		.dataListPanel.center {height: calc(100% - 50px);padding: 10px;}
+		[type='calendar'] {width: auto;}
+
+		/* dialog style */
+		#wxcl-dialog-wfnr .form-control, #wxcl-dialog-jieg .form-control {width: 428px;height: 50px;}
+		.modal-body form {}
+		.modal-body .control-label {display: inline-block;width: 6em;text-align: right;}
+		.modal-body .form-control {display: inline-block;}
+		textarea.form-control {resize: none;}
+		.ip-type-input div.form-control, .ip-type-text input.form-control, .ip-type-text select.form-control, .ip-type-text textarea.form-control, .ip-type-text .select2.select2-container {display: none;}
+		.ip-type-text div.form-control {width: 168px;}
+	</style>
+</head>
+<body>
+<div class="panel-wrapper" style="position: relative;">
+	<div class="panel-layout" layout="center">
+		<div class="panel-queryBar">
+			<form class="form-inline">
+
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="iconfont icon-chepai" type="icon"></i>
+						<select class="form-control input-sm select2" id="wxcl-cphm" data-placeholder="车牌号" style="width:188px;">
+						</select>
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="iconfont icon-qiye" type="icon"></i>
+						<select class="form-control input-sm select2" id="wxcl-company"  data-placeholder="业户" style="width:188px;">
+						</select>
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="iconfont icon-yichangguanli" type="icon"></i>
+						<select class="form-control input-sm select2" id="wxcl-type" style="width:188px"  data-placeholder="异常状态"  onchange="findgz()">
+							<option value="" disabled selected>异常状态</option>
+							<option value="0">全部异常状态</option>
+							<option value="1">主机故障</option>
+							<option value="2">定位故障</option>
+							<option value="3">通信故障</option>
+							<option value="4">定位回传故障</option>
+							<option value="5">摄像头故障</option>
+							<option value="6">视频主机/存储故障</option>
+							<option value="7">计价器断开故障</option>
+							<option value="8">导航屏断开故障</option>
+							<option value="9">空车灯故障</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="iconfont icon-yichangguanli" type="icon"></i>
+						<select class="form-control input-sm select2" style="width:188px;" id="wxcl-terminal" data-placeholder="异常类型">
+<!-- 							<option value="" disabled selected>具体异常状态</option> -->
+						</select>
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="glyphicon glyphicon-calendar" type="icon"></i>
+						<input type="text" class="form-control input-sm" id="wxcl-stateTime" placeholder="开始时间">
+					</div>
+				</div>
+				<label>-</label>
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="glyphicon glyphicon-calendar" type="icon"></i>
+						<input type="text" class="form-control input-sm" id="wxcl-endTime" placeholder="结束时间">
+					</div>
+				</div>&nbsp;&nbsp;&nbsp;
+				<div class="form-group form-group-sm">
+<!-- 				<iframe src="wxclcx.html" autofull  hide frameborder="0"></iframe> -->
+					<a class="toolItem return glyphicon glyphicon-share-alt" href="wxjdcx.html" title="跳转到维修进度"></a>
+				</div><br/>
+				<div class="form-group form-group-sm">
+					<a class="btn btn-primary btn-sm" id="wxcl-select">车辆查询</a>
+<!-- 					<a class="btn btn-primary btn-sm" id="wxcl-reset">重置</a> -->
+					<a class="btn btn-primary btn-sm" id="wxcl-dc">导出</a>
+				</div>
+			</form>
+		</div>
+		<div class="dataListPanel center">
+			<div id="wxclTable"></div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="wxcl-dialog" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">服务违章</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-inline ip-type-input" id="wxcl-dialog-form">
+					<div class="form-group form-group-sm" id="wxcl-dialog-cphm">
+						<label class="control-label">车牌号:</label>
+						<input type="text" class="form-control" placeholder="车牌号">
+						<div type="text" class="form-control">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="wxcl-dialog-ximi">
+						<label class="control-label">姓名:</label>
+						<input type="text" class="form-control" placeholder="姓名">
+						<div type="text" class="form-control">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="wxcl-dialog-wfnr">
+						<label class="control-label">违反内容:</label>
+						<textarea type="text" class="form-control" placeholder="违反内容"></textarea>
+						<div type="textarea" class="form-control">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="wxcl-dialog-jieg">
+						<label class="control-label">结果:</label>
+						<textarea type="text" class="form-control" placeholder="结果"></textarea>
+						<div type="textarea" class="form-control">&nbsp;</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" id="wxcl-dialog-save">提交</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+</body>
+</html>

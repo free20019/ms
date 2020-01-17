@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>文明車輛</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+	<script src="../../resources/script/layer/layer.js""></script>
+	<script src="./wmcl.js"></script>
+	<style>
+		.panel-queryBar {padding: 10px 10px 0;}
+		.form-inline .form-group {margin-bottom: 10px;}
+		.dataListPanel.center {height: calc(100% - 50px);padding: 10px;}
+		[type='calendar'] {width: auto;}
+
+		/* dialog style */
+		#wmcl-dialog-beiz .form-control {width: 428px;height: 50px;}
+		.modal-body form {}
+		.modal-body .control-label {display: inline-block;width: 6em;text-align: right;}
+		.modal-body .form-control {display: inline-block;}
+		textarea.form-control {resize: none;}
+		.ip-type-input div.form-control, .ip-type-text input.form-control, .ip-type-text select.form-control, .ip-type-text textarea.form-control, .ip-type-text .select2.select2-container {display: none;}
+		.ip-type-text div.form-control {width: 168px;}
+	</style>
+
+</head>
+<body>
+<div class="panel-wrapper" style="position: relative;">
+	<div class="panel-layout" layout="center">
+		<div class="panel-queryBar">
+			<form class="form-inline">
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="iconfont icon-chepai" type="icon"></i>
+						<!--<input type="text" class="form-control input-sm" id="wmcl-cphm" placeholder="车牌号">-->
+						<select type="text" class="form-control input-sm select2" autocomplete="off" id="wmcl-cphm" data-placeholder="车牌号" style="width: 160px;"><option></option></select>
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="ip-iconfont ip-icon-user" type="icon"></i>
+						<input type="text" class="form-control input-sm" id="wmcl-rymc" placeholder="荣誉名称">
+					</div>
+					<a class="btn btn-primary btn-sm" id="wmcl_select">查询</a>
+<!-- 					<a class="btn btn-primary btn-sm" id="wmcl-reset">重置</a> -->
+					<a class="btn btn-primary btn-sm" id="wmcl-add">添加</a>
+					<a class="btn btn-primary btn-sm" id="wmcl-Export">导出</a>
+				</div>
+			</form>
+		</div>
+		<div class="dataListPanel center">
+			<div id="wmclTable"></div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="wmcl-dialog" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">服务违章</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-inline ip-type-input" id="wmcl-dialog-form">
+					<div class="form-group form-group-sm" id="wmcl-dialog-cphm">
+						<label class="control-label">车牌号:</label>
+						<input type="text" class="form-control" placeholder="车牌号" id="wmcl_cphm1">
+						<div type="text" class="form-control"  id="wmcl_cphm">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="wmcl-dialog-pdrq">
+						<label class="control-label">判定日期:</label>
+						<input type="text" class="form-control" placeholder="判定日期" id="wmcl_pdrq1">
+						<div type="text" class="form-control" id="wmcl_pdrq">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="wmcl-dialog-nife">
+						<label class="control-label">年份:</label>
+						<input type="text" class="form-control" placeholder="年份" id="wmcl_nf1">
+						<div type="text" class="form-control" id="wmcl_nf">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="wmcl-dialog-rymc">
+						<label class="control-label">荣誉名称:</label>
+						<input type="text" class="form-control" placeholder="荣誉名称" id="wmcl_rymc1">
+						<div type="text" class="form-control" id="wmcl_rymc">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="wmcl-dialog-jlje">
+						<label class="control-label">星级情况:</label>
+						<input type="text" class="form-control" placeholder="星级情况" id="wmcl_xjqk1">
+						<div type="text" class="form-control" id="wmcl_xjqk">&nbsp;</div>
+					</div>
+					<div class="form-group form-group-sm" id="wmcl-dialog-beiz">
+						<label class="control-label">备注:</label>
+						<textarea class="form-control" placeholder="备注" id="wmcl_bz1"></textarea>
+						<div type="text" class="form-control" id="wmcl_bz">&nbsp;</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" id="wmcl-dialog-save">提交</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!-- <script>
+	(function ($) {
+		var wmclFields = [
+			//{name: 'BID', title: '编号', width: 120},
+			{name: 'CPH', title: '车牌号', width: 120},
+			{name: 'PDRQ', title: '判定日期', width: 120},
+			{name: 'NF', title: '年份', width: 150},
+			{name: 'RYMC', title: '荣誉名称', width: 250},
+			{name: 'XJQK', title: '星级情况', width: 120},
+			{name: 'BZ', title: '备注', width: 120},
+			{name: 'caozuo', title: '操作',
+				itemTemplate: function (_,item) {
+					var style = {marginRight: '4px'};
+					return [
+						$('<a>').addClass('btn btn-primary btn-xs').text('详情').css(style).on('click', function () {
+							$('#wmcl-dialog').modal('show');
+							$('#wmcl-dialog .modal-title').text('详情');
+							$('#wmcl-dialog-form').addClass('ip-type-text').removeClass('ip-type-input');
+							$('#wmcl-dialog-save').hide();
+							$("#wmcl_cphm").text(item.CPH);
+							$("#wmcl_pdrq").text(item.PDRQ);
+							$("#wmcl_nf").text(item.NF);
+							$("#wmcl_rymc").text(item.RYMC);
+							$("#wmcl_xjqk").text(item.XJQK);
+							$("#wmcl_bz").text(item.BZ);
+						}),
+						$('<a>').addClass('btn btn-primary btn-xs').text('修改').css(style).on('click', function () {
+							$('#wmcl-dialog').modal('show');
+							$('#wmcl-dialog .modal-title').text('修改');
+							$('#wmcl-dialog-form').addClass('ip-type-input').removeClass('ip-type-text');
+							$('#wmcl-dialog-save').show();
+							$('#wmcl-dialog-pdrq input.form-control').datetimepicker(dateDefaultOption);
+							$("#wmcl_cphm1").val(item.CPH);
+							$("#wmcl_pdrq1").val(item.PDRQ);
+							$("#wmcl_nf1").val(item.NF);
+							$("#wmcl_rymc1").val(item.RYMC);
+							$("#wmcl_xjqk1").val(item.XJQK);
+							$("#wmcl_bz1").val(item.BZ);
+							
+							
+							$("#wmcl-dialog-save").off('click').on('click' ,function(){
+								$.ajax({
+									 url :basePath + "getUpdatewmcl",
+										type : 'post',
+										dataType: 'json',
+									 data:{"bid":item.BID,"cph":$("#wmcl_cphm1").val(),"pdrq":$("#wmcl_pdrq1").val(),"nf":$("#wmcl_nf1").val(),
+											"rymc":$("#wmcl_rymc1").val(),"xjqk":$("#wmcl_xjqk1").val(),"bz":$("#wmcl_bz1").val()},
+										timeout : 180000,
+										success:function(data){
+											console.log(data);
+											if(data>0){
+												$('#wmcl-dialog').modal('hide');
+												findUser();
+											}
+										
+										}
+									 
+								 });
+							})
+							
+							
+							
+						}),
+						$('<a>').addClass('btn btn-danger btn-xs').text('删除').on('click', function () {
+							$.ajax({
+								url: basePath + "getDeletewmc",
+								type:'post',
+								dataType:'json',
+								data:{"bid":item.BID},
+								success:function(data){
+									if(data>0){
+										findUser();
+									}
+								}
+								
+							});
+							
+						})
+						
+					];
+				}, width: 135}
+		];
+		/* var wmclData = [
+			{cphm: '车牌号1', pdrq: '判定日期1', nife: '年份1', rymc: '荣誉名称1', xjqk: '星级情况1', beiz: '备注1'},
+			{cphm: '车牌号2', pdrq: '判定日期2', nife: '年份2', rymc: '荣誉名称2', xjqk: '星级情况2', beiz: '备注2'},
+			{cphm: '车牌号3', pdrq: '判定日期3', nife: '年份3', rymc: '荣誉名称3', xjqk: '星级情况3', beiz: '备注3'},
+			{cphm: '车牌号4', pdrq: '判定日期4', nife: '年份4', rymc: '荣誉名称4', xjqk: '星级情况4', beiz: '备注4'},
+			{cphm: '车牌号5', pdrq: '判定日期5', nife: '年份5', rymc: '荣誉名称5', xjqk: '星级情况5', beiz: '备注5'}
+		]; */
+		var resetQueryConditions = function (e) {
+			$('.panel-queryBar .form-control').val('');
+		};
+		var addwmcl = function (e) {
+			$('#wmcl-dialog').modal('show');
+			$('#wmcl-dialog .modal-title').text('添加');
+			$('#wmcl-dialog-form').addClass('ip-type-input').removeClass('ip-type-text');
+			$('#wmcl-dialog-save').show();
+			$('#wmcl-dialog-pdrq input.form-control').datetimepicker(dateDefaultOption);
+			$('#wmcl-dialog-nife input.form-control').datetimepicker(dateYearDefaultOption);
+			
+			
+			//添加
+			$("#wmcl-dialog-save").off('click').on('click',function(){
+				var cph=$("#wmcl_cphm1").val();
+				var pdrq=$("#wmcl_pdrq1").val();
+				var nf=$("#wmcl_nf1").val();
+				var rymc=$("#wmcl_rymc1").val();
+				var xjqk=$("#wmcl_xjqk1").val();
+				var bz=$("#wmcl_bz1").val();
+				
+				$.ajax({
+					url : basePath + "getInsertwmcl",
+					type : 'post',
+					dataType : 'json',
+					data:{"cph":cph,"pdrq":pdrq,"nf":nf,"rymc":rymc,"xjqk":xjqk,"bz":bz},
+					timeout:180000,
+					success:function(data){
+						$('#wmcl-dialog').modal('hide');
+						findUser();
+					}
+				});
+			});
+			
+		};
+		
+		function findUser(){
+			
+			//查询
+			
+			 var url = basePath;
+			    var data = {};
+			    var cphh = $("#wmcl-cphm").val();
+			    var rymcc = $("#wmcl-rymc").val();
+		    	console.info('findUser:', cphh, rymcc)
+			    if (!cphh && !rymcc) {
+			        url += 'getwmcl';
+	            } else {
+			        url += 'getSelectName';
+			        data.cph=cphh;
+			        data.rymc=rymcc;
+	            }
+			
+		    $.ajax({
+				url : url,
+				type : 'post',
+				data : data,
+				dataType: 'json',
+				timeout : 180000,
+				success:function(data){
+					var datas = data.data;
+					for(var i=0; i<datas.length; i++){
+						var item = datas[i];
+						item.gridId=i+1;
+					}
+// 					$('#yhglTable').jsGrid({
+// 						width: '100%',
+// 						height: 'calc(100% - 45px)',
+// 						editing: true,
+// 						sorting: true,
+// 						paging: true,
+// 						autoload: true,
+// 						pageIndex: 1,
+// 					    pageSize: 20,
+// 					    pageButtonCount: 15,
+// 					    pagerFormat: "{first} {prev} {pages} {next} {last}    {pageIndex} / {pageCount}",
+// 					    pagePrevText: "上一页",
+// 					    pageNextText: "下一页",
+// 					    pageFirstText: "首页",
+// 					    pageLastText: "尾页",
+// 					    data: datas,
+// 						fields: yhglFields
+// 					});
+					$('#wmclTable').jsGrid({
+						width: 'calc(100% - 2px)',
+						height: 'calc(100% - 2px)',
+						editing: true,
+						sorting: true,
+						paging: false,
+						autoload: true,
+						data: datas,
+						fields: wmclFields
+					});
+				},
+				error:function(data){
+				}
+			});
+		};
+		
+		$("#bljl_select").click(function(){
+			findUser();
+		});
+		
+		
+		$(function () {
+			findUser();
+			$('.addTimePeriod, .period').on('click', function () {
+				if ($(this).hasClass('addTimePeriod')) $(this).addClass('period').removeClass('addTimePeriod');
+				else if ($(this).hasClass('period')) $(this).addClass('addTimePeriod').removeClass('period');
+			});
+			$('#wmcl-wzxz').select2({
+				language: 'zh-CN',
+				width: '160',
+				minimumResultsForSearch: -1,
+				data: [
+					{id: '1', text: '违章性质1'},
+					{id: '2', text: '违章性质2'}
+				]
+			});
+			$('#wmcl-reset').on('click', resetQueryConditions);
+			$('#wmcl-add').on('click', addwmcl);
+			$('#wmcl-dialog').on('hidden.bs.modal', function (e) {
+				$(this).find('input[type=text].form-control, textarea.form-control').val('');
+				$(this).find('select.form-control').val('').trigger('change');
+				$(this).find('div.form-control').text('');
+			});
+			$('#wmclTable').jsGrid({
+				width: 'calc(100% - 2px)',
+				height: 'calc(100% - 2px)',
+				editing: true,
+				sorting: true,
+				paging: false,
+				autoload: true,
+				data: [],
+				fields: wmclFields
+			});
+			$('.scrollbar-macosx').scrollbar();
+		})
+	})(jQuery)
+</script> -->
+</body>
+</html>

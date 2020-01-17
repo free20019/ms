@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>出租乘运分析</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+	<style>
+		#czckfxMap {
+			height: 100%;
+			border: 1px solid #c4d4fb;
+			border-radius: 10px;
+		}
+	</style>
+</head>
+<body>
+<div class="panel-wrapper" style="position: relative;">
+	<div class="panel-layout" layout="left">
+		<div class="dataListPanel">
+			<div class="ip-tabWrapper" type="tab">
+				<div class="ip-tabPanelItem" id="czckfx-rmlyd" title="热门来源的">
+					<div type="calendar" style="width: calc(100% - 20px); margin: 10px;">
+						<i class="glyphicon glyphicon-calendar" type="icon"></i>
+						<input type="text" class="form-control input-sm" id="czckfx-lydDatetimeStart" placeholder="选着日期">
+					</div>
+					<div class="scrollbar-macosx">
+						<ul class="list" type="rankingList">
+							<li class="headerItem"><span class="col" type="ranking"></span><span class="col" type="area">热门地区</span><span class="col" type="proportion">比例</span></li>
+							<li class="listItem"><span class="col" type="ranking" number="1"></span><span class="col" type="area">西湖文化广场</span><span class="col" type="proportion">7.34</span></li>
+							<li class="listItem"><span class="col" type="ranking" number="2"></span><span class="col" type="area">文三路东部软件园</span><span class="col" type="proportion">6.2</span></li>
+							<li class="listItem"><span class="col" type="ranking" number="3"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li>
+							<li class="listItem"><span class="col" type="ranking" number="4"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li>
+							<li class="listItem"><span class="col" type="ranking" number="5"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li>
+							<li class="listItem"><span class="col" type="ranking" number="6"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li>
+							<li class="listItem"><span class="col" type="ranking" number="7"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li>
+							<li class="listItem"><span class="col" type="ranking" number="8"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li>
+							<li class="listItem"><span class="col" type="ranking" number="9"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li>
+						</ul>
+					</div>
+				</div>
+				<div class="ip-tabPanelItem" id="czckfx-rmmdd" title="热门目的地">
+					<div type="calendar" style="width: calc(100% - 20px); margin: 10px;">
+						<i class="glyphicon glyphicon-calendar" type="icon"></i>
+						<input type="text" class="form-control input-sm" id="czckfx-mddDatetimeStart" placeholder="选着日期">
+					</div>
+					<div class="scrollbar-macosx">
+						<ul class="list" type="rankingList">
+							<li class="headerItem"><span class="col" type="ranking"></span><span class="col" type="area">热门地区</span><span class="col" type="proportion">比例</span></li>
+							<li class="listItem"><span class="col" type="ranking" number="1"></span><span class="col" type="area">西湖文化广场</span><span class="col" type="proportion">7.34</span></li>
+							<li class="listItem"><span class="col" type="ranking" number="2"></span><span class="col" type="area">文三路东部软件园</span><span class="col" type="proportion">6.2</span></li>
+							<li class="listItem"><span class="col" type="ranking" number="3"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li>
+							<li class="listItem"><span class="col" type="ranking" number="4"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li>
+							<li class="listItem"><span class="col" type="ranking" number="5"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li>
+							<li class="listItem"><span class="col" type="ranking" number="6"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li>
+							<li class="listItem"><span class="col" type="ranking" number="7"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li>
+							<li class="listItem"><span class="col" type="ranking" number="8"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li>
+							<li class="listItem"><span class="col" type="ranking" number="9"></span><span class="col" type="area">朝晖一区</span><span class="col" type="proportion">5.1</span></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="panel-layout" layout="center">
+		<div id="czckfxMap"></div>
+	</div>
+</div>
+<script>
+	(function ($) {
+		$(function () {
+			$('.ip-tabWrapper').Tab();
+			$('#czckfx-lydDatetimeStart').datetimepicker(dateDefaultOption);
+			$('#czckfx-mddDatetimeStart').datetimepicker(dateDefaultOption);
+			$('.scrollbar-macosx').scrollbar();
+			var map = new AMap.Map('czckfxMap', {
+				zoom:11,
+				viewMode:'3D'
+			});
+		})
+	})(jQuery)
+</script>
+</body>
+</html>

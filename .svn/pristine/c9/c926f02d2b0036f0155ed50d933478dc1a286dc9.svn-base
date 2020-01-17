@@ -1,0 +1,89 @@
+package com.erxi.ms.controller;
+
+import ch.qos.logback.core.net.SyslogOutputStream;
+import com.erxi.ms.result.DownloadAct;
+import com.erxi.ms.result.Result;
+import com.erxi.ms.service.YdcsdqxjlctjService;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @ClassName 单车速度曲线及车辆统计
+ * @dOscription TODO
+ * @Author HXX
+ * @Date 2018/11/13 15:36
+ * @Version 1.0
+ **/
+
+
+@RestController
+public class YdcsdqxjlctjAction {
+    //导出的类
+    private DownloadAct downloadAct = new DownloadAct();
+
+    @Autowired
+    private YdcsdqxjlctjService ydcsdqxjlctjService;
+
+
+
+
+    @RequestMapping("/getYdcsdqxjlctjFindAllsName")
+    public Result<List<Map<String, Object>>> getYdcsdqxjlctjFindAllaName(@Param("cph") String cph) {
+
+        String car="%"+cph+"%";
+
+        Result<List<Map<String, Object>>> result = ydcsdqxjlctjService.getYdcsdqxjlctjServicesName(car);
+
+        System.out.println("Cotroller" + result);
+        return result;
+    }
+
+
+
+
+
+    @RequestMapping("/getYdcsdqxjlctjFindAlls")
+    public Result<List<Map<String, Object>>> getYdcsdqxjlctjFindAlla(@Param("kssj") String kssj, @Param("jssj") String jssj, @Param("cph")
+            String cph, @Param("csz") String csz
+//            @Param("pageIndex") Integer pageIndex, @Param("pageSize") Integer pageSize
+            ) {
+//       String car= cph.replaceAll("guolv","");
+        Result<List<Map<String, Object>>> result = ydcsdqxjlctjService.getYdcsdqxjlctjServices(kssj, jssj, cph, csz
+//        		pageIndex,pageSize
+        		);
+        return result;
+    }
+
+
+
+
+
+    /***
+     * Export
+     * @return
+     */
+    @RequestMapping("/getYdcsdqxjlctjExpport")
+    public String getYdcsdqxjlctjExport(HttpServletRequest request, @Param("kssj") String kssj, @Param("jssj") String jssj, @Param("gs") String gs, @Param("cph")
+            String cph, @Param("csz") String csz, HttpServletResponse response) throws IOException {
+
+
+        String export = ydcsdqxjlctjService.getYdcsdqxjlctjServicesExport(kssj, jssj, cph, csz);
+        String a[] = {"车号", "经度", "维度", "速度", "方向", "时间"};
+        String b[] = {"VEHICLE_NUM", "LONGI", "LATI", "SPEED", "DIRECTION", "TIME"};
+        String gzb = "单车速度曲线及车辆统计";
+
+        List<Map<String, Object>> list = downloadAct.str2list(export);
+
+        downloadAct.download(request, response, a, b, gzb, list);
+
+        return null;
+    }
+}

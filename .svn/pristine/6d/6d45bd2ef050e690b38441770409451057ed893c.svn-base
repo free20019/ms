@@ -1,0 +1,384 @@
+var rygl = (function($) {
+	var all = 0,re;
+	$(function () {
+		
+		var ryglFields = [
+            {name: 'gridId', title: '序号', width: 60, align: 'center'},
+		      			{name: 'CPH', title: '车牌号', width: 120},
+		      			{name: 'SJXM', title: '司机姓名', width: 120},
+		      			{name: 'PDRQ', title: '判定日期', width: 120},
+		      			{name: 'RYMC', title: '荣誉名称', width: 250},
+		      			{name: 'NF', title: '年份', width: 150},
+		      			{name: 'JLJE', title: '奖励金额', width: 120},
+		      			{name: 'XJ', title: '星级', width: 120},
+		      			{name: 'BZ', title: '备注', width: 120},
+		      			{name: 'caozuo', title: '操作',
+		      				itemTemplate: function (_,item) {
+		      					var style = {marginRight: '4px'};
+		      					return [
+		      						$('<a>').addClass('btn btn-primary btn-xs').text('详情').css(style).on('click', function () {
+		      							$('#rygl-dialog').modal('show');
+		      							$('#rygl-dialog .modal-title').text('详情');
+		      							$('#rygl-dialog-form').addClass('ip-type-text').removeClass('ip-type-input');
+		      							$('#rygl-dialog-save').hide();
+		      							$("#rygl_cph").text(item.CPH);
+		      							$("#rygl_sjxm").text(item.SJXM);
+		      							$("#rygl_pdrq").text(item.PDRQ);
+		      							$("#rygl_rymc").text(item.RYMC);
+		      							$("#rygl_nf").text(item.NF);
+		      							$("#rygl_jlje").text(item.JLJE);
+		      							$("#rygl_xj").text(item.XJ);
+		      							$("#rygl_bz").text(item.BZ);
+		      							
+		      						}),
+		      						$('<a>').addClass('btn btn-primary btn-xs').text('修改').css(style).on('click', function () {
+		      							$('#rygl-dialog').modal('show');
+		      							$('#rygl-dialog .modal-title').text('修改');
+		      							$('#rygl-dialog-form').addClass('ip-type-input').removeClass('ip-type-text');
+		      							$('#rygl-dialog-save').show();
+		      							
+		      							$("#rygl_cph1").val(item.CPH);
+		      							$("#rygl_sjxm1").val(item.SJXM);
+		      							$("#rygl_pdrq1").val(item.PDRQ);
+		      							$("#rygl_rymc1").val(item.RYMC);
+		      							$("#rygl_nf1").val(item.NF);
+		      							$("#rygl_jlje1").val(item.JLJE);
+		      							$("#rygl_xj1").val(item.XJ);
+		      							$("#rygl_bz1").val(item.BZ);
+		      							$('#rygl-dialog-pdrq input.form-control').datetimepicker(dateDefaultOption);
+		      							
+		      							 $("#rygl-dialog-save").off('click').on('click',function(){
+		      								jqxhr=$.ajax({
+		      									url:basePath + "getUpdaterygl",
+		      										type:'post',
+		      										dataType:'json',
+		      										data:{
+		      											"bid":item.BID,"cph":$("#rygl_cph1").val(),"sjxm":$("#rygl_sjxm1").val(),"pdrq":$("#rygl_pdrq1").val(),"rymc":$("#rygl_rymc1").val(),
+		      											"nf":$("#rygl_nf1").val(),"jlje":$("#rygl_jlje1").val(),"xj":$("#rygl_xj1").val(),"bz":$("#rygl_bz1").val(),
+		      										},
+		      										timeout:180000,
+		      										success:function(data){
+		      											if(data>0){
+		      												$('#rygl-dialog').modal('hide');
+		      												layer.msg('修改成功',{icon: 1})
+		      												hxx();
+		      											}
+		      											
+		      										}
+		      								});
+		      							}); 
+		      							
+		      							
+		      							
+		      						}),
+		      						$('<a>').addClass('btn btn-danger btn-xs').text('删除').on('click', function () {
+		      							
+		      							layer.confirm('确认删除吗 ？', {btn: ['确认','取消']
+		      							},function(){
+		      								
+		      								jqxhr=$.ajax({
+			      								url: basePath + "geDeletetryg",
+			      								type: 'post',
+			      								dataType: 'json',
+			      								data:{"bid":item.BID},
+			      								success:function(data){
+			      									if(data>0){
+			      										layer.msg('删除成功',{icon: 1})
+			      										hxx();
+			      									}else{
+			      										layer.msg('删除失败',{icon: 2})
+			      									}
+			      								}
+			      							});
+		      							},function(){
+		      								layer.msg('已取消删除',{icon: 2})
+		      							})
+
+		      						})
+		      					];
+		      				}, width: 135}
+		      		];
+		      		/* var ryglData = [
+		      			{cphm: '车牌号1', pdrq: '判定日期1', nife: '年份1', rymc: '荣誉名称1', xjqk: '星级情况1', beiz: '备注1'},
+		      			{cphm: '车牌号2', pdrq: '判定日期2', nife: '年份2', rymc: '荣誉名称2', xjqk: '星级情况2', beiz: '备注2'},
+		      			{cphm: '车牌号3', pdrq: '判定日期3', nife: '年份3', rymc: '荣誉名称3', xjqk: '星级情况3', beiz: '备注3'},
+		      			{cphm: '车牌号4', pdrq: '判定日期4', nife: '年份4', rymc: '荣誉名称4', xjqk: '星级情况4', beiz: '备注4'},
+		      			{cphm: '车牌号5', pdrq: '判定日期5', nife: '年份5', rymc: '荣誉名称5', xjqk: '星级情况5', beiz: '备注5'}
+		      		]; */
+		      		var resetQueryConditions = function (e) {
+		      			$('#rygl-siji').val('');
+		      			$('#rygl-cphm').select2('val','0');
+
+		      		};
+		      		var addrygl = function (e) {
+		      			$('#rygl-dialog').modal('show');
+		      			$('#rygl-dialog .modal-title').text('添加');
+		      			$('#rygl-dialog-form').addClass('ip-type-input').removeClass('ip-type-text');
+		      			$('#rygl-dialog-save').show();
+		      			$('#rygl-dialog-pdrq input.form-control').datetimepicker(dateDefaultOption);
+		      			$('#rygl-dialog-nife input.form-control').datetimepicker(dateYearDefaultOption);
+
+		      			
+		      			$("#rygl-dialog-save").off('click').on('click',function(){
+		      				
+		      				var cph=$("#rygl_cph1").val();
+		      				var sjxm=$("#rygl_sjxm1").val();
+		      				var pdrq=$("#rygl_pdrq1").val();
+		      				var rymc=$("#rygl_rymc1").val();
+		      				var nf=$("#rygl_nf1").val();
+		      				var jlje=$("#rygl_jlje1").val();
+		      				var xj=$("#rygl_xj1").val();
+		      				var bz=$("#rygl_bz1").val();
+		      				
+		      				jqxhr=$.ajax({
+		      					url : basePath + "getInserttryg",
+		      					type : 'post',
+		      					dataType : 'json',
+		      					data:{"cph":cph, "sjxm":sjxm, "pdrq":pdrq, "rymc":rymc, "nf":nf, "jlje":jlje, "xj":xj, "bz":bz},
+		      					timeout:180000,
+		      					success:function(data){
+		      						if(data>0){
+		      							layer.msg('添加成功',{icon:1})
+                                        $('#rygl-dialog').modal('hide');
+                                        hxx();
+
+									}else{
+                                        layer.msg('添加失败',{icon:1})
+									}
+		      					}
+		      				});
+		      				
+		      				
+		      			});
+		      		};
+		      		
+
+		      		/*function hxx(){
+		      			var index =layer.msg('小妹正在努力加载',{
+		      				icon: 16
+		      				,shade: 0.01,
+		      				time: 6000
+		      			});
+		      			var url =basePath;
+		      			var data={};
+		      			var cphm=$("#rygl_cphm").val();
+		      			var siji=$("#rygl_siji").val();
+		      			if(!cphm && !siji){
+		      				url+="getrygl";
+		      			}else{
+		      				url+="geSeleceNametryg";
+		      				data.cph=cphm;
+		      				data.sj=siji;
+		      				
+		      			}
+		      			
+		      			
+		      		    jqxhr=$.ajax({
+		      				url : url,
+		      				type : 'post',
+		      				dataType: 'json',
+		      				data:data,
+		      				timeout : 180000,
+		      				success:function(data){
+		      					var datas = data.data;
+		      					for(var i=0; i<datas.length; i++){
+		      						var item = datas[i];
+		      						item.gridId=i+1;
+		      					}
+		      					$('#ryglTable').jsGrid({
+		      						width: 'calc(100% - 2px)',
+		      						height: 'calc(100% - 2px)',
+		      						editing: true,
+		      						sorting: true,
+		      						paging: false,
+		      						autoload: true,
+		      						data: datas,
+		      						fields: ryglFields
+		      					});
+		      				},
+		      				error:function(data){
+		      				}
+		      			});
+		      		};*/
+		      		
+		      		
+		      		
+		      		
+		      		function hxx(){
+		    			$('#ryglTable').jsGrid({
+		    				width: '100%',
+		    				height: 'calc(100% - 55px)',
+		    				autoload: true,
+		    				paging: true,
+		    				pageLoading: true,
+		    				pageSize: 15,
+		    				pageIndex: 1,
+		    				controller: {
+		                        loadData: function(filter) {
+		                        	var d = $.Deferred();
+		                        	var a = res(filter, function(item){
+		                        		d.resolve(item);
+		                        	})
+		                        	return d.promise();
+		                        }
+		                    },
+		                 
+		    				pagerContainer: null,
+		    			    pageButtonCount: 5,
+		    			    pagerFormat: "{first} {prev} {pages} {next} {last} {pageIndex} of {pageCount}",
+		    			    pagePrevText: "上一页",
+		    			    pageNextText: "下一页",
+		    			    pageFirstText: "首页",
+		    			    pageLastText: "末页",
+		    			    pageNavigatorNextText: ">",
+		    			    pageNavigatorPrevText: "<"
+		              	});
+		    		}
+
+		    		function res(filter, callback){
+		    			//console.log(filter)
+		                var startIndex = (filter.pageIndex - 1) * filter.pageSize;
+		                jqxhr=$.ajax({
+		         	        url:"../../getryglFindAll",
+		         	        data:{
+		         	        	"cph" : $("#rygl_cphm").val(),
+		         				"xm" : $("#rygl_siji").val(),
+		         				"pageIndex":filter.pageIndex,
+		         				"pageSize":filter.pageSize
+		         	        },
+		         	        dataType: 'json'
+		                }).done(function(json) {
+		                		var xxfbData = [];
+		         				//console.log(json)
+		                		all = json.data[0].count;
+		         				re = json.data[0].datas;
+		         				//console.log(all)
+                            for (var i = 0; i < re.length; i++) {
+                                var iterm = re[i];
+                                iterm.gridId=i+1;}
+		             			if(json.code == 0){
+		             				/*for(var i = 0; i< re.length ;i++){
+		             					var rs={};
+		             					rs.title =  re[i].BT;
+		             					rs.content =  re[i].NR;
+		               					rs.datetime =  re[i].FBRQ;
+		             					rs.type =  re[i].LB;
+		             					xxfbData.push(rs);
+		             				}*/
+		             				return callback({
+		                                data: re,
+		                                itemsCount: all
+		                            });
+		             			}else{
+		            			}
+		                }).fail(function() {
+//		            			alert("数据异常");
+		                });
+		    		}
+		      		
+		      		//查询
+		      		$("#select_rygl").click(function(){
+		      			hxx();
+		      		});
+		      		
+		      		
+		      		$("#rygl-Export").off('click').on('click',function(){
+
+					layer.confirm('确认导出吗？',{btn:['确认','取消']
+					},function () {
+                        window.open(basePath + "getryglExport?cph="+ $("#rygl_cphm").val()+"&xm="+$("#rygl_siji").val())
+                        layer.msg('导出成功',{icon:1})
+						},function () {
+                        layer.msg('导出已取消',{icon:2})
+                        }
+					)
+		      		})
+
+		      		$(function () {
+		      			$(".select2").select2({  
+	        			  	language: "zh-CN",  //设置 提示语言
+	        		        tags:true,  
+	        		        createTag:function (decorated, params) {  
+	        		            return null;  
+	        		        },  
+	        		    });
+		      			$('.addTimePeriod, .period').on('click', function () {
+		      				if ($(this).hasClass('addTimePeriod')) $(this).addClass('period').removeClass('addTimePeriod');
+		      				else if ($(this).hasClass('period')) $(this).addClass('addTimePeriod').removeClass('period');
+		      			});
+
+
+		      			jqxhr=$.ajax({
+                            type:'post',
+                            url:basePath+ "geSelecerygNamet",
+                            data:{"cph": $("#rygl_cphm").val()},
+                            dataType:'json',
+                            timeout:3600000,
+							success:function (data) {
+                            	var datas=data.data;
+                            	for(var i=0; i<datas.length;i++){
+                            		datas[i].id =datas[i].CPH;
+                            		datas[i].text =datas[i].CPH;
+								}
+								var fh={};
+                            	fh.id="filter";
+                            	fh.text="全部";
+                            	datas.unshift(fh);
+                                $('#rygl_cphm').select2({
+									language:'zh-CN',
+									width:'160',
+									minimumInputLength: 3,
+									allowClear:true,
+									data:datas
+								})
+                            }
+
+
+						})
+
+
+		      		/*	$('#rygl_cphm').select2({
+                            language : 'zh-CN',
+                            width : 160,
+                            // minimumResultsForSearch : -1,
+                            ajax: {
+                                url: basePath + "geSelecerygNamet",
+                                dataType: 'json',
+                                data: function (params) {
+                                    return {
+                                        cph: params.term
+                                    };
+                                },
+                                processResults: function(res) {
+                                    var data = _.map(res.data, function(item){
+                                        return {id: item.CPH, text: item.CPH}
+                                    });
+                                    return {
+                                        results: data
+                                    };
+                                }
+                            }
+
+		      			});*/
+		      			$('#rygl-reset').on('click', resetQueryConditions);
+		      			$('#rygl-add').on('click', addrygl);
+		      			$('#rygl-dialog').on('hidden.bs.modal', function (e) {
+		      				$(this).find('input[type=text].form-control, textarea.form-control').val('');
+		      				$(this).find('select.form-control').val('').trigger('change');
+		      				$(this).find('div.form-control').text('');
+		      			});
+		      			$('#ryglTable').jsGrid({
+		      				width: 'calc(100% - 2px)',
+		      				height: 'calc(100% - 2px)',
+		      				editing: true,
+		      				sorting: true,
+		      				paging: false,
+		      				autoload: true,
+		      				data: [],
+		      				fields: ryglFields
+		      			});
+		      			$('.scrollbar-macosx').scrollbar();
+		      			hxx();
+		      		})
+	});
+})(jQuery);

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>车辆燃油类型分析</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/vue.min.js"></script>
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+	<style>
+		.panel-layout[layout='left'] {
+			width: 400px;
+		}
+		.panel-layout[layout='left'] ~ .panel-layout[layout='center'] {
+			width: calc(100% - 415px);
+			margin-left: 415px;
+		}
+		.item[type='inline'] {
+			border-bottom: 1px solid #f9f9f9;
+		}
+		.item[type='inline']:last-child {
+			border-bottom: none;
+		}
+		.item[type='inline'] .col {
+			display: inline-block;
+			width: 50%;
+			text-align: right;
+		}
+		.item[type='inline'] .col + .col {
+			text-indent: 2em;
+			text-align: left;
+		}
+		#clrylxfxEchart {
+			height: calc(100% - 90px);
+		}
+
+		[unit]:after {content: attr(unit);}
+		[type='number'] {
+			text-align: right;
+		}
+		div.form-control {
+			border-color: #66afe9;
+			outline: 0;
+			-webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
+			box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
+		}
+		.numberBox {
+			width: 140px;
+			font-family: '452-CAI978';
+			font-size: 18px;
+			font-weight: bold;
+			color: #1890ff;
+		}
+		.numberBox + [unit]:after {
+			color: #1890ff;
+		}
+		.form-inline .form-group {
+			margin-bottom: 10px;
+		}
+	</style>
+</head>
+<body>
+<div class="panel-wrapper" id="root" style="position: relative;">
+	<div class="panel-layout" layout="left">
+		<div class="dataListPanel" style="padding: 15px;">
+			<div class="item" type="inline">
+				<div class="col">总车辆：<span id="cl_all" class="ip-highlight-red" @click="handleAllVehicleClick" style="cursor:pointer; text-decoration: underline;">2589</span>&nbsp;辆</div>
+			</div>
+			<div class="item" type="inline">
+				<div class="col">新能源车辆：<span id="xny_all" class="ip-highlight-orange" @click="handleNewEnergyClick" style="cursor:pointer; text-decoration: underline;">2589</span>&nbsp;辆</div><div class="col">占比：<span id="xny_zb" class="ip-highlight-orange" @click="handleNewEnergyClick" style="cursor:pointer; text-decoration: underline;">76%</span></div>
+			</div>
+			<div class="item" type="inline">
+				<div class="col">非新能源车辆：<span id="fxny_all" class="ip-highlight-green" @click="handleNonNewEnergyClick" style="cursor:pointer; text-decoration: underline;">2589</span>&nbsp;辆</div><div class="col">占比：<span id="fxny_zb" class="ip-highlight-green" @click="handleNonNewEnergyClick" style="cursor:pointer; text-decoration: underline;">76%</span></div>
+			</div>
+			<div id="clrylxfxEchart"></div>
+		</div>
+	</div>
+	<div class="panel-layout" layout="center">
+		<div class="dataListPanel" style="padding: 10px;">
+			<div id="clrylxfxTable"></div>
+		</div>
+	</div>
+</div>
+<script>
+	(function (Vue, _, $) {
+		var vm = new Vue({
+			el: '#root',
+			data: function () {
+				return {
+					echart: null,
+					all:null,
+					xny:null,
+					fxny:null,
+					c:['新能源','非新能源','其他'],
+					c1:['双燃料(汽加气)','双燃料(柴加气)','双燃料(电加气)','电动','插电式混合动力'],
+					c2:['汽油','柴油','非插电式混合动力','液化石油气（LPG）','液化天然气（LNG）'],
+					table: {
+						fields: [
+							{name: 'ID', title: '序号', width: 60, align: 'center'},
+							{name: 'PLATE_NUMBER', title: '车牌号码', width: 160, align: 'center'},
+							{name: 'FUEL_NAME', title: '燃油类型', width: 120, align: 'center'},
+							{name: 'BRAND', title: '车辆品牌', width: 160, align: 'center'},
+							{name: 'COLOR', title: '车辆颜色', width: 120, align: 'center'}
+						]
+					}
+				}
+			},
+			created: function () {
+				var _this = this;
+				_this.init("0")//全部
+			},
+			mounted: function () {
+				var _this = this;
+				this.$nextTick(function () {
+					_this.getVehicleList();
+				});
+			},
+			methods: {
+				handleAllVehicleClick: function() {
+					var _this = this;
+					_this.getVehicleList();
+					_this.init("0")//全部
+				},
+				handleNewEnergyClick: function() {
+					var _this = this;
+					_this.getEchart(_this.c1,_this.xny);
+					_this.init("1");//新能源
+				},
+				handleNonNewEnergyClick: function() {
+					var _this = this;
+					_this.getEchart(_this.c2,_this.fxny);
+					_this.init("2")//非新能源
+				},
+				init:function(type){
+					var _this = this;
+					this.$nextTick(function () {
+						$('#clrylxfxTable').jsGrid({
+							width: '100%',
+							height: 'calc(100% - 55px)',
+							controller: {
+			                    loadData: function(filter) {
+			                    	var d = $.Deferred();
+			                    	var a = _this.res(filter,type, function(item){
+			                    		d.resolve(item);
+			                    	})
+			                    	return d.promise();
+			                    }
+			                },
+							autoload: true,
+							paging: true,
+							pageLoading: true,
+							pageSize: 15,
+							pageIndex: 1,
+							fields: _this.table.fields,
+							pagerContainer: null,
+						    pageButtonCount: 5,
+						    pagerFormat: "{first} {prev} {pages} {next} {last} {pageIndex} of {pageCount}",
+						    pagePrevText: "上一页",
+						    pageNextText: "下一页",
+						    pageFirstText: "首页",
+						    pageLastText: "末页",
+						    pageNavigatorNextText: ">",
+						    pageNavigatorPrevText: "<"
+						});
+					});
+				},
+				res:function(filter,type,callback){
+					var startIndex = (filter.pageIndex - 1) * filter.pageSize;
+					jqxhr=$.ajax({
+		     	        url:"../../tjfx/xny",
+		     	        data:{
+		     				"type" : type,
+		     				"pageIndex":filter.pageIndex,
+		     				"pageSize":filter.pageSize
+		     	        },
+		     	        dataType: 'json'
+		            }).done(function(json) {
+		            	var xnyData = [];
+	            		all = json.data[0].count;
+	     				re = json.data[0].datas;
+	         			if(json.code == 0){
+	         				for(var i = 0; i< re.length ;i++){
+	         					var rs={};
+	         					rs.ID = startIndex+i+1;
+	         					rs.PLATE_NUMBER =  re[i].PLATE_NUMBER;
+	           					rs.FUEL_NAME =  re[i].FUEL_NAME;
+	         					rs.BRAND =  re[i].BRAND;
+	         					rs.COLOR =  re[i].COLOR;
+	         					xnyData.push(rs);
+	         				}
+	         				return callback({
+	                            data: xnyData,
+	                            itemsCount: all
+	                        });
+	         			}else{
+	        			}
+		            }).fail(function() {
+// 		        		alert("数据异常");
+		            });
+				},
+				getEchart:function(c,d){
+					var clrylxfxEchart = echarts.init(document.getElementById('clrylxfxEchart'));
+					clrylxfxEchart.setOption({
+						color: ['#1391fd', '#4575b4', '#74add1', '#d48265', '#6e7074', '#749f83', '#c4ccd3', '#fdae61', '#f46d43', '#d73027', '#a50026'],
+						legend: {
+							orient: 'horizontal',
+							y: 'bottom',
+							x: 'center',
+							data: c
+						},
+						series : [
+							{
+								name: '访问来源',
+								type: 'pie',
+								radius : '80%',
+								center: ['50%', '40%'],
+								data:d,
+								itemStyle: {
+									emphasis: {
+										shadowBlur: 10,
+										shadowOffsetX: 0,
+										shadowColor: 'rgba(0, 0, 0, 0.5)'
+									}
+								},
+								labelLine: {
+									show: false
+								},
+								label: {
+									formatter: '{b}：{d}%',
+									position: 'inside'
+								}
+							}
+						]
+					});
+				},
+				getVehicleList: function (type) {
+					var _this = this;
+					jqxhr=$.ajax({
+						url: '../../tjfx/rylx',
+						dataType: 'json',
+						data: {}
+					}).then(function (e) {
+						console.log(e)
+						var res = e.data;
+						var xny = 0,fxny = 0,qt = 0, all=0;
+						var qjq = 0,cjq = 0,djq = 0,dd = 0,cd =0,
+							qy = 0,cy = 0,fcd = 0,syq = 0,trq =0;
+						for (var i = 0, l = res.length; i < l; i++){
+							if(res[i].FUEL_NAME == "双燃料(汽加气)" ){
+								xny += res[i].count; qjq += res[i].count;
+							}else if(res[i].FUEL_NAME == "双燃料(柴加气)" ){
+								xny += res[i].count; cjq += res[i].count;
+							}else if(res[i].FUEL_NAME == "双燃料(电加气)" ){
+								xny += res[i].count; djq += res[i].count;
+							}else if(res[i].FUEL_NAME == "电动" ){
+								xny += res[i].count; dd += res[i].count;
+							}else if(res[i].FUEL_NAME == "插电式混合动力" ){
+								xny += res[i].count; cd += res[i].count;
+							}else if(res[i].FUEL_NAME == "其它" ){
+								qt += res[i].count;
+							}else if(res[i].FUEL_NAME == "汽油" ){
+								fxny += res[i].count; qy += res[i].count;
+							}else if(res[i].FUEL_NAME == "柴油" ){
+								fxny += res[i].count; cy += res[i].count;
+							}else if(res[i].FUEL_NAME == "非插电式混合动力" ){
+								fxny += res[i].count; fcd += res[i].count;
+							}else if(res[i].FUEL_NAME == "液化石油气（LPG）" ){
+								fxny += res[i].count; syq += res[i].count;
+							}else if(res[i].FUEL_NAME == "液化天然气（LNG）" ){
+								fxny += res[i].count; trq += res[i].count;
+							}
+							all += res[i].count;
+						}
+						//html显示数值
+						$('#cl_all').html(all);
+						$('#xny_all').html(xny);
+						$('#fxny_all').html(fxny);
+						$('#xny_zb').html(((new Number(xny/all)*100).toFixed(2)+"%"));
+						$('#fxny_zb').html(((new Number(fxny/all)*100).toFixed(2)+"%"));
+						var result = [
+							{value:xny, name:'新能源'},
+							{value:fxny, name:'非新能源'},
+							{value:qt, name:'其他'}
+		              	];
+						
+						var result1 = [
+							{value:qjq, name:'双燃料(汽加气)'},
+							{value:cjq, name:'双燃料(柴加气)'},
+							{value:djq, name:'双燃料(电加气)'},
+							{value:dd, name:'电动'},
+							{value:cd, name:'插电式混合动力'}
+		              	];
+						
+						var result2 = [
+							{value:qy, name:'汽油'},
+							{value:cy, name:'柴油'},
+							{value:fcd, name:'非插电式混合动力'},
+							{value:syq, name:'液化石油气（LPG）'},
+							{value:trq, name:'液化天然气（LNG）'}
+		              	];
+						
+						//图 -->> 数据
+						_this.getEchart(_this.c,result);
+						_this.all = result; 
+						_this.xny = result1; 
+						_this.fxny = result2; 
+					});
+				}
+			}
+		});
+	})(Vue, _, jQuery)
+</script>
+</body>
+</html>

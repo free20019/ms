@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>维修车辆预警</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/element-ui/lib/theme-chalk/index.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="https://cdn.bootcss.com/vue/2.5.17/vue.js"></script>
+	<!--<script src="../../resources/script/vue.min.js"></script>-->
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/element-ui/lib/index.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+	<script src="../../resources/script/util.js"></script>
+		<!-- UI组件库 1.0 -->
+	<script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+	<style>
+		#wxclyjMap {
+			height: 100%;
+			border: 1px solid #c4d4fb;
+			border-radius: 10px;
+		}
+		.scrollbar-macosx {
+			height: calc(100% - 176px);
+			margin-bottom: 10px;
+		}
+		.list[type='carInfoList'] {
+			height: auto;
+			margin-bottom: 0;
+		}
+
+		.panel-layout[layout='left'] {width: 500px;}
+		.panel-layout[layout='left'] ~ .panel-layout[layout='center'] {position: relative;width: calc(100% - 515px);margin-left: 515px;}
+		.panel-layout > .panel {height: calc(100% - 30px);margin-right: 0;margin-bottom: 0;}
+		.panel-layout[layout='left'] > .panel-body {padding: 0;background-color: transparent;}
+
+		.button-group {overflow: hidden;height: 35px;border-radius: 10px 10px 0 0;}
+		.button {
+			float: left;
+			width: 50%;
+			height: 35px;
+			border-bottom: 1px solid #cccccc;
+			font-size: 16px;
+			line-height: 35px;
+			text-align: center;
+			color: #878787;
+			background-color: #ececec;
+			transition: background-color .5s ease-in-out, color .5s ease-in-out;
+			cursor: pointer;
+		}
+		.button.active {border-bottom-color: #ffffff;color: #333333;background-color: #ffffff;}
+		.mp-tabs-body {
+			height: calc(100% - 35px);
+			padding: 10px;
+			/*border: 1px solid #eeeeee;*/
+			/*border-top: none;*/
+			border-radius: 0 0 5px 5px;
+		}
+		.listItem {
+			padding-top: 5px;
+			padding-bottom: 5px;
+		}
+		.dataListPanel .btn.btn-more {width: auto;margin-left: 0;margin-right: 0;}
+		@media (max-width: 991px) {
+			.listItem  { zoom: 1; }
+			.listItem:after { display: block; clear: both; height: 0; content: ''; visibility: hidden; }
+			.listItem .col-md-5 {
+				float: left;
+				width: calc(100% - 160px);
+				padding-left: 0;
+				padding-right: 0;
+			}
+			.listItem .col-md-7 {
+				float: left;
+				width: 160px;
+				padding-left: 0;
+				padding-right: 0;
+			}
+		}
+	</style>
+</head>
+<body>
+<div class="panel-wrapper" id="root">
+	<div class="panel-layout" layout="left">
+		<div class="panel-title">
+			<div class="title">维修预警<span id="errorTime"></span></div>
+			<i class="iconfont icon-arrowTria" ip-type="left"></i>
+		</div>
+		<div class="panel panel-body">
+			<div class="dataListPanel">
+				<div class="button-group">
+					<div class="button" :class="{active: type === 1}" @click="handleYdqiClick">已到期(<span v-text="Ydqcount"></span>)</div>
+					<div class="button" :class="{active: type === 2}" @click="handleJjdqClick">即将到期(<span v-text="Jjdqcount"></span>)</div>
+				</div>
+				<div class="mp-tabs-body">
+					<!-- 				<div type="calendar" style="width: 100%; margin-bottom: 10px;"> -->
+					<!-- 					<i class="glyphicon glyphicon-calendar" type="icon"></i> -->
+					<!-- 					<input type="text" class="form-control" id="wxclyj-datetimeStart" placeholder="开始时间"> -->
+					<!-- 				</div> -->
+					<div type="calendar" style="width: 140px; margin-right: 7px;">
+						<i class="glyphicon glyphicon-calendar" type="icon"></i>
+						<input type="text" class="form-control" id="wxclyj-datetimeEnd" placeholder="时间">
+					</div>
+					<div type="calendar" style="margin-right: 7px;">
+						<i class="icon-first iconfont icon-car" type="icon"></i>
+						<input class="form-control" type="text" placeholder="输入三位以上车牌号" v-model.trim="queryLicensePlate"  @keyup="findVehile">
+						<!--<a class="btn btn-primary btn-sm btn-last ip-iconfont ip-icon-search" @click="handleQueryLicensePlateClick"></a>-->
+					</div>
+					<div class="btn btn-primary" style="margin-right: 7px;" @click="handleQueryClick">查&emsp;询</div>
+					<div class="btn btn-primary" @click="handleVehicleExcel">导&emsp;出</div>
+					<div class="search-body" id="wxclyjTable" style="margin-top: 10px;"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="panel-layout" layout="center" >
+		<div id="wxclyjMap" v-loading="realTimeMonitorMapLoading"></div>
+	</div>
+</div>
+<script src="./wxclyj.js"></script>
+</body>
+</html>

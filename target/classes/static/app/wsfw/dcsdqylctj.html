@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>单车速度曲线及里程统计</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+	<script src="dcsdqylctj.js"></script>
+
+	<style>
+		#sdqylctjEchart {
+			min-height: 300px;
+			height: calc(100% - 250px);
+		}
+		.panel-queryBar {padding: 10px 10px 0;}
+		.form-inline .form-group {margin-bottom: 10px;}
+		.dataListPanel.center {height: calc(100% - 50px);padding: 10px;}
+		.scrollbar-macosx {
+			height: 100%;
+		}
+	</style>
+
+</head>
+<body>
+<div class="panel-wrapper" style="position: relative;">
+	<div class="panel-layout" layout="center">
+		<div class="panel-queryBar">
+			<form class="form-inline">
+				<div class="form-group form-group-sm">
+
+
+						<div type="calendar">
+							<i class="iconfont icon-chepai" type="icon"></i>
+							<!--<input type="text" class="form-control input-sm" id="sdqylctj-carNumber" placeholder="车牌号码">-->
+							<select type="text" class="form-control input-sm" id="sdqylctj-carNumber" autocomplete="off" style="width: 150px;" data-placeholder="车牌号"><option></option></select>
+						</div>
+
+
+
+					<div type="calendar">
+						<i class="glyphicon glyphicon-calendar" type="icon"></i>
+						<input type="text" class="form-control" id="sdqylctj-datetimeStart" placeholder="开始时间">
+					</div>
+					<label class="addTimePeriod" db-control></label>
+					<div type="calendar">
+						<i class="glyphicon glyphicon-calendar" type="icon"></i>
+						<input type="text" class="form-control" id="sdqylctj-datetimeEnd" placeholder="结束时间">
+					</div>
+				</div>
+				<!--<div class="form-group">
+					<div type="calendar">
+						<i class="iconfont icon-qiye" type="icon"></i>
+						<select class="form-control" id="sdqylctj-enterprise" data-placeholder="公司"><option value="0">全部</option></select>
+					</div>
+				</div>-->
+
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="iconfont icon-xitongyunzhuanqingkuang" type="icon"></i>
+						<input type="text" class="form-control input-sm" id="sdqylctj-csz" placeholder="超速值">
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<a class="btn btn-primary btn-sm" id="select_num">查询</a>
+					<a class="btn btn-primary btn-sm" id="dcsdqx_Export">导出</a>
+					<!--<label style="margin-left: 4px;">总里程：<span id="sdqylctj-zlcs">20.24</span>公里</label>-->
+				</div>
+			</form>
+		</div>
+		<div class="dataListPanel center">
+			<div class="scrollbar-macosx">
+				<div id="sdqylctjEchart"></div>
+				<div id="sdqylctjTable"></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- <script>
+	(function ($) {
+		var sdqylctjFields = [
+			{name: 'gridId', title: '序号', width: 60},
+			{name: 'cheh', title: '车号', width: 120},
+			{name: 'jidu', title: '经度', width: 120},
+			{name: 'wedu', title: '纬度', width: 120},
+			{name: 'kslc', title: '速度', width: 120},
+			{name: 'faxi', title: '方向', width: 120},
+			{name: 'shij', title: '时间', width: 150},
+			{name: 'dlwz', title: '位置信息', width: 250}
+		];
+		var sdqylctjData = [
+			{gridId: '1', cheh: '车号1', jidu: '经度1', wedu: '纬度1', kslc: '速度1', faxi: '方向1', shij: '时间1', dlwz: '位置信息1'},
+			{gridId: '2', cheh: '车号2', jidu: '经度2', wedu: '纬度2', kslc: '速度2', faxi: '方向2', shij: '时间2', dlwz: '位置信息2'},
+			{gridId: '3', cheh: '车号3', jidu: '经度3', wedu: '纬度3', kslc: '速度3', faxi: '方向3', shij: '时间3', dlwz: '位置信息3'},
+			{gridId: '4', cheh: '车号4', jidu: '经度4', wedu: '纬度4', kslc: '速度4', faxi: '方向4', shij: '时间4', dlwz: '位置信息4'},
+			{gridId: '5', cheh: '车号5', jidu: '经度5', wedu: '纬度5', kslc: '速度5', faxi: '方向5', shij: '时间5', dlwz: '位置信息5'}
+		];
+		$(function () {
+			$('#sdqylctj-datetimeStart').datetimepicker(dateDefaultOption);
+			$('#sdqylctj-datetimeEnd').datetimepicker(dateDefaultOption);
+			$('.addTimePeriod, .period').on('click', function () {
+				if ($(this).hasClass('addTimePeriod')) $(this).addClass('period').removeClass('addTimePeriod');
+				else if ($(this).hasClass('period')) $(this).addClass('addTimePeriod').removeClass('period');
+			});
+			$('#sdqylctj-enterprise').select2({
+				language: 'zh-CN',
+				width: '160',
+				minimumResultsForSearch: -1,
+				data: [
+					{id: '1', text: 'yy公司'},
+					{id: '2', text: 'zz公司'}
+				]
+			});
+			var echart = echarts.init(document.getElementById('sdqylctjEchart'));
+			echart.setOption({
+				grid: {
+					left: 100,
+					right: 50
+				},
+				xAxis: {
+					type: 'category',
+					data: ['2018-08-01 10:00:00', '2018-08-01 10:15:00', '2018-08-01 10:20:00', '2018-08-01 10:25:00', '2018-08-01 10:30:00', '2018-08-01 10:40:00', '2018-08-01 10:50:00']
+				},
+				yAxis: {
+					type: 'value'
+				},
+				series: [{
+					data: [820, 932, 901, 934, 1290, 1330, 1320],
+					symbolSize: 10,
+					type: 'line'
+				}]
+			});
+			$(window).resize(function () {
+				echart.resize();
+			});
+			$('#sdqylctjTable').jsGrid({
+				width: 'calc(100% - 2px)',
+				height: '250',
+				editing: true,
+				sorting: true,
+				paging: false,
+				autoload: true,
+				data: sdqylctjData,
+				fields: sdqylctjFields
+			});
+			$('.scrollbar-macosx').scrollbar();
+		})
+	})(jQuery)
+</script> -->
+</body>
+</html>

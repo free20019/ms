@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>营运态势</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/style/css/yyts.css">
+	<script src="../../resources/script/vue.min.js"></script>
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.min.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/iPeakUI/bootstrap-template/bs-table.js"></script>
+	<script src="../../resources/script/util.js"></script>
+</head>
+<body>
+<div class="template-wrapper" id="root">
+	<div class="scrollbar-macosx">
+	<div class="template-main">
+			<div class="panel-box">
+				<div class="panel-heading">上线率</div>
+				<div class="panel-body">
+					<div class="scrollbar-macosx">
+						<bs-table :fields="tableFields" :data="onlineRateData"></bs-table>
+					</div>
+				</div>
+			</div>
+			<div class="panel-box">
+				<div class="panel-heading">在线营运率</div>
+				<div class="panel-body">
+					<div class="scrollbar-macosx">
+						<bs-table :fields="tableFields" :data="onlineOperatingRateData"></bs-table>
+					</div>
+				</div>
+			</div>
+<!-- 			<div class="panel-box"> -->
+<!-- 				<div class="panel-heading">一小时未营运车辆数</div> -->
+<!-- 				<div class="panel-body"> -->
+<!-- 					<div class="scrollbar-macosx"> -->
+<!-- 						<bs-table :fields="tableFields" :data="notOperatingForOneHourData"></bs-table> -->
+<!-- 					</div> -->
+<!-- 				</div> -->
+<!-- 			</div> -->
+			<div class="panel-box">
+				<div class="panel-heading">重点监控区域车辆数</div>
+				<div class="panel-body">
+					<div class="scrollbar-macosx">
+						<bs-table :fields="tableFields" :data="importAreaVehicleData"></bs-table>
+					</div>
+				</div>
+			</div>
+			<div class="panel-box">
+				<div class="panel-heading">疑似停运车辆分析(自4点开始未营运车辆数量统计)</div>
+				<div class="panel-body">
+					<div class="scrollbar-macosx">
+						<bs-table :fields="tableFields" :data="notReallyStopData"></bs-table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	(function (Vue, _, jQuery, BSTable) {
+		var vm = new Vue({
+			el: '#root',
+			data:function () {
+				return {
+					tableFields: [
+						{id: 'DATE', title: '上线率', width: 160, align: 'center', whiteSpace: 'nowrap'},
+						{id: 'a0', title: '0:00', width: 120},
+						{id: 'a1', title: '1:00', width: 120},
+						{id: 'a2', title: '2:00', width: 120},
+						{id: 'a3', title: '3:00', width: 120},
+						{id: 'a4', title: '4:00', width: 120},
+						{id: 'a5', title: '5:00', width: 120},
+						{id: 'a6', title: '6:00', width: 120},
+						{id: 'a7', title: '7:00', width: 120},
+						{id: 'a8', title: '8:00', width: 120},
+						{id: 'a9', title: '9:00', width: 120},
+						{id: 'a10', title: '10:00', width: 120},
+						{id: 'a11', title: '11:00', width: 120},
+						{id: 'a12', title: '12:00', width: 120},
+						{id: 'a13', title: '13:00', width: 120},
+						{id: 'a14', title: '14:00', width: 120},
+						{id: 'a15', title: '15:00', width: 120},
+						{id: 'a16', title: '16:00', width: 120},
+						{id: 'a17', title: '17:00', width: 120},
+						{id: 'a18', title: '18:00', width: 120},
+						{id: 'a19', title: '19:00', width: 120},
+						{id: 'a20', title: '20:00', width: 120},
+						{id: 'a21', title: '21:00', width: 120},
+						{id: 'a22', title: '22:00', width: 120},
+						{id: 'a23', title: '23:00', width: 120},
+					],
+					onlineRateData: [],
+					onlineOperatingRateData: [],
+					notOperatingForOneHourData: [],
+					importAreaVehicleData: [],
+					notReallyStopData: []
+				}
+			},
+			mounted: function () {
+				var _this = this;
+				this.$nextTick(function () {
+					$('.scrollbar-macosx').scrollbar();
+
+					_this.getOnlineRate();
+					_this.getOnlineOperatingRate();
+					//_this.getNotOperatingForOneHour();
+					_this.getImportAreaVehicle();
+					_this.getNotReallyStop();
+				})
+			},
+			computed: {},
+			methods: {
+				getOnlineRate: function () {
+					var _this = this;
+					$.ajax({
+						type: 'POST',
+						url: '../../otta/sxl',
+						dataType: 'json',
+						timeout: 3600000
+					}).then(function(res) {
+						console.log(res);
+						_this.onlineRateData = res.data[0].datas || [];
+					})
+				},
+				getOnlineOperatingRate: function () {
+					var _this = this;
+					$.ajax({
+						type: 'POST',
+						url: '../../otta/zxyy',
+						dataType: 'json',
+						timeout: 3600000
+					}).then(function(res) {
+						console.log(res);
+						_this.onlineOperatingRateData = res.data[0].datas || [];
+					})
+				},
+				getNotOperatingForOneHour: function () {
+					var _this = this;
+					$.ajax({
+						type: 'POST',
+						url: '../../otta/yxswyy',
+						dataType: 'json',
+						timeout: 3600000
+					}).then(function(res) {
+						console.log(res);
+						_this.notOperatingForOneHourData = res.data[0].datas || [];
+					})
+				},
+				getImportAreaVehicle: function () {
+					var _this = this;
+					$.ajax({
+						type: 'POST',
+						url: '../../otta/findzdqu',
+						dataType: 'json',
+						timeout: 3600000
+					}).then(function(res) {
+						console.log(res);
+						_this.importAreaVehicleData = res.data[0].datas || [];
+					})
+				},
+				getNotReallyStop: function () {
+					var _this = this;
+					$.ajax({
+						type: 'POST',
+						url: '../../otta/ysty',
+						dataType: 'json',
+						timeout: 3600000
+					}).then(function(res) {
+						console.log(res);
+						_this.notReallyStopData = res.data[0].datas || [];
+					})
+				}
+				
+			},
+			components: {
+				'bs-table': BSTable
+			}
+		})
+	})(Vue, _, jQuery, BSTable);
+</script>
+</body>
+</html>

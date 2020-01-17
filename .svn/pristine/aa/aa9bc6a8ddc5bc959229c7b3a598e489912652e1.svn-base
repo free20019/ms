@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>维修车辆监控</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/element-ui/lib/theme-chalk/index.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+<!-- 	<script src="https://cdn.bootcss.com/vue/2.5.17/vue.js"></script> -->
+	<script src="../../resources/script/vue.min.js"></script>
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/element-ui/lib/index.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/js/transfer.js"></script>
+		<!-- UI组件库 1.0 -->
+	<script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+	<style>
+		#wxcljkMap {
+			height: 100%;
+			border: 1px solid #c4d4fb;
+			border-radius: 10px;
+		}
+		.scrollbar-macosx {
+			height: calc(100% - 104px);
+			margin-bottom: 10px;
+		}
+		.list[type='carInfoList'] {
+			height: auto;
+			margin-bottom: 0;
+		}
+
+		.mapToolBar {top: 18px;
+			right: 100px;max-width: 700px;height: auto;min-height: 30px;background-size: 30px 30px;background-image: linear-gradient(#ffffff 29px, #e2dff3 29px, #e2dff3 30px);}
+		.mapToolItem[type='button'] {min-width: 30px;margin-left: 10px;text-align: center;}
+		.mapToolItem[type='button'] {position: relative;min-width: 30px;margin-left: 10px;text-align: center;}
+		.mapToolItem[type='button']:hover:before {content: '';position: absolute;top: 50%;left: 50%;width: 25px;height: 25px;border-radius: 4px;box-shadow: 1px 1px 4px #999999;transform: translate(-50%, -50%);}
+		.mapToolItem[type='number'] {width: 12em;}
+		.mapToolItem[type='number'][title]:before {width: 6em;}
+		.mapToolItem[t-length='4'] {width: 10em;}
+		.mapToolItem[t-length='4'][title]:before {width: 4em;}
+		.mapToolItem[t-length='8'] {width: 14em;}
+		.mapToolItem[t-length='8'][title]:before {width: 8em;}
+		.mapToolItem[t-length='10'] {width: 16em;}
+		.mapToolItem[t-length='10'][title]:before {width: 10em;}
+
+		.list[type='vehicleInfoList'] {height: 100%;margin-left: 15px;margin-right: 15px;border-bottom: none;}
+		.list[type='vehicleInfoList'] .listItem {position: relative;padding: 5px 10px; /*border-bottom: 1px solid #DDDDDD;*/text-align: left;}
+		.list[type='vehicleInfoList'] .listItem:last-child {border-bottom: none;}
+		.list[type='vehicleInfoList'] .col[type='licensePlate'] {position: static;top: auto;left: auto;display: block; /*min-width: 80px;*/height: 28px;padding: 4px 4px;border: 1px solid #ffffff;box-shadow: 0 0 0 1px #1492ff, -1px 0 0 1px #1492ff, 1px 0 0 1px #1492ff;line-height: 1.3em;text-align: center;color: #ffffff;background-color: #1492ff;transform: none;cursor: pointer;}
+
+
+		.button-group {overflow: hidden;height: 35px;border-radius: 10px 10px 0 0;}
+		.button {
+			float: left;
+			width: 50%;
+			height: 35px;
+			border-bottom: 1px solid #cccccc;
+			font-size: 16px;
+			line-height: 35px;
+			text-align: center;
+			color: #878787;
+			background-color: #ececec;
+			transition: background-color .5s ease-in-out, color .5s ease-in-out;
+			cursor: pointer;
+		}
+		.button.active {border-bottom-color: #ffffff;color: #333333;background-color: #ffffff;}
+		.mp-tabs-body {
+			height: calc(100% - 35px);
+			/*border: 1px solid #eeeeee;*/
+			/*border-top: none;*/
+			border-radius: 0 0 5px 5px;
+		}
+		.mp-tabs-panel {display: none;height: 100%;padding: 10px;}
+		.mp-tabs-panel.active {display: block;}
+
+		/* 右键菜单样式 */
+		.rightClickMenu {position: absolute;width: 200px;z-index: 100;}
+		.rightClickMenu:before {content: '';position: absolute;top: 50%;left: 50%;width: calc(100% + 25px);height: calc(100% + 25px);transform: translate(-50%, -50%);}
+		.rightClickMenu .el-menu {border: 1px solid #e4e7ed;}
+		.rightClickMenu .el-menu-item,
+		.rightClickMenu .el-submenu__title {height: 35px;line-height: 32px;}
+	</style>
+</head>
+<body>
+<div class="panel-wrapper" id="root">
+	<div class="panel-layout" layout="left">
+		<div class="dataListPanel">
+			<div class="button-group">
+				<div class="button" :class="{active: type === 1}" @click="handleGzclClick">故障车辆</div>
+				<div class="button" :class="{active: type === 2}" @click="handleFzjkClick">分组监控</div>
+			</div>
+			<div class="mp-tabs-body">
+				<div class="mp-tabs-panel" :class="{active: type === 1}" style="padding: 10px 0 0 0;">
+					<div class="searchBar" style="margin-top: 0;">
+						<i class="icon-first iconfont icon-car"></i>
+						<input type="text" placeholder="输入三位以上车牌号" v-model.trim="queryLicensePlate">
+						<a class="btn btn-primary btn-sm btn-last ip-iconfont ip-icon-search" @click="handleQueryLicensePlateClick"></a>
+					</div>
+					<div class="scrollbar-macosx">
+						<ul class="list" type="vehicleInfoList" ref="vehicleInfoList">
+							<li class="listItem" v-for="(item, index) in findVehile"
+									:key="item.MDT_ID+'-'+item.MDT_NO"
+									v-if="index <= currentDisplayPages"
+									@click="handleJumpVehicleClick(item)">
+								<span class="col" type="licensePlate" v-text="item.VEHI_NO"></span>
+							</li>
+						</ul>
+					</div>
+					<button class="btn btn-primary btn-more" :disabled="hasDisabledLoadMoreButton" @click="handleVehicleLoadMoreClick">加载更多</button>
+				</div>
+				<div class="mp-tabs-panel" :class="{active: type === 2}">
+					<select class="form-control input-sm" v-model="queryServiceType" style="width: 100%;" @change="handleQueryClick">
+						<option v-for="item in serviceTypeOption" :value="item.id" v-text="item.text"></option>
+					</select>
+<!-- 					<div class="btn btn-primary btn-block" style="margin-bottom: 10px;" @click="handleQueryClick">查&emsp;询</div> -->
+					<el-tree :default-expanded-keys="realTimeMonitorTreeKeys" v-loading="realTimeMonitorTreeLoading" @node-click="clickFind" :data="realTimeMonitorTree" node-key="id" :default-checked-keys="realTimeMonitorTreeChecked" :auto-expand-parent="true"  :default-expanded-keys="realTimeMonitorTreeExpanded" :expand-on-click-node="true" :style="{height: 'calc(100% - 30px)', overflow: 'auto'}" @node-contextmenu="rightContextmenu" ref="realTimeMonitorTreeobj">
+						<div class="custom-tree-node" slot-scope="{node, data}">
+							<i :class="node.icon"></i>
+							<span v-text="node.label" class="" ></span>
+						</div>
+					</el-tree>
+					<div class="rightClickMenu" v-if="rightClickMenu.display" :style="{top: rightClickMenu.top+'px', left: rightClickMenu.left+'px'}" @click="handleRightContentMenuClick" @mouseleave="handleRightContentMenuMouseLeave">
+						<el-menu class="el-menu-vertical-demo">
+							<el-menu-item v-for="item in rightClickMenu.data" :key="item.id" :index="item.id" @click="item.click">
+								<i :class="item.icon"></i>
+								<span slot="title" v-text="item.title"></span>
+							</el-menu-item>
+						</el-menu>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="panel-layout" layout="center">
+		<div id="wxcljkMap"  v-loading="realTimeMonitorMapLoading"></div>
+		<ul class="mapToolBar">
+			<li class="mapToolItem" type="number" title="总数" unit="辆" t-length="10" v-text="faultStatistics.total"></li>
+<!-- 			<li class="mapToolItem" type="number" title="主机故障" unit="辆" t-length="10" v-text="faultStatistics.zjgz"></li> -->
+				<li class="mapToolItem" type="number" title="无定位数据" unit="辆" t-length="10" v-text="faultStatistics.zjgz"></li>
+<!-- 			<li class="mapToolItem" type="number" title="定位故障" unit="辆" t-length="10" v-text="faultStatistics.dwgz"></li> -->
+<!-- 			<li class="mapToolItem" type="number" title="通信故障" unit="辆" t-length="10" v-text="faultStatistics.txgz"></li> -->
+<!-- 			<li class="mapToolItem" type="number" title="定位回传故障" unit="辆" t-length="10" v-text="faultStatistics.dhhcgz"></li> -->
+			<li class="mapToolItem" type="number" title="摄像头故障" unit="辆" t-length="10" v-text="faultStatistics.sxtgz"></li>
+<!-- 			<li class="mapToolItem" type="number" title="视频主机/存储故障" unit="辆"  t-length="10" v-text="faultStatistics.zjncgz"></li> -->
+			<li class="mapToolItem" type="number" title="计价器断开故障" unit="辆" t-length="10" v-text="faultStatistics.jjqdkgz"></li>
+<!-- 			<li class="mapToolItem" type="number" title="导航屏断开故障" unit="辆" t-length="10" v-text="faultStatistics.dhpdkgz"></li> -->
+<!-- 			<li class="mapToolItem" type="number" title="空车灯故障" unit="辆" t-length="10" v-text="faultStatistics.kcdgz"></li> -->
+			<li class="mapToolItem" type="number" title="多个故障" unit="辆" t-length="10" v-text="faultStatistics.dggz"></li>
+			<li class="mapToolItem" type="" ><i @click="handleAddVehicleGroupClick" class="btn btn-primary btn-xs" style="margin-left: 70px;">添加分组</i></li>
+<!-- 			el-icon-plus -->
+		</ul>
+	</div>
+	<div class="modal fade" id="wxcljkDialog" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title" v-text="dialog.title"></h4>
+				</div>
+				<div class="modal-body">
+					<form>
+						<div class="form-group">
+							<label>车辆组名称</label>
+							<input type="text" class="form-control input-sm" v-model="dialog.form.clzmc" placeholder="车辆组名称" style="display: inline-block;">
+						</div>
+						<div class="form-group">
+							<transfer :value.sync="dialog.form.clzxx" :data="transfer.data" :titles="['所有车辆', '监控车辆']">
+							</transfer>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+					<button type="button" class="btn btn-primary" @click="handleDialogSaveClick">保存</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+</div>
+<script src="./wxcljk.js"></script>
+</body>
+</html>

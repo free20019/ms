@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>安全监测</title>
+	<link rel="stylesheet" href="resources/style/reset.css">
+	<link rel="stylesheet" href="resources/script/bootstrap/css/bootstrap.css">
+	<link rel="stylesheet" href="resources/style/safetyMonitor.css">
+	<script src="resources/script/vue.min.js"></script>
+	<script src="resources/script/underscore-min.js"></script>
+	<script src="resources/script/moment.min.js"></script>
+	<script src="resources/script/jquery-1.12.1.min.js"></script>
+	
+	<style>
+		.mp-panel {
+			height: 100%;
+		}
+	</style>
+</head>
+<body>
+<div class="template-wrapper" id="root">
+	<div class="template-title" style="margin: 0 30px;">
+		<div class="text">出租车二期项目——安全监测系统</div>
+		<div class="datetime" v-text="datetime"></div>
+	</div>
+	<div class="template-body">
+		<div class="container-fluid">
+			<div class="row" style="height: 250px;">
+				<div class="col-md-6">
+					<div class="mp-panel">
+						<div class="mp-panel-title">系统运行监测</div>
+						<div class="mp-panel-body air">
+							<table class="mp-table size-lg" style="height: 100%;">
+								<thead>
+								<tr>
+									<th class="mp-table-th" v-for="item in dates" :key="item" v-text="item"></th>
+									<!--<th class="mp-table-th">2018-12-10</th>-->
+									<!--<th class="mp-table-th">2018-12-09</th>-->
+									<!--<th class="mp-table-th">2018-12-08</th>-->
+									<!--<th class="mp-table-th">2018-12-07</th>-->
+									<!--<th class="mp-table-th">2018-12-06</th>-->
+								</tr>
+								</thead>
+								<tbody>
+								<tr>
+									<td class="mp-table-td success">网络正常</td>
+									<td class="mp-table-td success">网络正常</td>
+									<td class="mp-table-td success">网络正常</td>
+									<td class="mp-table-td success">网络正常</td>
+									<td class="mp-table-td success">网络正常</td>
+								</tr>
+								<tr>
+									<td class="mp-table-td success">内存正常</td>
+									<td class="mp-table-td success">内存正常</td>
+									<td class="mp-table-td success">内存正常</td>
+									<td class="mp-table-td success">内存正常</td>
+									<td class="mp-table-td success">内存正常</td>
+								</tr>
+								<tr>
+									<td class="mp-table-td success">日志正常</td>
+									<td class="mp-table-td success">日志正常</td>
+									<td class="mp-table-td success">日志正常</td>
+									<td class="mp-table-td success">日志正常</td>
+									<td class="mp-table-td success">日志正常</td>
+								</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="mp-panel">
+						<div class="mp-panel-title">数据库运行监测</div>
+						<div class="mp-panel-body air">
+							<table class="mp-table last-border size-lg" style="height: 100%;">
+								<thead>
+								<tr>
+									<th class="mp-table-th">数据库</th>
+									<th class="mp-table-th">数据库存储</th>
+									<th class="mp-table-th">数据表</th>
+								</tr>
+								<tr>
+									<th class="mp-table-th">（系统运行）</th>
+									<th class="mp-table-th">（小于90%）</th>
+									<th class="mp-table-th">（实时表）</th>
+								</tr>
+								</thead>
+								<tbody>
+								<tr>
+									<td class="mp-table-td success" style="line-height: 65px;">正常</td>
+									<td class="mp-table-td success" style="line-height: 65px;">正常</td>
+									<td class="mp-table-td success" style="line-height: 65px;">正常</td>
+								</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row" style="height: calc(100% - 270px);">
+				<div class="col-md-12">
+					<div class="mp-panel">
+						<div class="mp-panel-title">数据传输监测</div>
+						<div class="mp-panel-body air">
+							<table class="mp-table border" style="height: 100%;">
+								<thead>
+								<tr>
+									<th class="mp-table-th">名称</th>
+									<th class="mp-table-th">数据来源</th>
+									<th class="mp-table-th">接口状态</th>
+									<th class="mp-table-th">流量情况</th>
+								</tr>
+								</thead>
+								<tbody>
+								<tr>
+									<td class="mp-table-th" rowspan="3">定位数据</td>
+									<td class="mp-table-td">192.168.0.69（通用）</td>
+									<td class="mp-table-td" :class="state1" v-text="stateText(state1)"></td>
+									<td class="mp-table-td" v-text="ty"></td>
+								</tr>
+								<tr>
+									<td class="mp-table-td">192.168.0.69（华强）</td>
+									<td class="mp-table-td" :class="state2" v-text="stateText(state2)"></td>
+									<td class="mp-table-td" v-text="hq"></td>
+								</tr>
+								<tr>
+									<td class="mp-table-td">192.168.0.69（飞田）</td>
+									<td class="mp-table-td" :class="state3" v-text="stateText(state3)"></td>
+									<td class="mp-table-td" v-text="ft"></td>
+								</tr>
+								<tr>
+									<td class="mp-table-th">营运数据</td>
+									<td class="mp-table-td">192.168.0.89</td>
+									<td class="mp-table-td success">正常</td>
+									<td class="mp-table-td success">正常</td>
+								</tr>
+								<tr>
+									<td class="mp-table-th">抓拍数据</td>
+									<td class="mp-table-td">172.16.16.21</td>
+									<td class="mp-table-td success">正常</td>
+									<td class="mp-table-td success">正常</td>
+								</tr>
+								<tr>
+									<td class="mp-table-th">投诉故障</td>
+									<td class="mp-table-td">172.16.16.88</td>
+									<td class="mp-table-td success">正常</td>
+									<td class="mp-table-td success">正常</td>
+								</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	(function(Vue, _){
+		var vm = new Vue({
+			el: '#root',
+			data: function () {
+				return {
+					datetime: '',
+					dates: [],
+					ty: 14040,
+					hq: 5191,
+					ft: 417
+				}
+			},
+			mounted: function () {
+				var _this = this;
+				this.$nextTick(function () {
+					this.datetime = moment().format('YYYY-MM-DD hh:mm:ss');
+					_this.hourMeter();
+					for (var i = 0; i < 5; i++) {
+						_this.dates.push(moment().subtract(i, 'd').format('YYYY-MM-DD'))
+					}
+				})
+			},
+			computed: {
+				state1: function() {
+					return this.ty >= 6000 ? 'success' : 'danger' 
+				},
+				state2: function() {
+					return this.hq >= 2250 ? 'success' : 'danger' 
+				},
+				state3: function() {
+					return this.ft >= 900 ? 'success' : 'danger' 
+				},
+				
+			},
+			methods: {
+				hourMeter: function() {
+					var _this = this;
+					_this.jqxhr=$.ajax('sbwx/safety',{
+						type: 'GET',
+						dataType: 'json',
+						data:{},
+					}).then(function (res) {
+						console.log("res"+JSON.stringify(res))
+						setTimeout(function () {							
+							_this.ty=res[0].ty;
+							_this.hq=res[0].hq;
+							_this.ft=res[0].ft;
+							_this.datetime = moment().format('YYYY-MM-DD hh:mm:ss');
+							_this.hourMeter();
+						}, 1000);
+					})	
+				},
+				stateText: function(state) {
+					return state === 'success' ? '正常' : '异常';
+				}
+			}
+		})
+	})(Vue, _);
+</script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>营运里程异常分析</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/vue.min.js"></script>
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.core.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.load-indicator.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.load-strategies.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.sort-strategies.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.field.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<style>
+		.scrollbar-macosx {height: 100%;}
+		/*.form-inline {padding: 5px 5px 0 5px;}*/
+		.form-inline .form-group {margin-bottom: 5px;}
+		.form-inline + .panel-body {height: calc(100% - 40px);padding: 5px;overflow: auto;font-size: 0;}
+
+		.col-half {display: inline-block;width: 50%}
+		.panel-echart.col-half {width: calc(50% - 5px);height: 300px;margin-right: 5px;}
+		.panel-table.col-half {width: calc(50% - 5px);height: 300px;margin-left: 5px;}
+		.panel-table.col100P {height: calc(100% - 302px);padding-top: 10px;}
+		.panel-table {font-size: 12px;}
+
+		#yylcycfx-echart {
+			height: 100%;
+		}
+	</style>
+</head>
+<body>
+<div class="panel-wrapper" id="yylcycfxPanel" style="position: relative;">
+	<div class="panel-layout" layout="center">
+		<div class="dataListPanel" style="padding: 15px;">
+			<div class="form-inline">
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="glyphicon glyphicon-calendar" type="icon"></i>
+						<input type="text" class="form-control" id="yylcycfx-datetime" placeholder="日期" v-model="query.startTime">
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="iconfont icon-xitongyunzhuanqingkuang" type="icon"></i>
+						<input type="text" class="form-control" placeholder="最低里程" v-model="query.minMileage">
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<div type="calendar">
+						<i class="iconfont icon-xitongyunzhuanqingkuang" type="icon"></i>
+						<input type="text" class="form-control" placeholder="最高公里" v-model="query.maxMileage">
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<a class="btn btn-primary btn-sm" @click="handleQueryClick">查询</a>
+					<a class="btn btn-primary btn-sm" @click="handleExcleClick">导出</a>
+				</div>
+			</div>
+			<div class="panel-body">
+				<div class="scrollbar-macosx">
+					<div class="col-half panel-echart">
+						<div id="yylcycfx-echart"></div>
+					</div>
+					<div class="col-half panel-table">
+						<div id="yylcycfx-tabel"></div>
+					</div>
+					<div class="col100P panel-table">
+						<div id="yylcycfx-tabel-two"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script src="./yylcycfx.js"></script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>杭州市出租汽车服务管理系统</title>
+	<link rel="stylesheet" href="resources/style/reset.css">
+	<link rel="stylesheet" href="resources/style/iconfont.css">
+	<link rel="stylesheet" href="resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="resources/style/main.css">
+	<script src="resources/script/jquery-1.12.1.min.js"></script>
+	<script src="resources/js/md5.min.js"></script>
+    <script src="resources/script/layer/layer.js"></script>
+	<style>
+		body {
+			background-color: #292bd4;
+			background-image: url(resources/images/login-bg.png);
+			background-position: top right;
+			background-repeat: no-repeat;
+		}
+		.login-title {
+			position: absolute;
+			top: 10%;
+			left: 8%;
+			padding-left: 70px;
+			line-height: 44px;
+			font-size: 48px;
+			font-weight: bold;
+			color: #ffffff;
+		}
+		.login-title:before {content: '';position: absolute;left: 13px;display: inline-block;width: 45px;height: 54px;background: url(resources/images/logo.png);background-size: 100% 100%;}
+		.login-box {
+			position: absolute;
+			top: 45%;
+			left: 26%;
+			width: 230px;
+			z-index: 10;
+			transform: translate(-50%, -50%);
+		}
+		.login-box > .title {
+			margin-bottom: 20px;
+			padding-bottom: 3px;
+			border-bottom: 1px solid #797fe2;
+			font-size: 18px;
+			color: #ffffff;
+		}
+		.form-group {
+			margin-bottom: 25px;
+		}
+		[type='calendar'] {
+			width: 100%;
+		}
+		.form-control {
+			width: 100%;
+		}
+		.btn-login {
+			width: 100%;
+			border-radius: 8px;
+			font-size: 14px;
+			font-weight: bold;
+			line-height: 1.4em;
+			color: #5a98de;
+			background-color: #ffffff;
+/* 			color: #0b1afc; */
+/* 			background-color: #6cf5e3; */
+		}
+		.btn-login:hover {
+			border-color: #ffffff;
+			color: #0b1afc;
+		}
+		.login-img {
+			position: absolute;
+			right: 0;
+			bottom: 0;
+			width: 100%;
+			height: 100%;
+			min-width: 1480px;
+			min-height: 675px;
+			background: url(resources/images/login-img.png) right bottom / 85% 100% no-repeat;
+		}
+	</style>
+</head>
+<body>
+<h1 class="login-title">杭州市出租汽车服务管理系统</h1>
+<div class="login-box">
+	<div class="title"><i class="iconfont icon-user" type="icon"></i>用户登录</div>
+	<form class="">
+		<div class="form-group form-group-sm">
+			<div type="calendar">
+				<i class="glyphicon glyphicon-user" type="icon"></i>
+				<input type="text" class="form-control" id="username" placeholder="用户名">
+			</div>
+		</div>
+		<div class="form-group form-group-sm">
+			<div type="calendar">
+				<i class="glyphicon glyphicon-lock" type="icon"></i>
+				<input type="password" class="form-control" id="password" placeholder="密码">
+			</div>
+		</div>
+		<div class="form-group panel-buttonBar" layout="center" style="margin-bottom: 0;">
+			<a class="btn btn-sm btn-login" id="czclogin">登&emsp;&emsp;录</a>
+		</div>
+	</form>
+</div>
+<div class="login-img"></div>
+<script>
+//salt
+var g_passsword_salt="1a2b3c4d"
+
+$('#czclogin').on('click',function(){
+	var inputPass = $("#password").val();
+	var salt = g_passsword_salt;
+	var str = "" + salt.charAt(0) + salt.charAt(2) + inputPass+ salt.charAt(5) + salt.charAt(4);
+	var password = md5(str);
+	
+	$.ajax({
+		url : "common/do_login",
+		type : 'post',
+		data : {
+			username : $('#username').val(),
+			password : password
+		},
+		dataType : 'json',
+		success : function(data) {
+			console.log(data)
+			layer.closeAll();
+			if (data.code == 0) {
+				layer.msg("成功");
+				window.location.href = "http://"+self.location.host+"/zhpt/index.html";
+			} else {
+				layer.msg(data.msg);
+			}
+		},
+		error : function(data) {
+			layer.closeAll();
+		}
+	})
+})
+</script>
+</body>
+</html>

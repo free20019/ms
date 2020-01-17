@@ -1,0 +1,33 @@
+@import 'main';
+body {
+  background-color: transparent;
+}
+.template {
+  &-wrapper {
+    & > .scrollbar-macosx {
+      height: 100%;
+    }
+  }
+  &-main {
+    height: auto;
+    padding: 10px 15px;
+  }
+}
+
+.table {
+  margin-bottom: 0;
+}
+.panel-heading {
+  font-size: 18px;
+  font-weight: bold;
+  border-bottom: 1px solid #dddddd;
+}
+.panel-box {
+  width: 100%;
+  height: auto;
+  margin-bottom: 10px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}

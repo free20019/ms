@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>信息生成</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<link rel="stylesheet" href="../../resources/style/css/yjzhcz/startReport.css">
+	<link rel="stylesheet" href="../../resources/script/element-ui/lib/theme-chalk/index.css">
+	<script src="../../resources/script/vue.min.js"></script>
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="../../resources/script/moment.min.js"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.min.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/element-ui/lib/index.js"></script>
+</head>
+<body>
+<div class="template-wrapper" id="root">
+	<form class="form-inline query-bar form-group-sm">
+		<div class="form-group">
+			<input type="text" v-model="query.theme" class="form-control" placeholder="主题">
+		</div>
+		<div class="form-group">
+			<button type="button" class="btn btn-primary btn-sm" @click="handleQueryClick">查询</button>
+		</div>
+	</form>
+	<div class="dataListPanel center" style="height: 220px; margin-bottom: 10px;">
+		<div id="accessTable" class="jsgrid"></div>
+	</div>
+	<div class="tw-layout" style="height: calc(100% - 280px);">
+		<div class="tw-layout-left">
+			<div class="dataListPanel center">
+				<div class="header"><i class="iconfont icon-sound"></i>&nbsp;报警内容</div>
+				<div class="content">
+					<div class="scrollbar-macosx">
+						{{selectTableItem.SJNR}}
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="tw-layout-main">
+			<div class="dataListPanel center" style="padding: 0;">
+				<div id="ztree" class="ztree">
+					<el-tree ref="tree" :data="data2" show-checkbox node-key="id" :default-expanded-keys="[2, 3]" :default-checked-keys="[3]" :props="defaultProps"  style="margin-left:90px;">
+					</el-tree>
+				</div>
+				<div class="ztree-bar">
+					<label class="checkbox-inline">
+						<input type="checkbox" v-model="sendType" value="短信" id="message">&nbsp;短信
+					</label>
+					<label class="checkbox-inline">
+						<input type="checkbox" v-model="sendType" value="邮件" id="email">&nbsp;邮件
+					</label>&nbsp;&nbsp;&nbsp;&nbsp;
+					<button type="button" class="btn btn-primary" @click="handleSendClick">发送</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	(function (Vue, _, $, moment) {
+		var vm = new Vue({
+			el: '#root',
+			data: function () {
+				return {
+			        data2: [{
+			            id: 1,
+			            label: '运管局',
+			            children: [{
+			              id: 2,
+			              label: '指挥中心',
+			              children: [{
+				              id: 3,
+				              label: '金俊'
+				            }]
+			              
+			            }]
+			          }],
+			          defaultProps: {
+			            children: 'children',
+			            label: 'label'
+			          },
+					query: {
+						theme: ''
+					},
+					table: {
+						fields: [
+							{ name: "gId", title: "序号", width: 60 },
+							{ name: "TIME", title: "时间", itemTemplate: this.formatDate, width: 160 },
+							{ name: "SJZT", title: "主题", width: 200 },
+							{ name: "BJR", title: "报警人", width: 120 },
+							{ name: "DJDH", title: "报警人电话", width: 140 },
+							{ name: "JJR", title: "接警人", width: 120 },
+							{ name: "SJJB", title: "事件级别", width: 120 },
+							{ name: "SH", title: "状态", itemTemplate: this.formatReview, width: 120 },
+						],
+						data: []
+					},
+					selectTableItem: {},
+					sendType: []
+				}
+			},
+			mounted: function () {
+				var _this = this;
+				this.$nextTick(function () {
+					$('.scrollbar-macosx').scrollbar();
+					$("#accessTable").jsGrid({
+						height: "100%",
+						width: "100%",
+						noDataContent: '未查询到数据',
+						fields: _this.table.fields,
+						rowClick: _this.handleTableItemClick
+					});
+
+					_this.getAccess();
+				})
+			},
+			methods: {
+				// 异步
+				getAccess: function () {
+					var theme = this.query.theme;
+					var fields = this.table.fields;
+					$.ajax({
+						url: '../../Yjzh/fingyjsjjr',
+						type: 'GET',
+						dataType: 'json',
+						data: {
+							sjzt: theme
+						}
+					}).then(function (res) {
+						var data = _.map(res, function (item, index) {
+							item.gId = index + 1;
+							return item;
+						})
+						console.info('getAccess:', res)
+						$("#accessTable").jsGrid({
+							data: res
+						})
+					})
+				},
+				// 事件
+				handleQueryClick: function () {
+					this.getAccess();
+				},
+				handleTableItemClick: function(row) {
+					console.info('handleTableItemClick:', row)
+					var item = row.item;
+					this.selectTableItem = item;
+				},
+				handleSendClick: function () {
+					if(this.$refs.tree.getCheckedNodes()==""){
+						alert("请选择接收人");
+						return false;
+					}else{
+						if($("#message").prop('checked')||$("#email").prop('checked')){
+						 	alert("发送成功");						
+						}else{
+							alert("请勾选发送短信或邮箱")
+						}		
+					}
+					
+				},
+				// 格式
+				formatDate: function(date) {
+					console.info('formatDate:', date)
+					return moment(date).format('YYYY-MM-DD');
+				},
+				formatReview: function (type) {
+					switch (type) {
+						case 0:
+							return '未核实';
+						case 1:
+							return '已核实'
+					}
+				}
+			}
+		})
+	})(Vue, _, jQuery, moment);
+</script>
+</body>
+</html>

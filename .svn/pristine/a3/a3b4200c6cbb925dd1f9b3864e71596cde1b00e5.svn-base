@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>营运数据分析</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+	<script src="./yysjfx.js"></script>
+	
+	<style>
+		.panel-queryBar {padding: 10px 10px 0;}
+		.form-inline .form-group {margin-bottom: 10px;}
+		.dataListPanel.center {height: calc(100% - 50px);padding: 10px;}
+	</style>
+
+</head>
+<body>
+<div class="panel-wrapper" style="position: relative;">
+	<div class="panel-layout" layout="center">
+		<div class="panel-queryBar">
+			<form class="form-inline">
+				<div class="form-group form-group-sm">
+
+<!-- 					<div type="calendar"> -->
+<!-- 						<i class="glyphicon glyphicon-calendar" type="icon"></i> -->
+						<!--<input type="text" class="form-control" id="yysjfx-cph" placeholder="车牌号">-->
+<!-- 						<select type="text" class="form-control" autocomplete="off" id="yysjfx-cph" data-placeholder="车牌号" style="width: 150px;"><option></option></select> -->
+<!-- 					</div> -->
+
+					<div type="calendar">
+						<i class="glyphicon glyphicon-calendar" type="icon"></i>
+						<input type="text" class="form-control" id="yysjfx-datetimeStart" placeholder="开始时间">
+					</div>
+					<label class="addTimePeriod" db-control></label>
+					
+					<div type="calendar">
+						<i class="glyphicon glyphicon-calendar" type="icon"></i>
+						<input type="text" class="form-control" id="yysjfx-datetimeEnd" placeholder="结束时间">
+					</div>
+					<a class="btn btn-primary btn-sm" style="margin-left: 10px;" id="select_yysjfx">查询</a>
+					<a class="btn btn-primary btn-sm" id="daochu_yysjfx">导出</a>
+				</div>
+			</form>
+		</div>
+		<div class="dataListPanel center">
+			<div id="yysjfxTable"></div>
+		</div>
+	</div>
+</div>
+<!-- <script>
+	(function ($) {
+		var yysjfxFields = [
+			{name: 'datetime', title: '日期', width: 70, align: 'center'},
+			{name: 'dcpjyysy', title: '单车平均营运收益', width: 140},
+			{name: 'dcpjzklc', title: '单车平均载客里程', width: 140},
+			{name: 'dcpjkslc', title: '单车平均空驶里程', width: 140},
+			{name: 'dcpjyycs', title: '单车平均营运次数', width: 140},
+			{name: 'dcpjzksj', title: '单车平均载客时间', width: 140},
+			{name: 'dcpjzkdhsj', title: '单车平均载客等候时间', width: 160}
+		];
+		var yysjfxData = [
+			{datetime: '08月01日', dcpjyysy: '单车平均营运收益1', dcpjzklc: '单车平均载客里程1', dcpjkslc: '单车平均空驶里程1', dcpjyycs: '单车平均营运次数1', dcpjzksj: '单车平均载客时间1', dcpjzkdhsj: '单车平均载客等候时间1'},
+			{datetime: '08月02日', dcpjyysy: '单车平均营运收益2', dcpjzklc: '单车平均载客里程2', dcpjkslc: '单车平均空驶里程2', dcpjyycs: '单车平均营运次数2', dcpjzksj: '单车平均载客时间2', dcpjzkdhsj: '单车平均载客等候时间2'},
+			{datetime: '08月03日', dcpjyysy: '单车平均营运收益3', dcpjzklc: '单车平均载客里程3', dcpjkslc: '单车平均空驶里程3', dcpjyycs: '单车平均营运次数3', dcpjzksj: '单车平均载客时间3', dcpjzkdhsj: '单车平均载客等候时间3'},
+			{datetime: '08月04日', dcpjyysy: '单车平均营运收益4', dcpjzklc: '单车平均载客里程4', dcpjkslc: '单车平均空驶里程4', dcpjyycs: '单车平均营运次数4', dcpjzksj: '单车平均载客时间4', dcpjzkdhsj: '单车平均载客等候时间4'},
+			{datetime: '08月05日', dcpjyysy: '单车平均营运收益5', dcpjzklc: '单车平均载客里程5', dcpjkslc: '单车平均空驶里程5', dcpjyycs: '单车平均营运次数5', dcpjzksj: '单车平均载客时间5', dcpjzkdhsj: '单车平均载客等候时间5'},
+		];
+		$(function () {
+			$('#yysjfx-datetimeStart').datetimepicker(dateDefaultOption);
+			$('#yysjfx-datetimeEnd').datetimepicker(dateDefaultOption);
+			$('.addTimePeriod, .period').on('click', function () {
+				if ($(this).hasClass('addTimePeriod')) $(this).addClass('period').removeClass('addTimePeriod');
+				else if ($(this).hasClass('period')) $(this).addClass('addTimePeriod').removeClass('period');
+			});
+			$('#yysjfxTable').jsGrid({
+				width: 'calc(100% - 2px)',
+				height: 'calc(100% - 2px)',
+				editing: true,
+				sorting: true,
+				paging: false,
+				autoload: true,
+				data: yysjfxData,
+				fields: yysjfxFields
+			});
+		})
+	})(jQuery)
+</script> -->
+</body>
+</html>

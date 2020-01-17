@@ -1,0 +1,77 @@
+@import "../main";
+
+.tw-layout {
+  &-left {
+    .header {
+      padding-left: 5px;
+      padding-right: 5px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #cccccc;
+    }
+    .content {
+      height: calc(100% - 41px);
+      padding: 10px 0;
+      .scroll-content {
+        padding: 0 10px;
+      }
+    }
+  }
+  &-main {
+    .header {
+      height: 70px;
+      padding: 10px;
+      border-bottom: 1px solid #cccccc;
+      box-sizing: border-box;
+      font-size: 28px;
+      line-height: 50px;
+      text-align: center;
+    }
+    .content {
+      height: calc(100% - 70px);
+      padding: 10px 0 10px 10px;
+      .scroll-content {
+        padding: 0 10px 0 0;
+      }
+    }
+  }
+}
+
+.base-item {
+  position: relative;
+  height: 35px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-bottom: 1px solid #eeeeee;
+  cursor: pointer;
+
+  &:hover {
+    color: #ffffff;
+    background-color: #1492ff;
+    .item-tool {
+      display: block;
+    }
+  }
+  &.text-clear{
+    line-height: 0;
+  }
+  .item-title {
+    font-size: 14px;
+    line-height: 35px;
+  }
+
+  .item-tool {
+    position: absolute;
+    top: 1px;
+    right: 10px;
+    display: none;
+    height: 100%;
+  }
+}
+
+.scrollbar-macosx {
+  height: 100%;
+}
+
+.form-control {
+  width: 100%;
+}

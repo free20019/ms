@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>车辆监控跟踪</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="./cljkgz.js"></script>
+	<style>
+		#cljkgzMap {
+			height: 100%;
+			border: 1px solid #c4d4fb;
+			border-radius: 10px;
+		}
+		.scrollbar-macosx {
+			height: calc(100% - 122px);
+			margin-bottom: 10px;
+		}
+		.list[type='carInfoList'] {
+			height: auto;
+			margin-bottom: 0;
+		}
+	</style>
+</head>
+<body>
+<div class="panel-wrapper" style="position: relative;">
+	<div class="panel-layout" layout="left">
+		<div class="dataListPanel">
+			<div class="searchBar">
+				<i class="icon-first iconfont icon-car"></i>
+				<input type="text" placeholder="输入三位以上车牌号码" id="cphm_value">
+				<a class="btn btn-primary btn-sm btn-last ip-iconfont ip-icon-search"></a>
+			</div>
+			<div class="scrollbar-macosx">
+				<ul class="list" type="carInfoList" id="vehi_list">
+<!-- 					<li class="listItem"> -->
+<!-- 						<span class="col" type="licensePlate">浙A12345</span> -->
+<!-- 						<span class="col btn btn-default btn-xs" type="button">跟踪</span> -->
+<!-- 						<span class="col btn btn-primary btn-xs" type="button">轨迹回放</span> -->
+<!-- 					</li> -->
+<!-- 					<li class="listItem"> -->
+<!-- 						<span class="col" type="licensePlate">浙A12346</span> -->
+<!-- 						<span class="col btn btn-default btn-xs" type="button">跟踪</span> -->
+<!-- 						<span class="col btn btn-primary btn-xs" type="button">轨迹回放</span> -->
+<!-- 					</li> -->
+<!-- 					<li class="listItem"> -->
+<!-- 						<span class="col" type="licensePlate">浙A12347</span> -->
+<!-- 						<span class="col btn btn-default btn-xs" type="button">跟踪</span> -->
+<!-- 						<span class="col btn btn-primary btn-xs" type="button">轨迹回放</span> -->
+<!-- 					</li> -->
+<!-- 					<li class="listItem"> -->
+<!-- 						<span class="col" type="licensePlate">浙A12348</span> -->
+<!-- 						<span class="col btn btn-default btn-xs" type="button">跟踪</span> -->
+<!-- 						<span class="col btn btn-primary btn-xs" type="button">轨迹回放</span> -->
+<!-- 					</li> -->
+<!-- 					<li class="listItem"> -->
+<!-- 						<span class="col" type="licensePlate">浙A12349</span> -->
+<!-- 						<span class="col btn btn-default btn-xs" type="button">跟踪</span> -->
+<!-- 						<span class="col btn btn-primary btn-xs" type="button">轨迹回放</span> -->
+<!-- 					</li> -->
+				</ul>
+			</div>
+			<a class="btn btn-primary btn-more" id="get_more">加载更多</a>
+		</div>
+	</div>
+	<div class="panel-layout" layout="center">
+		<div id="cljkgzMap"></div>
+	</div>
+<!-- 	<div class="mapDialogInfo"> -->
+		<!--地图-车辆信息START-->
+<!-- 		<div class="mapInfo-body"> -->
+<!-- 			<div class="mapInfo-title">浙ATC776</div> -->
+<!-- 			<div class="mapInfo-item" type="mapInfoItem" title="所属公司">杭州一运出租汽车有限公司</div> -->
+<!-- 			<div class="mapInfo-item" type="mapInfoItem" title="SIM卡">18248406066</div> -->
+<!-- 			<div class="mapInfo-item" type="mapInfoItem" title="车辆所属人">王海还</div> -->
+<!-- 			<div class="mapInfo-item" type="mapInfoItem" title="联系电话">18248406066</div> -->
+<!-- 			<div class="mapInfo-item" type="mapInfoItem" title="经度">120.116452</div> -->
+<!-- 			<div class="mapInfo-item" type="mapInfoItem" title="纬度">30.3127014</div> -->
+<!-- 		</div> -->
+		<!--地图-车辆信息END-->
+<!-- 	</div> -->
+</div>
+</body>
+</html>

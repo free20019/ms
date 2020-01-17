@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>特殊车辆查询</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.PolyEditor,AMap.CircleEditor,AMap.Geocoder"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<script src="../../config.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<style>
+		#tsclcxMap {
+			height: 100%;
+			border: 1px solid #c4d4fb;
+			border-radius: 10px;
+		}
+		.panel-layout[layout='left'] {
+			width: 360px;
+		}
+		.panel-layout[layout='left'] ~ .panel-layout[layout='center'] {width: calc(100% - 375px);margin-left: 375px;}
+
+		.scrollbar-macosx {
+			height: calc(100% - 268px);
+			margin-bottom: 10px;
+		}
+		.scrollbar-macosx + .btn-clear {
+			margin: 0;
+		}
+
+		.dataListPanel {width: 360px;padding: 10px;}
+
+		.table {
+			table-layout: auto;
+		}
+		thead .t_vehicle {width: 50px;text-align: center;}
+		.t_latAndLon {width: 100px;text-align: right;}
+		.t_datetime {width: 150px;text-align: center;}
+		.t_operate {width: 60px;text-align: center;}
+
+	</style>
+</head>
+<body>
+<div class="panel-wrapper" id="tsclcxPanel" style="position: relative;">
+	<div class="panel-layout" layout="left">
+		<div class="panel-title" ip-type="attach-left">
+			<div class="title">特殊车辆查询</div>
+			<i class="iconfont icon-arrowTria" ip-type="left"></i>
+		</div>
+		<div class="dataListPanel">
+			<div class="card panel-queryBar" border="left" color="red">
+				<span class="title">起点时间</span>
+				<div type="calendar">
+					<i class="glyphicon glyphicon-calendar" type="icon"></i>
+					<input type="text" class="form-control input-sm" id="tsclcx-datetimeStart">
+				</div>
+				<span>前后</span>
+				<input type="text" class="form-control input-sm" value="30" id="qd_etime" number>
+				<span>分钟</span>
+				<a class="btn btn-primary btn-xs btn-position" id="dwqdfw">定位</a>
+			</div>
+			<div class="card panel-queryBar" border="left" color="greed">
+				<span class="title">终点时间</span>
+				<div type="calendar">
+					<i class="glyphicon glyphicon-calendar" type="icon"></i>
+					<input type="text" class="form-control input-sm" id="tsclcx-datetimeEnd">
+				</div>
+				<span>前后</span>
+				<input type="text" class="form-control input-sm" value="30" id="zd_etime" number>
+				<span>分钟</span>
+				<a class="btn btn-primary btn-xs btn-position" id="dwzdfw">定位</a>
+			</div>
+			<div class="panel-buttonBar" layout="center">
+				<a class="btn btn-primary" id="swcz_cx">查找</a>
+				<a class="btn btn-primary" id="swcz_dc">导出</a>
+			</div>
+			<div class="scrollbar-macosx">
+				<div class="card" border="left" color="red" id="qdfwPanel">
+					<span class="title">起点车辆</span>
+					<table class="table" style="margin-bottom: 0;">
+						<thead>
+						<th class="t_vehicle">车牌号</th>
+						<th class="t_datetime">时间</th>
+						</thead>
+						<tbody>
+ 						<!--<tr><td class="t_vehicle">浙A2345</td><td class="t_datetime">2018-07-09 12:35:00</td></tr>-->
+ 						<!--<tr><td class="t_vehicle">浙A2345</td><td class="t_datetime">2018-07-09 12:35:00</td></tr>-->
+ 						<!--<tr><td class="t_vehicle">浙A2347</td><td class="t_datetime">2018-07-09 12:35:00</td></tr>-->
+ 						<!--<tr><td class="t_vehicle">浙A2348</td><td class="t_datetime">2018-07-09 12:35:00</td></tr>-->
+ 						<!--<tr><td class="t_vehicle">浙A2349</td><td class="t_datetime">2018-07-09 12:35:00</td></tr>-->
+						</tbody>
+					</table>
+				</div>
+				<div class="card" border="left" color="greed" id="zdfwPanel">
+					<span class="title">终点车辆</span>
+					<table class="table" style="margin-bottom: 0;">
+						<thead>
+						<th class="t_vehicle">车牌号</th>
+						<th class="t_datetime">时间</th>
+						</thead>
+						<tbody>
+ 						<!--<tr><td class="t_vehicle">浙A2345</td><td class="t_datetime">2018-07-09 12:35:00</td></tr>-->
+ 						<!--<tr><td class="t_vehicle">浙A2345</td><td class="t_datetime">2018-07-09 12:35:00</td></tr>-->
+ 						<!--<tr><td class="t_vehicle">浙A2347</td><td class="t_datetime">2018-07-09 12:35:00</td></tr>-->
+ 						<!--<tr><td class="t_vehicle">浙A2348</td><td class="t_datetime">2018-07-09 12:35:00</td></tr>-->
+ 						<!--<tr><td class="t_vehicle">浙A2349</td><td class="t_datetime">2018-07-09 12:35:00</td></tr>-->
+						</tbody>
+					</table>
+				</div>
+				<div class="card" border="left" color="blue" style="margin-bottom: 1px;" id="clxxPanel">
+					<span class="title">目标车辆</span>
+					<table class="table" style="margin-bottom: 0;">
+						<thead>
+						<th class="t_vehicle">车牌号</th>
+						<th class="t_operate">操作</th>
+						</thead>
+						<tbody>
+ 						<!--<tr><td class="t_vehicle">浙A2345</td><td class="t_operate"><button class="btn btn-primary btn-xs guijichaxun">轨迹</button></td></tr>-->
+ 						<!--<tr><td class="t_vehicle">浙A2345</td><td class="t_operate"><button class="btn btn-primary btn-xs guijichaxun">轨迹</button></td></tr>-->
+ 						<!--<tr><td class="t_vehicle">浙A2347</td><td class="t_operate"><button class="btn btn-primary btn-xs guijichaxun">轨迹</button></td></tr>-->
+ 						<!--<tr><td class="t_vehicle">浙A2348</td><td class="t_operate"><button class="btn btn-primary btn-xs guijichaxun">轨迹</button></td></tr>-->
+ 						<!--<tr><td class="t_vehicle">浙A2349</td><td class="t_operate"><button class="btn btn-primary btn-xs guijichaxun">轨迹</button></td></tr>-->
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<a class="btn btn-primary btn-clear" id="clearMap">清除</a>
+		</div>
+	</div>
+	<div class="panel-layout" layout="center">
+		<div id="tsclcxMap"></div>
+	</div>
+</div>
+<script>
+	(function ($) {
+		$(function () {
+			$('.scrollbar-macosx').scrollbar();
+
+			$('#tsclcx-datetimeStart').datetimepicker(datetimeDefaultOption);
+			$('#tsclcx-datetimeEnd').datetimepicker(datetimeDefaultOption);
+			$('#tsclcx-datetimeStart').val(new Date().Format('yyyy-MM-dd hh:mm:ss'));
+			$('#tsclcx-datetimeEnd').val(new Date().Format('yyyy-MM-dd hh:mm:ss'));
+
+			$('.form-control[type=calendar] .glyphicon-calendar').on('click', function () {
+				$(this).next('input').trigger('focus');
+			});
+			titlePanelScaling('#tsclcxPanel', {width: 360});
+
+			var shiwumap = new AMap.Map('tsclcxMap', {
+				zoom: 14,
+				viewMode: '3D'
+			});
+
+			var fxudmouseTool = null;
+			var polygonfk = null;
+			var polygonfks = [null, null];
+			var udpolygonOption = {
+				strokeColor: "",
+				strokeOpacity: 0,
+				strokeWeight: 1
+			};
+			var isStart = false, isEnd = false;
+			var mouseTool = null;
+			var qd_jwd = "", zd_jwd = "";
+			var kt1 = new Array(), kt2 = new Array();
+			var zj;
+
+
+			setTimeout(function () {
+				$($($(window.parent.document)).find('.ip-menuItem').get(3)).find('.ip-menuTitle').click();
+			}, 1000)
+
+
+			//起点
+			$('#dwqdfw').click(function () {
+				if (!isStart) isStart = arawAreaFun(shiwumap, isStart, 1);
+			});
+			//终点
+			$('#dwzdfw').click(function () {
+				if (!isEnd) isEnd = arawAreaFun(shiwumap, isEnd, 2);
+			});
+			//清除地图
+			$('#clearMap').hide().click(function () {
+				if (polygonfk != null) {
+					shiwumap.clearMap();
+				}
+				qd_jwd = "";
+				zd_jwd = "";
+				isStart = false;
+				isEnd = false;
+				polygonfks = [null, null];
+				$(this).hide();
+			});
+			//导出
+			$('#swcz_dc').on('click', function () {
+				if ($('#clxxPanel table tbody').html() == "") {
+					alert("无数据无法导出信息!");
+				} else {
+					var data = {
+						"qd_stime": timestart($("#tsclcx-datetimeStart").val(), $("#qd_etime").val()),
+						"qd_etime": timeend($("#tsclcx-datetimeStart").val(), $("#qd_etime").val()),
+						"zd_stime": timestart($("#tsclcx-datetimeEnd").val(), $("#zd_etime").val()),
+						"zd_etime": timeend($("#tsclcx-datetimeEnd").val(), $("#zd_etime").val()),
+						"qd_jwd": qd_jwd,
+						"zd_jwd": zd_jwd,
+					};
+					url = "../../claq/findswczexcle?data=" + dojo.toJson(data) , window.open(url)
+				}
+			});
+
+			//查询
+			$('#swcz_cx').on('click', function () {
+				if (qd_jwd == "" || zd_jwd == "") {
+					alert("请先选择区域!");
+					return;
+				}
+				layer.load(2);
+				$("#swcz_cx").attr('disabled', "true");
+				$.ajax({
+					type: "POST",
+					url: "../../claq/findswcz",
+					data: {
+						"qd_stime": timestart($("#tsclcx-datetimeStart").val(), $("#qd_etime").val()),
+						"qd_etime": timeend($("#tsclcx-datetimeStart").val(), $("#qd_etime").val()),
+						"zd_stime": timestart($("#tsclcx-datetimeEnd").val(), $("#zd_etime").val()),
+						"zd_etime": timeend($("#tsclcx-datetimeEnd").val(), $("#zd_etime").val()),
+						"qd_jwd": qd_jwd,
+						"zd_jwd": zd_jwd,
+					},
+					dataType: 'json',
+					timeout: 3600000,
+					success: function (json) {
+						console.log(json)
+						$('#qdfwPanel table tbody, #clxxPanel table tbody, #zdfwPanel table tbody').empty();
+						console.log(json[0].length + "   " + json[1].length + "   " + json[2].length)
+						if (json[0].length > 0 || json[1].length > 0 || json[2].length > 0) {
+							console.log(json)
+							var qd = json[0];
+							var zd = json[1];
+							zj = json[2];
+							for (var i = 0; i < qd.length; i++) {
+								var trTag = $('<tr>');
+								$('<td>').addClass('t_vehicle').text(qd[i].vehi_no).appendTo(trTag);
+								$('<td>').addClass('t_datetime').text(qd[i].stime).appendTo(trTag);
+								$('#qdfwPanel table tbody').append(trTag);
+							}
+							for (var i = 0; i < zd.length; i++) {
+								var trTag = $('<tr>');
+								$('<td>').addClass('t_vehicle').text(zd[i].vehi_no).appendTo(trTag);
+								$('<td>').addClass('t_datetime').text(zd[i].stime).appendTo(trTag);
+								$('#zdfwPanel table tbody').append(trTag);
+							}
+							var icon = "../../resources/images/c.png";
+							var marker1;
+							for (var i = 0; i < zj.length; i++) {
+								var trTag = $('<tr>');
+								$('<td>').addClass('t_vehicle').text(zd[i].vehi_no).appendTo(trTag);
+								var operate = $('<td>').addClass('t_operate');
+								operate.append(
+									$('<button>').addClass('btn btn-primary btn-xs guijichaxun').data('ip-index', i).text('轨迹').on('click', function () {
+										var index = $(this).data('ip-index');
+										var _parent = parent.$(window.parent.document);
+										if (_parent.find('.ip-tabBarItem[data-name="gjhfgz"]').length > 0) {
+											_parent.find('.ip-tabBarItem[data-name="gjhfgz"]').trigger('click');
+											_parent.find('#gjhfgz').get(0).contentWindow.location.reload(true);
+										}
+										_parent.find('#defaultVehi').val(zj[index].vehi_no);
+										_parent.find('.ip-menuItem [data-skip="gjhfgz"]').trigger("click");
+									})
+								);
+								operate.appendTo(trTag);
+								$('#clxxPanel table tbody').append(trTag);
+							}
+							$('#swcz_cx').removeAttr("disabled");
+							layer.closeAll('loading');
+						} else {
+							$('#swcz_cx').removeAttr("disabled");
+							layer.closeAll('loading');
+							alert("该时间内起点与终点区域内没有符合条件的车辆");
+						}
+					},
+					error: function () {
+						layer.closeAll('loading');
+					}
+				});
+			});
+
+			//画框
+			function arawAreaFun(mapObj, isArea, num) {
+				console.info(num);
+				if (isArea) return false;
+				mapObj.plugin(["AMap.MouseTool"], function () {
+					fxudmouseTool = new AMap.MouseTool(mapObj);
+					fxudmouseTool.polygon(udpolygonOption);   //使用鼠标工具绘制多边形
+					AMap.event.addListener(fxudmouseTool, "draw", function (e) {
+						var drawObj = e.obj;
+						var pointsCount = e.obj.getPath().length;
+						var a = e.obj.getPath();
+						var zbs = "";
+						var polygonArr1 = [];//多边形覆盖物节点坐标数组
+						for (var i = 0; i < pointsCount; i++) {
+							polygonArr1.push([a[i].lng, a[i].lat]);
+						}
+						polygonfk = fanwei(polygonArr1, num);
+						polygonfk.setMap(mapObj);
+						if (num == 1) polygonfks[0] = polygonfk;
+						else polygonfks[1] = polygonfk;
+						fxudmouseTool.close(true);
+						fxudmouseTool = null;
+						$('#clearMap').show();
+					});
+				});
+				return true
+			}
+
+			// //轨迹 --- 跳转
+			// findlsgj = function(obj){
+			// 	console.log(zj[obj].vehi_no)
+			// 	var li = $($(window.parent.document)).find('.ip-tabBarItem');
+			// 	for(var i=0;i<li.length;i++){
+			// 		if(li.get(i).getAttribute('data-name') == "gjhfgz"){
+			// 			$($(window.parent.document)).find('.ip-tabItemRemove').get(i).click();
+			// 		}
+			// 	}
+			// 	parent.$($($(window.parent.document)).find('#defaultVehi')).val(zj[obj].vehi_no);
+			// 	parent.$($($(window.parent.document)).find('.ip-menuItem').get(3)).find('.ip-menuTitle').trigger("click");
+			// }
+
+			//范围坐标
+			function fanwei(polygonArr1, num) {
+				if (1 == num) {
+					qd_jwd = "";
+					for (var i = 0; i < polygonArr1.length; i++) {
+						qd_jwd += polygonArr1[i] + ";";
+						kt1.push(polygonArr1[i]);
+					}
+				}
+				if (2 == num) {
+					zd_jwd = "";
+					for (var i = 0; i < polygonArr1.length; i++) {
+						zd_jwd += polygonArr1[i] + ";";
+						kt2.push(polygonArr1[i]);
+					}
+				}
+				return new AMap.Polygon({
+					path: polygonArr1,//设置多边形边界路径
+					strokeColor: "#1791fc", //线颜色
+					strokeOpacity: 1, //线透明度
+					strokeWeight: 2,    //线宽
+					fillColor: "#1791fc", //填充色
+					fillOpacity: .5//填充透明度
+				});
+			}
+
+			//开始时间
+			function timestart(e, c) {
+				var ddate = new Date(e);
+				var result = new Date(ddate - parseInt(c) * 60 * 1000);
+				return setformatnewlc(result);
+			}
+
+			//结束时间
+			function timeend(e, c) {
+				var ddate = new Date(e);
+				var result = new Date(ddate + parseInt(c) * 60 * 1000);
+				return setformatnewlc(result);
+			}
+
+			//截取时间
+			function setformatnewlc(obj) {
+				var y = (obj.getFullYear()).toString();
+				var m = (obj.getMonth() + 1).toString();
+				if (m.length == 1) {
+					m = "0" + m;
+				}
+				var d = obj.getDate().toString();
+				if (d.length == 1) {
+					d = "0" + d;
+				}
+				var h = obj.getHours().toString();
+				if (h.length == 1) {
+					h = "0" + h;
+				}
+				var mi = obj.getMinutes().toString();
+				if (mi.length == 1) {
+					mi = "0" + mi;
+				}
+				var s = obj.getSeconds().toString();
+				if (s.length == 1) {
+					s = "0" + s;
+				}
+				var time = y + "-" + m + "-" + d + " " + h + ":" + mi + ":" + s;
+				console.log(time)
+				return time;
+			}
+		})
+	})(jQuery);
+</script>
+</body>
+</html>

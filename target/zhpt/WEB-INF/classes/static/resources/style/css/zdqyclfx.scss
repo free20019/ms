@@ -1,0 +1,30 @@
+@import 'main';
+
+body {
+  background-color: transparent;
+}
+
+.template {
+  &-wrapper {}
+  &-main {
+    height: calc(100% - 40px);
+    padding: $space;
+  }
+}
+
+.panel-box {
+  padding: $space;
+}
+
+.table-box {
+  height: 390px;
+  margin-bottom: 10px;
+}
+
+.chart-box {
+  height: calc(100% - 400px);
+  min-height: 250px;
+}
+.scrollbar-macosx {
+  height: 100%;
+}

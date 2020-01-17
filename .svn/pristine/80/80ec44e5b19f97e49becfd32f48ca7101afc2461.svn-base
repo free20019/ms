@@ -1,0 +1,233 @@
+var tswzcx=(function ($) {
+	var clfb_map;
+	$(function () {
+		$('#tswz-stateTime').datetimepicker(datetimeDefaultOption);
+//		$('#tswz-stateTime').val(new Date().Format('yyyy-MM-dd hh:mm:ss'));
+		$('#tswz-endTime').datetimepicker(datetimeDefaultOption);
+//		$('#tswz-endTime').val(new Date().Format('yyyy-MM-dd hh:mm:ss'));
+
+		$(document).ready(function() {
+			  $(".select2").select2({  
+				  	language: "zh-CN",  //设置 提示语言
+			        tags:true,  
+			        allowClear: true,
+			        createTag:function (decorated, params) {  
+			            return null;  
+			        },  
+			    });
+			});
+//		jqxhr=$.ajax({
+//				type: "POST",
+//				url: "../../ycyy/tsxll",
+//				data:{"field":"AUTO_NUM","table":"tb_taxi_illegal_info_out"},
+//				timeout : 180000,
+//				dataType: 'json',
+//				success:function(data){
+//					$("#tswz-cphm").select2({ 
+//						language: "zh-CN",  //设置 提示语言
+//				        minimumInputLength: 3,
+//				        tags:true,  
+//				        allowClear: true,
+//				        closeOnSelect: true,
+//				        createTag:function (decorated, params) {  
+//				            return null;  
+//				        },  
+//				    });
+//					$("#tswz-cphm").empty();
+//					$("#tswz-cphm").append('<option value="" selected></option>');
+//					$("#tswz-cphm").append('<option value="null">全部车辆</option>');
+//					for(var i=0; i<data.length;i++){
+//						$("#tswz-cphm").append('<option value="'+data[i].AUTO_NUM+'">'+data[i].AUTO_NUM+'</option>');
+//					}
+//				},
+//				error: function(){
+//				}         
+//			});
+			jqxhr=$.ajax({
+				type: "POST",
+				url:"../../claq/qyveh",
+				data:{},
+				dataType: 'json',
+				timeout : 3600000,
+				success:function(json){
+					console.log(json);
+					var data= json.dataveh;
+					for (var i = 0; i < data.length; i++) {
+						data[i].id=data[i].PLATE_NUMBER;
+						data[i].text=data[i].PLATE_NUMBER;
+					}
+					var qb={};
+					qb.id='0';
+					qb.text='全部';
+					data.unshift(qb);
+					$('#tswz-cphm').select2({
+						data: data,
+						language:'zh-CN',
+						minimumInputLength: 3,
+						allowClear: true
+					});
+				}
+			});
+		jqxhr=$.ajax({
+				type: "POST",
+				url: "../../ycyy/tsxll",
+				data:{"field":"CASE_REASON","table":"tb_taxi_illegal_info_out"},
+				timeout : 180000,
+				dataType: 'json',
+				success:function(data){
+					$("#tswz-type").empty();
+					$("#tswz-type").append('<option value="" disabled selected>类型</option>');
+					$("#tswz-type").append('<option value="null">全部类型</option>');
+					for(var i=0; i<data.length;i++){
+						$("#tswz-type").append('<option value="'+data[i].CASE_REASON+'">'+data[i].CASE_REASON+'</option>');
+					}
+				},
+				error: function(){
+				}         
+			});
+		jqxhr=$.ajax({
+			type: "POST",
+			url: "../../ycyy/tsxll",
+			data:{"field":"AREA","table":"tb_taxi_illegal_info_out"},
+			timeout : 180000,
+			dataType: 'json',
+			success:function(data){
+				$("#tswz-address").empty();
+				$("#tswz-address").append('<option value="" disabled selected>采集点</option>');
+				$("#tswz-address").append('<option value="null">全部地点</option>');
+				for(var i=0; i<data.length;i++){
+					if(null!=data[i].AREA){
+						$("#tswz-address").append('<option value="'+data[i].AREA+'">'+data[i].AREA+'</option>');						
+					}
+				}
+			},
+			error: function(){
+			}         
+		});
+		
+		var bljlFields = [
+		                {name: 'id', title: '序号', width: 60, align: 'center'},
+	                  	{name: 'cphm', title: '车牌号', width: 120, align: 'center'},
+	                  	{name: 'dsrxm', title: '当事人姓名', width: 120, align: 'center'},
+	                  	{name: 'ickfz', title: 'IC卡分值', width: 120, align: 'center'},
+		    			{name: 'wzsj', title: '采集时间', width: 120, align: 'center'},
+		    			{name: 'zfsj', title: '执法时间', width: 120, align: 'center'},
+		    			{name: 'ajyy', title: '案件类型', width: 120, align: 'center'},
+		    			{name: 'zfbm', title: '执法部门', width: 120, align: 'center'},
+		    			{name: 'zfqy', title: '采集点', width: 120, align: 'center'},
+		    			{name: 'jyxkzh', title: '经营许可证号', width: 120, align: 'center'},
+
+//		                  	{name: 'id', title: '序号', width: 60},
+//		                  	{name: 'cphm', title: '车牌号', width: 120},
+////			    			{name: 'cjdd', title: '采集地点', width: 120},
+//			    			{name: 'yclx', title: '异常类型', width: 120},
+//			    			{name: 'cjsj', title: '采集时间', width: 120},
+			    		];
+		$('#tswz-select').on('click', function () {
+			findtswz();
+		});
+		function findtswz(){
+			var all = 0;
+			$('#tswzTable').jsGrid({
+				width: '100%',
+				height: 'calc(100% - 55px)',
+				autoload: true,
+				paging: true,
+				pageLoading: true,
+				editing: true,
+				sorting: true,
+				pageSize: 15,
+				pageIndex: 1,
+				controller: {
+                    loadData: function(filter) {
+                    	var d = $.Deferred();
+                    	var a = re(filter, function(item){
+                    		d.resolve(item);
+                    	})
+                    	return d.promise();
+                    }
+                },
+                fields: bljlFields,
+				pagerContainer: null,
+			    pageButtonCount: 5,
+			    pagerFormat: "{first} {prev} {pages} {next} {last} {pageIndex} of {pageCount}",
+			    pagePrevText: "上一页",
+			    pageNextText: "下一页",
+			    pageFirstText: "首页",
+			    pageLastText: "末页",
+			    pageNavigatorNextText: ">",
+			    pageNavigatorPrevText: "<"
+          	});
+
+//			setTimeout("findtswz()",1000);
+		}
+		function re(filter, callback){
+            var startIndex = (filter.pageIndex - 1) * filter.pageSize;
+            jqxhr=jqxhr=$.ajax({
+            	type: "POST",
+				url: "../../ycyy/findtswz",
+				data:{"stime":$("#tswz-stateTime").val(),
+					"etime":$("#tswz-endTime").val(),
+					"vehicle":$("#tswz-cphm").val(),
+					"type":$("#tswz-type").val(),
+					"address":$("#tswz-address").val(),
+					"pageIndex":filter.pageIndex,
+     				"pageSize":filter.pageSize
+					},
+				timeout : 180000,
+				dataType: 'json',
+            }).done(function(data) {
+            		var jsycxData = [];
+     				all = data[0].count;
+         			if(data.length>0){
+         				for(var i = 0; i< data[0].datas.length ;i++){
+         					var rs={};
+         					var vehicle=data[0].datas[i];
+         					rs.id =  startIndex+i+1;	
+         					rs.cphm =  data[0].datas[i].AUTO_NUM;
+         					rs.dsrxm =  data[0].datas[i].PARTY_NAME;
+         					rs.ickfz =  data[0].datas[i].IC_SCORE;
+         					rs.wzsj = (data[0].datas[i].ILLEGAL_TIME==null?"":(new Date(data[0].datas[i].ILLEGAL_TIME)).Format("yyyy-MM-dd hh:mm:ss"));
+         					rs.zfsj = (data[0].datas[i].LEGAL_TIME==null?"":(new Date(data[0].datas[i].LEGAL_TIME)).Format("yyyy-MM-dd hh:mm:ss"));
+         					rs.ajyy =  data[0].datas[i].CASE_REASON;
+         					rs.zfbm =  data[0].datas[i].ORGAN;
+         					rs.zfqy =  data[0].datas[i].AREA;
+         					rs.jyxkzh =  data[0].datas[i].LIENCE_NUM;
+         					jsycxData.push(rs);
+         				}
+         				return callback({
+                            data: jsycxData,
+                            itemsCount: all
+                        });
+
+         			}else{
+        			}
+            }).fail(function() {
+//        			alert("数据异常");
+            });
+		}
+		findtswz();
+		$('#tswz-reset').on('click', function () {
+			$('.panel-queryBar .form-control').val('');
+			$('.panel-queryBar .select2').val([""]).trigger("change");
+		});
+		$('#tswz-dc').on('click', function () {
+			layer.confirm('你确定要导出数据', {
+				btn: ['确定', '取消'],
+				offset: '100px'
+			}, function (layerIndex) {
+				window.open(basePath+"ycyy/findtswzdc?stime="+$("#tswz-stateTime").val()
+						+"&etime="+$("#tswz-endTime").val()
+						+"&vehicle="+$("#tswz-cphm").val()
+						+"&type="+$("#tswz-type").val()
+						+"&address="+$("#tswz-address").val()
+				);
+				layer.close(layerIndex);
+			}, function (layerIndex) {
+				layer.close(layerIndex);
+			});
+		});
+	})
+	
+})(jQuery)
+

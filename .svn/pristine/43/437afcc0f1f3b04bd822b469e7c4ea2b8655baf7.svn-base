@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>滞留车辆监控</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<style>
+		#zlcljkMap {
+			height: 100%;
+			border: 1px solid #c4d4fb;
+			border-radius: 10px;
+		}
+
+		.panel-layout[layout='left'] {
+			width: 485px;
+		}
+		.panel-layout[layout='left'] ~ .panel-layout[layout='center'] {
+			width: calc(100% - 500px);
+			margin-left: 500px;
+		}
+
+
+		.list-header[type='fluid'] {
+			line-height: 47px;
+			display: flex;
+			padding: 0 10px;
+			border-bottom: 1px solid #9aa3fd;
+		}
+		.list-bodyer[type='fluid'] {
+			padding: 0 10px;
+			margin-bottom: 0;
+		}
+		.list-bodyer[type='fluid'] .listItem {
+			display: flex;
+		}
+		.list-bodyer[type='fluid'] .listItem:not(:last-child) {
+			border-bottom: 1px solid #ccd1fe;
+		}
+		.list-header[type='fluid'] .item-col,
+		.list-bodyer[type='fluid'] .item-col {
+			align-items: end;
+			display: flex;
+			flex: .65;
+			justify-content:center;
+		}
+		.list-header[type='fluid'] .item-col[type='vehicleNum'],
+		.list-bodyer[type='fluid'] .item-col[type='vehicleNum'] {
+			align-items: end;
+			display: flex;
+			flex: .35;
+			justify-content:center;
+		}
+		.list-bodyer[type='fluid'] .item-col {
+			height: 30px;
+			line-height: 30px;
+		}
+		.list-header[type='fluid'] .item-col:not(:last-child),
+		.list-bodyer[type='fluid'] .item-col:not(:last-child) {
+			position: relative;
+		}
+		.list-header[type='fluid'] .item-col:not(:last-child):after,
+		.list-bodyer[type='fluid'] .item-col:not(:last-child):after {
+			content: '';
+			position: absolute;
+			top: 50%;
+			right: 0;
+			border-right: 1px solid #9aa3fd;
+			transform: translate(-50%, -50%);
+		}
+		.list-header[type='fluid'] .item-col:not(:last-child):after {
+			top: 58%;
+			height: 40%;
+		}
+		.list-bodyer[type='fluid'] .item-col:not(:last-child):after {
+			height: 45%;
+		}
+		.list-header[type='fluid'] .item-col[type='labelName'],
+		.list-bodyer[type='fluid'] .item-col[type='labelName'] {
+			flex: 1;
+			width: 130px;
+		}
+		.list-bodyer[type='fluid'] .item-col[type='labelName'] {
+			justify-content: left;
+			overflow: hidden;
+			font-size: 14px;
+		}
+		.list-bodyer[type='fluid'] .item-col.icon-location:before {
+			margin-left: -2px;
+			margin-right: 2px;
+			font-size: 16px;
+			color: #fe5c87;
+		}
+		.list-header[type='fluid'] .item-col[type='vehicleNum'],
+		.list-bodyer[type='fluid'] .item-col[type='vehicleNum'] {
+		}
+		.list-header[type='fluid'] .item-col[type='alarmsNum'],
+		.list-bodyer[type='fluid'] .item-col[type='alarmsNum'] {
+		}
+		.scrollbar-macosx {
+			height: calc(100% - 45px);
+		}
+	</style>
+</head>
+<body>
+<div class="panel-wrapper" id="zlcljkPanel" style="position: relative;">
+	<div class="panel-layout" layout="left">
+		<div class="panel-title" ip-type="attach-left">
+			<div class="title">滞留车辆查询</div>
+			<i class="iconfont icon-arrowTria" ip-type="left"></i>
+		</div>
+		<div class="dataListPanel" style="width: 485px;padding: 15px;">
+			<div class="card panel-queryBar" border="left" color="red">
+				<!--<span class="title">起点时间</span>-->
+				<div class="form-inline">
+					<div class="form-group form-group-sm">
+						<div type="calendar">
+							<i class="glyphicon glyphicon-calendar" type="icon"></i>
+							<input type="text" class="form-control input-sm" id="zlcljk-datetimeStart">
+						</div>
+						<span>前后</span>
+						<input type="text" class="form-control input-sm" value="30" number>
+						<span>分钟</span>
+					</div>
+					<div class="form-group">
+						<select class="form-control" id="zlcljk-vehicleOperateStatus" data-placeholder="车辆运营状态"></select>
+					</div>
+					<div class="form-group form-group-sm" style="margin-top: 15px;">
+						<input type="text" class="form-control" style="width: 100px;" placeholder="车速">
+						<a class="btn btn-primary btn-sm btn-position">定位</a>
+						<a class="btn btn-primary btn-sm">查询</a>
+						<a class="btn btn-primary btn-sm">导出</a>
+					</div>
+				</div>
+			</div>
+			<div class="card" border="left" color="greed" style="height: calc(100% - 100px);">
+				<!--<span class="title">起点车辆</span>-->
+				<div class="list list-header" type="fluid">
+					<span class="item-col" type="vehicleNum">车牌</span>
+					<span class="item-col" type="datetime">时间</span>
+					<span class="item-col" type="company">所属公司</span>
+				</div>
+				<div class="scrollbar-macosx">
+					<ul class="list list-bodyer" id="zlcljk-carList" type="fluid">
+						<li class="listItem">
+							<span class="item-col" type="vehicleNum">浙A12341</span>
+							<span class="item-col" type="datetime">2018-07-10 12:30:00</span>
+							<span class="item-col" type="company">杭州市通悟科技有限公司</span>
+						</li>
+						<li class="listItem">
+							<span class="item-col" type="vehicleNum">浙A12342</span>
+							<span class="item-col" type="datetime">2018-07-10 12:30:00</span>
+							<span class="item-col" type="company">杭州市通悟科技有限公司</span>
+						</li>
+						<li class="listItem">
+							<span class="item-col" type="vehicleNum">浙A12343</span>
+							<span class="item-col" type="datetime">2018-07-10 12:30:00</span>
+							<span class="item-col" type="company">杭州市通悟科技有限公司</span>
+						</li>
+						<li class="listItem">
+							<span class="item-col" type="vehicleNum">浙A12344</span>
+							<span class="item-col" type="datetime">2018-07-10 12:30:00</span>
+							<span class="item-col" type="company">杭州市通悟科技有限公司</span>
+						</li>
+						<li class="listItem">
+							<span class="item-col" type="vehicleNum">浙A12345</span>
+							<span class="item-col" type="datetime">2018-07-10 12:30:00</span>
+							<span class="item-col" type="company">杭州市通悟科技有限公司</span>
+						</li>
+						<li class="listItem">
+							<span class="item-col" type="vehicleNum">浙A12346</span>
+							<span class="item-col" type="datetime">2018-07-10 12:30:00</span>
+							<span class="item-col" type="company">杭州市通悟科技有限公司</span>
+						</li>
+						<li class="listItem">
+							<span class="item-col" type="vehicleNum">浙A12347</span>
+							<span class="item-col" type="datetime">2018-07-10 12:30:00</span>
+							<span class="item-col" type="company">杭州市通悟科技有限公司</span>
+						</li>
+						<li class="listItem">
+							<span class="item-col" type="vehicleNum">浙A12348</span>
+							<span class="item-col" type="datetime">2018-07-10 12:30:00</span>
+							<span class="item-col" type="company">杭州市通悟科技有限公司</span>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="panel-layout" layout="center">
+		<div id="zlcljkMap"></div>
+	</div>
+</div><script>
+	(function ($) {
+		var dataCar = ['浙A12345', '浙A12346', '浙A12347', '浙A12348', '浙A12349'];
+		$(function () {
+			$('#zlcljk-vehicleOperateStatus').select2({
+				language: 'zh-CN',
+				width: '160',
+				minimumResultsForSearch: -1,
+				data: [
+					{id: '0', text: '不限'},
+					{id: '1', text: '载客'},
+					{id: '2', text: '空载'}
+				]
+			});
+			titlePanelScaling('#zlcljkPanel', {width: 485});
+			$('.scrollbar-macosx').scrollbar();
+			var map = new AMap.Map('zlcljkMap', {
+				zoom:11,
+				viewMode:'3D'
+			});
+		})
+	})(jQuery);
+</script>
+</body>
+</html>

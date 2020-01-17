@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>权限管理</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+	<link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.css">
+	<script src="../../resources/script/vue.min.js"></script>
+	<script src="../../resources/script/underscore-min.js"></script>
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+	<script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+	<script src="../../resources/script/layer/layer.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/select2/dist/js/select2.js"></script>
+	<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+	<script src="../../resources/script/My97DatePicker/WdatePicker.js"></script>
+	<style>
+		.panel-queryBar {padding: 10px 10px 0;}
+		.form-inline .form-group {margin-bottom: 10px;}
+		.dataListPanel.center {height: calc(100% - 50px);padding: 10px;}
+	</style>
+
+
+</head>
+<body>
+<div class="template-wrapper__full" id="root">
+	<div class="panel-queryBar">
+		<form class="form-inline">
+			<div class="form-group form-group-sm">
+				<input id="xm" type="text" class="form-control" placeholder="姓名" style="width: 150px;">
+			</div>
+			<div class="form-group form-group-sm">
+				<a class="btn btn-primary btn-sm" @click="handleQueryClick">查询</a>
+<!-- 				<a class="btn btn-primary btn-sm" @click="handleChangeClick">修改</a> -->
+			</div>
+		</form>
+	</div>
+	<div class="dataListPanel center">
+		<div id="qxglTable"></div>
+	</div>
+</div>
+<div class="modal fade" id="qxgl-dialog" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">权限列表</h4>
+			</div>
+			<div class="modal-body" style="height: 400px; overflow-y: auto;">
+				<form class="form-inline ip-type-input" id="clcx-dialog-form">
+					<div class="panel panel-default">
+						<div class="panel-heading">信息服务</div>
+						<div class="panel-body">
+							<div class="form-group form-group-sm">
+								<label class="control-label">行业总览:</label>
+								<input type="checkbox" name="hyzl">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">车辆分布:</label>
+								<input type="checkbox" name="clfb">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">营运态势:</label>
+								<input type="checkbox" name="yyts">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">车辆监控跟踪:</label>
+								<input type="checkbox" name="cljkgz">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">轨迹回放改造:</label>
+								<input type="checkbox" name="gjhfgz">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">多车监控:</label>
+								<input type="checkbox" name="dcjk">
+							</div><br/>
+							<div class="form-group form-group-sm">
+								<label class="control-label">重点关注车辆:</label>
+								<input type="checkbox" name="zdgzcl">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">重点关注车辆添加:</label>
+								<input type="checkbox" name="zdgzcl_add">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">重点关注车辆移除:</label>
+								<input type="checkbox" name="zdgzcl_remove">
+							</div><br/>
+							<div class="form-group form-group-sm">
+								<label class="control-label">滞留车辆查询:</label>
+								<input type="checkbox" name="zlclcx">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">区域应急指令:</label>
+								<input type="checkbox" name="qyyjzl">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">目标车辆查找:</label>
+								<input type="checkbox" name="tsclcx">
+							</div>
+						</div>
+					</div>
+					
+					<div class="panel panel-default">
+						<div class="panel-heading">综合统计分析</div>
+						<div class="panel-body">
+							<div class="form-group form-group-sm">
+								<label class="control-label">出租乘运需求分析:</label>
+								<input type="checkbox" name="czcyxq">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">营运异常分析:</label>
+								<input type="checkbox" name="yyycfx">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">车辆营运情况分析:</label>
+								<input type="checkbox" name="clyyqk">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">综合查询:</label>
+								<input type="checkbox" name="zhcx">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">故障查询统计:</label>
+								<input type="checkbox" name="gzcx">
+							</div>
+						</div>
+					</div>
+					
+					<div class="panel panel-default">
+						<div class="panel-heading">网上服务</div>
+						<div class="panel-body">
+							<div class="form-group form-group-sm">
+								<label class="control-label">营运业务数据统计:</label>
+								<input type="checkbox" name="yyywsjtj">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">出租汽车服务系统:</label>
+								<input type="checkbox" name="czqcfwxt">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">运营情况统计分析:</label>
+								<input type="checkbox" name="yyqktjfx">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">运营效益统计分析:</label>
+								<input type="checkbox" name="yyxytjfx">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">出租保有量统计:</label>
+								<input type="checkbox" name="czbyltj">
+							</div>
+						</div>
+					</div>
+					
+					
+					<div class="panel panel-default">
+						<div class="panel-heading">抓拍数据</div>
+						<div class="panel-body">
+							<div class="form-group form-group-sm">
+								<label class="control-label">抓拍设备故障:</label>
+								<input type="checkbox" name="cpsbgz">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">抓拍数据:</label>
+								<input type="checkbox" name="zpsj">
+							</div>
+						</div>
+					</div>
+					
+					<div class="panel panel-default">
+						<div class="panel-heading">设备维修</div>
+						<div class="panel-body">
+							<div class="form-group form-group-sm">
+								<label class="control-label">维修车辆监控:</label>
+								<input type="checkbox" name="wxcljk">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">维修车辆预警:</label>
+								<input type="checkbox" name="wxclyj">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">综合统计与查询:</label>
+								<input type="checkbox" name="zhtjcx">
+							</div>
+						</div>
+					</div>
+					
+					
+					
+					<div class="panel panel-default">
+						<div class="panel-heading">应急指挥处置</div>
+						<div class="panel-body">
+							<div class="form-group form-group-sm">
+								<label class="control-label">应急接入:</label>
+								<input type="checkbox" name="yjjr">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">启动报送:</label>
+								<input type="checkbox" name="qdbs">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">事件处理:</label>
+								<input type="checkbox" name="sjcl">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">信息发布:</label>
+								<input type="checkbox" name="xxfb2">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">查询与统计:</label>
+								<input type="checkbox" name="cxytj">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">资源库:</label>
+								<input type="checkbox" name="zyk">
+							</div>
+						</div>
+					</div>
+					
+					<div class="panel panel-default">
+						<div class="panel-heading">电召调度</div>
+						<div class="panel-body">
+							<div class="form-group form-group-sm">
+								<label class="control-label">电召总览:</label>
+								<input type="checkbox" name="dzzl">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">车辆调度服务:</label>
+								<input type="checkbox" name="clddfw">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">智能扬招服务:</label>
+								<input type="checkbox" name="znyzfw">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">企业在线管理:</label>
+								<input type="checkbox" name="qyxzgl">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">公众信息服务:</label>
+								<input type="checkbox" name="gzxxfw">
+							</div>
+							<div class="form-group form-group-sm">
+								<label class="control-label">电召调度服务:</label>
+								<input type="checkbox" name="dzddfw">
+							</div>
+						</div>
+					</div>
+					
+					
+					<div class="panel panel-default">
+						<div class="panel-heading">交易总览</div>
+						<div class="panel-body">
+							<div class="form-group form-group-sm">
+								<label class="control-label">交易信息总览:</label>
+								<input type="checkbox" name="jyxx">
+							</div>
+						</div>
+					</div>
+					
+					
+					<div class="panel panel-default">
+						<div class="panel-heading">专车数据</div>
+						<div class="panel-body">
+							<div class="form-group form-group-sm">
+								<label class="control-label">专车数据总览:</label>
+								<input type="checkbox" name="zcsj">
+							</div>
+						</div>
+					</div>
+					
+					
+					<div class="panel panel-default">
+						<div class="panel-heading">信息共享与报送</div>
+						<div class="panel-body">
+							<div class="form-group form-group-sm">
+								<label class="control-label">信息共享与报送系统:</label>
+								<input type="checkbox" name="xxgxybs">
+							</div>
+						</div>
+					</div>
+					
+					<div class="panel panel-default">
+						<div class="panel-heading">权限管理</div>
+						<div class="panel-body">
+							<div class="form-group form-group-sm">
+								<label class="control-label">权限管理:</label>
+								<input type="checkbox" name="qxgl">
+							</div>
+						</div>
+					</div>
+					
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" id="qxgl-dialog-save">提交</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script>
+(function (Vue, _, $) {
+	var vm = new Vue({
+		el: '#root',
+		data: function () {
+			var _this = this;
+			return {
+				query: {
+				},
+				table: {
+					fields: [
+						{name: 'ID', title: '序号', width: 40, align: 'center'},
+						{name: 'username', title: '姓名', width: 100, align: 'center'},
+						{name: 'userid', title: '', width: 100, align: 'center',visible:false},
+						{name: 'menus', title: '权限', width: 160, align: 'center'},
+						{
+	        				title: '修改',
+	                        itemTemplate: function(_, item) {
+	                        	var style = {};
+	                            return [
+									$('<a>').addClass('btn btn-primary btn-xs').text('修改').css(style).on('click', function () {
+										$('#qxgl-dialog').modal('show');
+										var $form = $("#clcx-dialog-form");
+										$form.find("input").prop("checked","false");
+										$('#qxgl-dialog-save').on('click', function () {
+											var $name = $form.find("input:checked");
+											var arr = "",brr = "";
+											$name.each(function(index,ar){
+												name = $(ar).attr("name");
+												names = $(ar).prev().html();
+												names = names.substr(0, names.length - 1);
+												arr += name+",";
+												brr += names+",";
+											});
+											$.ajax({
+												url : "../../claq/qxglEdit",
+												type : 'post',
+												data : {
+													id : item.userid,
+													qx : arr,
+													qxname : brr
+												},
+												dataType : 'json',
+												success : function(data) {
+													console.log(data)
+													if (data.code == 0) {
+														layer.msg("成功");
+														_this.getAlarmManageList();
+													} else {
+														layer.msg("失败");
+													}
+													$('#qxgl-dialog').modal('hide');
+												},
+												error : function(data) {
+													layer.closeAll();
+												}
+											})
+										})
+									})
+								]
+	                        },
+	                        align: "center",
+	                        width: 50
+						}
+					]
+				}
+			}
+		},
+		created: function () {
+			var _this = this;
+			this.$nextTick(function () {
+			});
+		},
+		mounted: function () {
+			var _this = this;
+			this.$nextTick(function () {
+				_this.getAlarmManageList();
+			});
+		},
+		methods: {
+			getAlarmManageList:function(){
+				var _this=this;
+				$('#qxglTable').jsGrid({
+					width: '100%',
+					height: '100%',
+					autoload: true,
+					pageSize: 15000,
+					pageIndex: 1,
+					paging: true,
+					pageLoading: true,
+					controller: {
+	                    loadData: function(filter) {
+	                    	var d = $.Deferred();
+	                    	var a = _this.init(filter, function(item){
+	                    		d.resolve(item);
+	                    	})
+	                    	return d.promise();
+	                    }
+	                },
+					fields: _this.table.fields,
+					pagerContainer: null,
+				    pageButtonCount: 5,
+				    pagerFormat: "{first} {prev} {pages} {next} {last} {pageIndex} of {pageCount}",
+				    pagePrevText: "上一页",
+				    pageNextText: "下一页",
+				    pageFirstText: "第一页",
+				    pageLastText: "末页",
+				    pageNavigatorNextText: ">",
+				    pageNavigatorPrevText: "<"
+				});
+			},
+			init: function (filter,callback) {
+				var startIndex = (filter.pageIndex - 1) * filter.pageSize;
+				var xm = $('#xm').val();
+				jqxhr=$.ajax({
+					type: "POST",
+					url:"../../claq/qxgl",
+					data:{
+						"username":xm,
+						"pageIndex":filter.pageIndex,
+	     				"pageSize":filter.pageSize
+					},
+					dataType: 'json',
+					timeout : 3600000,
+					success:function(json){
+						console.log(json);
+						var qxglData = [];
+	            		all = json.data[0].count;
+	     				re = json.data[0].datas;
+	         			if(json.code == 0){
+	         				for(var i = 0; i< re.length ;i++){
+	         					var rs={};
+	         					rs.ID = startIndex+i+1;
+	         					rs.userid = re[i].id;
+	         					rs.username =  re[i].username;
+	         					rs.menus =  re[i].menus;
+	         					qxglData.push(rs);
+	         				}
+	         				return callback({
+	                            data: qxglData,
+	                            itemsCount: all
+	                        });
+	         			}else{
+	        			}
+					}
+				});
+			},
+			handleQueryClick: function () {
+				this.getAlarmManageList();
+			},
+			handleChangeClick: function () {
+			}
+		}
+	})
+})(Vue, _, jQuery);
+</script>
+</body>
+</html>

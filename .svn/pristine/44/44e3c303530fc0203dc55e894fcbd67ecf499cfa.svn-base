@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>行业总览</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+	<link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+	<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+	<script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+	<script src="../../resources/script/echarts.min.js"></script>
+	<script src="../../resources/script/util.js"></script>
+	<script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+	<style>
+		.scrollbar-macosx {
+			height: 100%;
+		}
+		.table {
+			margin-bottom: 10px;
+		}
+		caption.tableCaptionLabel {
+			line-height: 16px;
+			margin-top: -14px;
+			margin-bottom: -4px;
+			padding-top: 3px;
+			padding-bottom: 3px;
+			text-align: left;
+			color: #c8cbd2;
+		}
+		.table>thead>tr>th,
+		.table>tbody>tr>th,
+		.table>tbody>tr>td {
+			height: 16px;
+			line-height: 16px;
+			padding: 6px;
+		}
+		[class^='col-'] > .panel-heading {
+			margin-top: -8px;
+			padding: 5px 0;
+		}
+
+		.table > tbody > tr > th.ip-ranking,
+		.table > tbody > tr > td.ip-ranking,
+		.table > tbody > tr > th.ip-count,
+		.table > tbody > tr > td.ip-count {
+			/*text-align: center;*/
+			/*text-align: right;*/
+			color: #ff598c;
+		}
+		.table > tbody > tr:first-child > th.ip-ranking,
+		.table > tbody > tr:first-child > td.ip-ranking {
+			position: relative;
+		}
+		.table > tbody > tr:first-child > th.ip-ranking:before,
+		.table > tbody > tr:first-child > td.ip-ranking:before {
+			content: '1';
+			position: absolute;
+			/*top: 50%;left: 50%;*/
+			left: 0;
+			display: inline-block;
+			width: 20px;
+			height: 20px;
+			line-height: 20px;
+			/*margin: -10px;*/
+			border-radius: 50%;
+			text-align: center;
+			text-indent: 0;
+			color: #fff;
+			background-color: #ff598c;
+		}
+
+
+		/*第一行*/
+		.panel-hyzl .panel-content {
+			width: 90%;
+			min-width: 284px;
+		}
+		.panel-hyzl .panel-content > .panel-heading,
+		.panel-hyyxzk > .ip-item > .panel-heading,
+		.panel-hyyyzk > .ip-item > .panel-heading,
+		.panel-czsbzk > .ip-item > .panel-heading {
+			margin-top: -7px;
+			padding-top: 5px;
+			padding-bottom: 5px;
+		}
+
+		/*第二行-左边*/
+		#hyzl-echarts_clzxzl, #hyzl-echarts_clzkzl {
+			width: 100%;
+			height: 284px;
+		}
+		.panel-hyyxzk .ip-item {
+			width: calc(50% - 7.5px);
+		}
+		.panel-hyyxzk .panel {
+			margin-bottom: 0;
+		}
+		.panel-hyyxzk .ip-item:last-child {
+			margin-right: 0;
+		}
+		.panel-hyyxzk .list-group-item {
+			line-height: 16px;
+			margin-left: 4px;
+			margin-right: 4px;
+			padding: 5px 15px;
+		}
+		.panel-hyyxzk .list-group-item:last-child {
+			border-bottom: none;
+		}
+		@media (min-width: 992px) {
+			.panel-wrapper > .row > [class^='col-']:not(:last-child) {
+				padding-right: 0;
+			}
+			.panel-hyzl .panel-content .panel {
+				margin-bottom: 0;
+			}
+		}
+		@media (min-width: 992px) and (max-width: 2048px) {
+			#hyzl-echarts_clzxzl, #hyzl-echarts_clzkzl {
+				height: 135px;
+				margin-bottom: 15px;
+			}
+			.panel-hyyxzk .panel {
+				margin-bottom: 15px;
+			}
+			.panel-hyyxzk .ip-item {
+				width: 100%;
+			}
+			.panel-hyyxzk .ip-item:last-child .panel {
+				margin-bottom: 0;
+			}
+		}
+
+		/*第二行-右边*/
+		#hyzl-echarts_ddzl, #hyzl-echarts_jyzl {
+			width: 100%;
+			height: 217px;
+		}
+		.panel-hyyyzk .ip-item.ip-item-c2 .panel {
+			margin-bottom: 0;
+		}
+		.panel-hyyyzk .ip-item.ip-item-c3 .panel {
+			height: 34px;
+			line-height: 34px;
+			margin-bottom: 0;
+			text-align: center;
+		}
+		@media (min-width: 992px) and (max-width: 2048px) {
+			#hyzl-echarts_ddzl, #hyzl-echarts_jyzl {
+				height: 402px;
+				margin-bottom: 15px;
+			}
+		}
+
+		/*第三行-左边*/
+		.panel-czsbzk .ip-item .panel {
+			margin-bottom: 0;
+		}
+
+		/*第三行-右边*/
+		#hyzl-echarts_tsxxpm ,#hyzl-echarts_yjjwtzb {
+			height: 207px;
+			margin-bottom: 10px;
+		}
+
+		.panel-body > .panel-heading {
+			margin-top: -10px;
+		}
+		.panel-heading {
+			position: relative;
+		}
+
+		.ip-tool[ip-align] {
+			position: absolute;
+			top: 50%;
+			display: inline-block;
+			margin-bottom: 0;
+			transform: translateY(-50%);
+		}
+		.ip-tool[ip-align='right'] {
+			right: 10px;
+		}
+		.ip-tool .ip-toolItem {
+			display: inline-block;
+			width: 22px;
+			text-align: center;
+			cursor: pointer;
+		}
+		.ip-tool .ip-toolItem:hover {
+			color: #7685fc;
+		}
+
+		.panel-position-right {
+			position: absolute;
+			top: 20px;
+			right: 30px;
+			padding: 2px 20px;
+		}
+	</style>
+</head>
+<body>
+<div class="scrollbar-macosx">
+	<div class="panel-wrapper" style="overflow-x: hidden;">
+		<div class="panel panel-default">
+			<div class="panel-body panel-hyzl">
+				<div class="panel-heading"><span class="title">行业基本状况</span></div>
+				<div class="row">
+					<div class="col-md-4">
+						<div class="panel-content">
+							<div class="panel-heading">企业总览</div>
+							<div class="panel panel-default">
+								<div class="panel-heading clearfix" style="padding: 6px 15px;">
+									<div class="ip-item ip-item-c2 col-itemTitle">企业总数</div>
+									<div class="ip-item ip-item-c2 col-itemTitle">
+										<span class="ip-highlight-red">78</span>&nbsp;家
+									</div>
+								</div>
+								<div class="panel-body">
+									<table class="table">
+										<thead>
+										<tr>
+											<th>数量</th>
+											<th>企业名称</th>
+										</tr>
+										</thead>
+										<tbody>
+										<tr>
+											<th class="ip-count" width="50">500</th>
+											<td>Mark</td>
+										</tr>
+										<tr>
+											<th class="ip-count">200</th>
+											<td>Jacob</td>
+										</tr>
+										<tr>
+											<th class="ip-count">103</th>
+											<td>Larry</td>
+										</tr>
+										<tr>
+											<th class="ip-count">84</th>
+											<td>Larry</td>
+										</tr>
+										<tr>
+											<th class="ip-count">75</th>
+											<td>Larry</td>
+										</tr>
+										</tbody>
+									</table>
+									<div class="btnBox-center">
+										<a class="btn btn-details">查看详情</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="panel-content">
+							<div class="panel-heading">
+								<span>车辆总览</span>
+								<ul class="ip-tool" id="hyzl-gstype" ip-align="right">
+									<li class="ip-toolItem iconfont icon-a-left" name="clpp" style="display: none;"></li>
+									<li class="ip-toolItem iconfont icon-a-right" name="clnx"></li>
+								</ul>
+							</div>
+							<div class="panel panel-default">
+								<div class="panel-heading clearfix" style="padding: 6px 15px;">
+									<div class="ip-item ip-item-c2 col-itemTitle">车辆总数</div>
+									<div class="ip-item ip-item-c2 col-itemTitle">
+										<span class="ip-highlight-red">800</span>&nbsp;辆
+									</div>
+								</div>
+								<div class="panel-body" name="clpp">
+									<table class="table">
+										<thead>
+										<tr>
+											<th>数量</th>
+											<th>企业</th>
+										</tr>
+										</thead>
+										<tbody>
+										<tr>
+											<th class="ip-count">351</th>
+											<td>Mark</td>
+										</tr>
+										<tr>
+											<th class="ip-count">320</th>
+											<td>Jacob</td>
+										</tr>
+										<tr>
+											<th class="ip-count">280</th>
+											<td>Larry</td>
+										</tr>
+										<tr>
+											<th class="ip-count">200</th>
+											<td>Larry</td>
+										</tr>
+										<tr>
+											<th class="ip-count">190</th>
+											<td>Larry</td>
+										</tr>
+										</tbody>
+									</table>
+									<div class="btnBox-center">
+										<a class="btn btn-details">查看详情</a>
+									</div>
+								</div>
+								<div class="panel-body" name="clnx" style="display: none;">
+									<table class="table">
+										<thead>
+										<tr>
+											<th>数量</th>
+											<th>设备厂商</th>
+										</tr>
+										</thead>
+										<tbody>
+										<tr>
+											<td class="ip-count">300</td>
+											<td>Mark</td>
+										</tr>
+										<tr>
+											<td class="ip-count">295</td>
+											<td>Jacob</td>
+										</tr>
+										<tr>
+											<td class="ip-count">273</td>
+											<td>Larry</td>
+										</tr>
+										<tr>
+											<td class="ip-count">219</td>
+											<td>Larry</td>
+										</tr>
+										<tr>
+											<td class="ip-count">115</td>
+											<td>Larry</td>
+										</tr>
+										</tbody>
+									</table>
+									<div class="btnBox-center">
+										<a class="btn btn-details">查看详情</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="panel-content">
+							<div class="panel-heading">驾驶员总览</div>
+							<div class="panel panel-default">
+								<div class="panel-heading clearfix" style="padding: 6px 15px;">
+									<div class="ip-item ip-item-c2 col-itemTitle">企业总数</div>
+									<div class="ip-item ip-item-c2 col-itemTitle">
+										<span class="ip-highlight-red">500</span>&nbsp;人
+									</div>
+								</div>
+								<div class="panel-body">
+									<table class="table">
+										<thead>
+										<tr>
+											<th>数量</th>
+											<th>地域</th>
+										</tr>
+										</thead>
+										<tbody>
+										<tr>
+											<td class="ip-count">200</td>
+											<td>Mark</td>
+										</tr>
+										<tr>
+											<td class="ip-count">300</td>
+											<td>Jacob</td>
+										</tr>
+										<tr>
+											<td class="ip-count">300</td>
+											<td>Larry</td>
+										</tr>
+										<tr>
+											<td class="ip-count">300</td>
+											<td>Larry</td>
+										</tr>
+										<tr>
+											<td class="ip-count">300</td>
+											<td>Larry</td>
+										</tr>
+										</tbody>
+									</table>
+									<div class="btnBox-center">
+										<a class="btn btn-details">查看详情</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4">
+				<div class="panel panel-default">
+					<div class="panel-body panel-hyyxzk">
+						<div class="panel-heading"><span class="title">行业运行状况</span></div>
+						<div class="ip-item">
+							<div class="panel-heading" style="padding: 5px 15px 0;">车辆在线总览</div>
+							<div class="panel panel-default">
+								<ul class="list-group">
+									<li class="list-group-item">
+										车辆在线数：<span class="ip-highlight-orange">2589</span>&nbsp;辆
+									</li>
+									<li class="list-group-item">
+										车辆在线率：<span class="ip-highlight-green">76</span>&nbsp;%
+									</li>
+								</ul>
+								<div class="panel-body">
+									<div id="hyzl-echarts_clzxzl"></div>
+									<div class="btnBox-center">
+										<a class="btn btn-details">查看详情</a>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="ip-item">
+							<div class="panel-heading" style="padding: 5px 15px 0;">车辆载客总览</div>
+							<div class="panel panel-default">
+								<ul class="list-group">
+									<li class="list-group-item">
+										载客车辆数：<span class="ip-highlight-orange">896</span>&nbsp;辆
+									</li>
+									<li class="list-group-item">
+										车辆载客率：<span class="ip-highlight-green">63</span>&nbsp;%
+									</li>
+								</ul>
+								<div class="panel-body">
+									<div id="hyzl-echarts_clzkzl"></div>
+									<div class="btnBox-center">
+										<a class="btn btn-details">查看详情</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-8">
+				<div class="panel panel-default">
+					<div class="panel-body panel-hyyyzk">
+						<div class="panel-heading"><span class="title">行业营运状况</span></div>
+						<div class="panel-heading" style="padding: 5px 15px 0;">运营总览</div>
+						<div class="panel panel-default">
+							<div class="panel-body">
+								<div class="ip-item ip-item-c3">
+									<div class="panel panel-default">
+										营运总里程：<span class="ip-highlight">2589</span>&nbsp;公里
+									</div>
+								</div>
+								<div class="ip-item ip-item-c3">
+									<div class="panel panel-default">
+										营运总时长：<span class="ip-highlight">2589</span>&nbsp;小时
+									</div>
+								</div>
+								<div class="ip-item ip-item-c3 btnBox-center">
+									<a class="btn btn-details">查看详情</a>
+								</div>
+							</div>
+						</div>
+						<div class="ip-item ip-item-c2" style="margin-right: 15px;">
+							<div class="panel-heading" style="padding: 5px 15px 0;">订单总览</div>
+							<div class="panel panel-default">
+								<div class="panel-body" style="position: relative;">
+									<div id="hyzl-echarts_ddzl"></div>
+									<div class="panel panel-default panel-position-right">
+										当日总订单量：<span class="ip-highlight">2589</span>&nbsp;单
+									</div>
+									<div class="btnBox-center">
+										<a class="btn btn-details">查看详情</a>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="ip-item ip-item-c2" style="margin-right: 0;">
+							<div class="panel-heading" style="padding: 5px 15px 0;">交易总览</div>
+							<div class="panel panel-default">
+								<div class="panel-body" style="position: relative;">
+									<div id="hyzl-echarts_jyzl"></div>
+									<div class="panel panel-default panel-position-right">
+										当日交易总金额：<span class="ip-highlight">2589</span>&nbsp;元
+									</div>
+									<div class="btnBox-center">
+										<a class="btn btn-details">查看详情</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-7">
+				<div class="panel panel-default" style="margin-bottom: 0;">
+					<div class="panel-body panel-czsbzk">
+						<div class="panel-heading"><span class="title">车载设备状况</span></div>
+						<div>
+							<div class="ip-item ip-item-c2">
+								<div class="panel-heading" style="padding: 5px 15px 0;">车载设备总览</div>
+								<div class="panel panel-default">
+									<div class="panel-heading clearfix" style="padding: 6px 15px;">
+										<div class="ip-item ip-item-c2 col-itemTitle">车载设备总数</div>
+										<div class="ip-item ip-item-c2 col-itemTitle">
+											<span class="ip-highlight-red">13000</span>&nbsp;件
+										</div>
+									</div>
+									<div class="panel-body">
+										<table class="table">
+											<thead>
+											<tr>
+												<th>排名</th>
+												<th>企业名称</th>
+												<th>设备数量</th>
+											</tr>
+											</thead>
+											<tbody>
+											<tr>
+												<th class="ip-ranking" width="50">1</th>
+												<td>Mark</td>
+												<td width="90">30</td>
+											</tr>
+											<tr>
+												<th class="ip-ranking">2</th>
+												<td>Jacob</td>
+												<td>50</td>
+											</tr>
+											<tr>
+												<th class="ip-ranking">3</th>
+												<td>Larry</td>
+												<td>50</td>
+											</tr>
+											<tr>
+												<th class="ip-ranking">4</th>
+												<td>Larry</td>
+												<td>50</td>
+											</tr>
+											<tr>
+												<th class="ip-ranking">5</th>
+												<td>Larry</td>
+												<td>50</td>
+											</tr>
+											</tbody>
+										</table>
+										<div class="btnBox-center">
+											<a class="btn btn-details">查看详情</a>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="ip-item ip-item-c2">
+								<div class="panel-heading" style="padding: 5px 15px 0;">故障设备总览</div>
+								<div class="panel panel-default">
+									<div class="panel-heading clearfix" style="padding: 6px 15px;">
+										<div class="ip-item ip-item-c2 col-itemTitle">故障设备总数</div>
+										<div class="ip-item ip-item-c2 col-itemTitle">
+											<span class="ip-highlight-red">20</span>&nbsp;件
+										</div>
+									</div>
+									<div class="panel-body">
+										<table class="table">
+											<thead>
+											<tr>
+												<th>排名</th>
+												<th>企业名称</th>
+												<th>设备数量</th>
+											</tr>
+											</thead>
+											<tbody>
+											<tr>
+												<th class="ip-ranking" width="50">1</th>
+												<td>Mark</td>
+												<td width="90">30</td>
+											</tr>
+											<tr>
+												<th class="ip-ranking">2</th>
+												<td>Jacob</td>
+												<td>50</td>
+											</tr>
+											<tr>
+												<th class="ip-ranking">3</th>
+												<td>Larry</td>
+												<td>50</td>
+											</tr>
+											<tr>
+												<th class="ip-ranking">4</th>
+												<td>Larry</td>
+												<td>50</td>
+											</tr>
+											<tr>
+												<th class="ip-ranking">5</th>
+												<td>Larry</td>
+												<td>50</td>
+											</tr>
+											</tbody>
+										</table>
+										<div class="btnBox-center">
+											<a class="btn btn-details">查看详情</a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-5">
+				<div class="panel panel-default" style="margin-bottom: 0;">
+					<div class="panel-body panel-tsxxzl">
+						<div class="panel-heading"><span class="title">投诉信息总览</span></div>
+						<div>
+							<div class="ip-item ip-item-c2">
+								<div class="panel-heading" style="padding: 5px 15px 0;">投诉类型排名</div>
+								<div class="panel panel-default" style="margin-bottom: 0;">
+									<div class="panel-body">
+										<div id="hyzl-echarts_tsxxpm"></div>
+										<div class="btnBox-center">
+											<a class="btn btn-details">查看详情</a>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="ip-item ip-item-c2">
+								<div class="panel-heading" style="padding: 5px 15px 0;">已解决问题占比</div>
+								<div class="panel panel-default" style="margin-bottom: 0;">
+									<div class="panel-body">
+										<div id="hyzl-echarts_yjjwtzb"></div>
+										<div class="btnBox-center">
+											<a class="btn btn-details">查看详情</a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	(function ($) {
+		$(function () {
+			$('.scrollbar-macosx').scrollbar();
+			$('#hyzl-gstype .ip-toolItem').on('click', function () {
+				var name = $(this).attr('name');
+				var box = $(this).parents('.panel-heading').next();
+				$(this).hide().siblings().show();
+				box.find('[name='+name+']').show().siblings('[name='+$(this).siblings().attr('name')+']').hide();
+			});
+			var hyzlEcharts_clzx = echarts.init(document.getElementById('hyzl-echarts_clzxzl'));
+			hyzlEcharts_clzx.setOption({
+				color: ['#ff9f43', '#fdca57'],
+				legend: {
+					orient: 'horizontal',
+					y: 'bottom',
+					x: 'center',
+					data: ['车辆离线', '车辆在线']
+				},
+				series: [
+					{
+						name: '访问来源',
+						type: 'pie',
+						radius: '80%',
+						center: ['50%', '40%'],
+						data: [
+							{value: 24, name: '车辆离线'},
+							{value: 76, name: '车辆在线'}
+						],
+						itemStyle: {
+							emphasis: {
+								shadowBlur: 10,
+								shadowOffsetX: 0,
+								shadowColor: 'rgba(0, 0, 0, 0.5)'
+							}
+						},
+						labelLine: {
+							show: false
+						},
+						label: {
+							formatter: '{b}：{d}%',
+							position: 'inside'
+						}
+					}
+				]
+			});
+			var hyzlEcharts_clzk = echarts.init(document.getElementById('hyzl-echarts_clzkzl'));
+			hyzlEcharts_clzk.setOption({
+				color: ['#ff9f43', '#fdca57'],
+				legend: {
+					orient: 'horizontal',
+					y: 'bottom',
+					x: 'center',
+					data: ['车辆离线', '车辆在线']
+				},
+				series: [
+					{
+						name: '访问来源',
+						type: 'pie',
+						radius: '80%',
+						center: ['50%', '40%'],
+						data: [
+							{value: 24, name: '车辆离线'},
+							{value: 76, name: '车辆在线'}
+						],
+						itemStyle: {
+							emphasis: {
+								shadowBlur: 10,
+								shadowOffsetX: 0,
+								shadowColor: 'rgba(0, 0, 0, 0.5)'
+							}
+						},
+						labelLine: {
+							show: false
+						},
+						label: {
+							formatter: '{b}：{d}%',
+							position: 'inside'
+						}
+					}
+				]
+			});
+			var hyzlEcharts_ddzl = echarts.init(document.getElementById('hyzl-echarts_ddzl'));
+			hyzlEcharts_ddzl.setOption({
+				color: ['#1b8de6'],
+				tooltip: {
+					trigger: 'axis',
+					axisPointer: {
+						type: 'shadow'
+					}
+				},
+				grid: {
+					top: '70px',
+					left: '30px',
+					right: '40px',
+					bottom: '20px'
+				},
+				xAxis: [
+					{
+						name: '企业',
+						type: 'category',
+						data: ['大众', '宝马', '奔驰', '众泰', '吉利'],
+						axisTick: {
+							alignWithLabel: true
+						}
+					}
+				],
+				yAxis: [
+					{
+						name: '订单',
+						type: 'value'
+					}
+				],
+				series: [
+					{
+						name: '直接访问',
+						type: 'bar',
+						barWidth: '60%',
+						markPoint: {
+							data: [
+								{type: 'max', name: '最大值'}
+							]
+						},
+						data: [10, 52, 200, 334, 39]
+					}
+				]
+			});
+			var hyzlEcharts_jyzl = echarts.init(document.getElementById('hyzl-echarts_jyzl'));
+			hyzlEcharts_jyzl.setOption({
+				color: ['#7868ec'],
+				tooltip: {
+					trigger: 'axis',
+					axisPointer: {
+						type: 'shadow'
+					}
+				},
+				grid: {
+					top: '70px',
+					left: '30px',
+					right: '40px',
+					bottom: '20px'
+				},
+				xAxis: [
+					{
+						name: '企业',
+						type: 'category',
+						data: ['大众', '宝马', '奔驰', '众泰', '吉利'],
+						axisTick: {
+							alignWithLabel: true
+						}
+					}
+				],
+				yAxis: [
+					{
+						name: '订单',
+						type: 'value'
+					}
+				],
+				series: [
+					{
+						name: '直接访问',
+						type: 'bar',
+						barWidth: '60%',
+						markPoint: {
+							data: [
+								{type: 'max', name: '最大值'}
+							]
+						},
+						data: [10, 52, 200, 334, 39]
+					}
+				]
+			});
+			var hyzlEcharts_tsxx = echarts.init(document.getElementById('hyzl-echarts_tsxxpm'));
+			hyzlEcharts_tsxx.setOption({
+				color: ['#fbc956', '#ff6a6c', '#1ad19e', '#4ea5ff', '#cad6e6'],
+				legend: {
+					orient: 'horizontal',
+					y: '75%',
+					x: 'center',
+					data: ['拒载', '绕路', '不整洁', '态度差', '无车可用']
+				},
+				series: [
+					{
+						name: '访问来源',
+						type: 'pie',
+						radius: '70%',
+						center: ['50%', '35%'],
+						data: [
+							{value: 24, name: '拒载'},
+							{value: 24, name: '绕路'},
+							{value: 24, name: '不整洁'},
+							{value: 24, name: '态度差'},
+							{value: 76, name: '无车可用'}
+						],
+						itemStyle: {
+							emphasis: {
+								shadowBlur: 10,
+								shadowOffsetX: 0,
+								shadowColor: 'rgba(0, 0, 0, 0.5)'
+							}
+						},
+						labelLine: {
+							show: false
+						},
+						label: {
+							formatter: '{b}：{d}%',
+							position: 'inside'
+						}
+					}
+				]
+			});
+			var hyzlEcharts_yjjwtzb = echarts.init(document.getElementById('hyzl-echarts_yjjwtzb'));
+			hyzlEcharts_yjjwtzb.setOption({
+				color: ['#00bdbe', '#fc6c92'],
+				tooltip: {
+					trigger: 'axis',
+					axisPointer: {
+						type: 'shadow'
+					}
+				},
+				legend: {
+					data: ['已解决', '为解决']
+				},
+				grid: {
+					left: '10px',
+					right: '30px',
+					bottom: '20px'
+				},
+				xAxis: {
+					type: 'value',
+					boundaryGap: [0, 0.01]
+				},
+				yAxis: {
+					type: 'category',
+					data: ['']
+				},
+				series: [
+					{
+						name: '已解决',
+						type: 'bar',
+						barWidth: '30',
+						barGap: '1px',
+						label: {normal: {position: 'right', show: true}},
+						data: [182]
+					},
+					{
+						name: '为解决',
+						type: 'bar',
+						barWidth: '30',
+						label: {normal: {position: 'right', show: true}},
+						data: [193]
+					}
+				]
+			});
+			$(window).resize(function () {
+				hyzlEcharts_clzx.resize();
+				hyzlEcharts_clzk.resize();
+				hyzlEcharts_ddzl.resize();
+				hyzlEcharts_jyzl.resize();
+				hyzlEcharts_tsxx.resize();
+				hyzlEcharts_yjjwtzb.resize();
+			})
+		})
+	})(jQuery);
+</script>
+</body>
+</html>
