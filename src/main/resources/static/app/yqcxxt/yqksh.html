@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>疫情可视化</title>
+    <link rel="stylesheet" href="../../resources/style/reset.css" />
+    <link rel="stylesheet" href="../../resources/style/iconfont.css" />
+    <link
+      rel="stylesheet"
+      href="../../resources/script/bootstrap/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="../../resources/script/scrollbar/scrollbar.css"
+    />
+    <link rel="stylesheet" href="../../resources/style/main.css" />
+    <link
+      rel="stylesheet"
+      href="../../resources/style/css/yjzhcz/emergencyPlan.css"
+    />
+    <script src="../../resources/script/vue.min.js"></script>
+    <script src="../../resources/script/underscore-min.js"></script>
+    <script src="../../resources/script/jquery-1.12.1.min.js"></script>
+    <script src="../../resources/script/moment.min.js"></script>
+    <script src="../../resources/script/element-ui/lib/index.js"></script>
+    <link rel="stylesheet" href="../../resources/script/element-ui/lib/theme-chalk/index.css">
+    <script src="../../resources/script/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+    <script src="../../resources/script/wangEditor-3.1.1/wangEditor.min.js"></script>
+    <script src="../../resources/script/layer/layer.js"></script>
+    <script src="../../resources/js/echarts.min.js"></script>
+  </head>
+  <style>
+    .number {
+      position: relative;
+      left: 20px;
+      height: 39px;
+      line-height: 35px;
+      width: 23%;
+      float: left;
+      margin: 5px;
+      border: 1px solid #c4d4fb;
+      border-radius: 6px;
+      background-color: white;
+    }
+    .right_text {
+      float: right;
+      margin-right: 10%;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .left_text {
+      float: left;
+      margin-left: 3%;
+      /*background-color: white;*/
+      color: #1492FF;
+    }
+    .summary {
+      width: 100%;
+      /*height: 330px;*/
+      height: 80%;
+      border: 1px solid #c4d4fb;
+      border-radius: 10px;
+    }
+    .summary_text {
+      height: 30px;
+      line-height: 30px;
+      background-color: #f2f2f2;
+      border-radius: 10px 10px 0 0;
+    }
+    .summary_title {
+      font-size: 20px;
+      height: 30px;
+      text-align: center;
+      background-color: white;
+    }
+    .summary_left ,.summary_right{
+      float: left;
+      width: 50%;
+      height: calc(100% - 60px);
+      background-color: white;
+    }
+    .summary_left_cirle {
+      position: relative;
+      top: 28%;
+      left: 20%;
+      width: 75px;
+      height: 75px;
+      border-radius: 50%;
+      background-color: #87CEFF;
+      z-index: 1;
+      color: white;
+    }
+    .summary_left_circle1{
+      position: relative;
+      top: 10%;
+      left: 10%;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: #5CACEE;
+      z-index: 1;
+    }
+    .summary_left_rectangular{
+      position: relative;
+      top: -15%;
+      right: -52%;
+      height: 40px;
+      line-height: 40px;
+      width: 200px;
+      background-color: #CAE1FF	;
+      border: 1px solid #5CACEE;
+      z-index: 1;
+    }
+    .summary_left_rectangular1{
+      position: relative;
+      top: 15%;
+      right: -52%;
+      height: 40px;
+      line-height: 40px;
+      width: 200px;
+      background-color: #CAE1FF	;
+      border: 1px solid #5CACEE;
+      z-index: 1;
+    }
+    .summary_left_line{
+      position: relative;
+      top: -32%;
+      left: 25%;
+      width: 30%;
+      height: 2px;
+      background-color: #5CACEE;
+      transform:rotate(-12deg);
+      z-index: 0;
+    }
+    .summary_left_line1{
+      position: relative;
+      top: -3%;
+      left: 25%;
+      width: 30%;
+      height: 2px;
+      background-color: #5CACEE;
+      transform:rotate(12deg);
+      z-index: 0;
+    }
+    .inquire_left {
+      /* border-right: 1px solid #c4d4fb; */
+      height: calc(100% - 30px);
+      float: left;
+      width: 35%;
+      background-color: white;
+    }
+    .inquire_right {
+      height: calc(100% - 30px);
+      float: right;
+      width: 64%;
+      background-color: white;
+      overflow-y: auto;
+    }
+    .shadow {
+      background-color: #c4d4fb;
+      float: left;
+      width: 1px;
+      height: calc(100% - 30px);
+      box-shadow: 1px 1px 1px #888888;
+    }
+    #yqksh-select, #yqksh-select1 {
+      position: relative;
+      left: 17%;
+      width: 100px;
+    }
+    .Treechart{
+      width:100%;
+      height:calc( 180% ) ;
+      /* position: relative;
+      left: 4%; */
+    }
+    .tb{
+      float: left;
+      margin-left: 5%;
+    }
+    .tb-img{
+      width: 30px;
+      height: 29px;
+      line-height: 29px;
+    }
+  </style>
+  <body>
+    <div id="root" class="template-wrapper">
+      <div style="width: 100%;height: 100px;position: relative;left: 10px;">
+        <div>
+          <div class="number">
+            <div class="tb">
+              <img class="tb-img" src="../../resources/images/todayinfo/sj.png" alt=""></div>
+            <div class="left_text">注册司机数量</div>
+            <div class="right_text">{{infoData.zcsjsl}}</div>
+          </div>
+          <div class="number">
+            <div class="tb">
+            <img  class="tb-img"src="../../resources/images/todayinfo/sj1.png" alt=""></div>
+            <div class="left_text">认证司机数量</div>
+            <div class="right_text">{{infoData.rzsjsl}}</div>
+          </div>
+          <!--<div class="number">-->
+            <!--<div class="tb">-->
+            <!--<img class="tb-img" src="../../resources/images/todayinfo/ck.png" alt=""></div>-->
+            <!--<div class="left_text">新增乘客登记</div>-->
+            <!--<div class="right_text">{{infoData.xzckdj}}</div>-->
+          <!--</div>-->
+          <div class="number">
+            <div class="tb">
+            <img class="tb-img" src="../../resources/images/todayinfo/ck.png" alt=""></div>
+            <div class="left_text">昨日新增乘客登记</div>
+            <div class="right_text">{{infoData.zrxzckdj}}</div>
+          </div>
+          <div class="number">
+            <div class="tb">
+            <img class="tb-img" src="../../resources/images/todayinfo/ckxx.png" alt=""></div>
+            <div class="left_text">累计乘客登记</div>
+            <div class="right_text">{{infoData.ljckdj}}</div>
+          </div>
+        </div>
+        <div>
+          <div class="number">
+            <div class="tb">
+            <img  class="tb-img" src="../../resources/images/todayinfo/czc.png" alt=""></div>
+            <div class="left_text">营运车辆</div>
+            <div class="right_text">{{infoData.yycl}}</div>
+          </div>
+          <div class="number">
+            <div class="tb">
+            <img class="tb-img" src="../../resources/images/todayinfo/jl.png" alt=""></div>
+            <div class="left_text">营运记录</div>
+            <div class="right_text">{{infoData.yyjl}}</div>
+          </div>
+          <div class="number">
+            <div class="tb">
+            <img  class="tb-img" src="../../resources/images/todayinfo/jl1.png" alt=""></div>
+            <div class="left_text">当日注册数量</div>
+           <div class="right_text">{{infoData.dqzcsl}}</div>
+          </div>
+          <div class="number">
+            <div class="tb">
+            <img  class="tb-img" src="../../resources/images/todayinfo/tj.png" alt=""></div>
+            <div class="left_text">当日认证数量</div>
+            <div class="right_text">{{infoData.dqrzsl}}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="summary" hidden>
+        <div class="summary_text">出租车疫情溯源数据汇总</div>
+        <div class="summary_title">出租车疫情溯源数据汇总</div>
+        <div class="summary_left" >
+          <div class="summary_left_cirle">
+            <div class="summary_left_circle1">
+              <div style="float: left;
+              margin-top: 10%;
+              width: 100%;">
+                <span style="font-size: 16px;margin-left: 30%;">3</span><span style="font-size:10px">人</span><br>
+              <span style="font-size: 10px;margin:10% 0 0  10%;">确认乘客</span>
+              </div></div>
+          </div>
+          <div class="summary_left_rectangular"> <span style="margin-left: 2%;font-size: 15px;color: #5CACEE;">直接接触司机</span>
+            <div style="background-color: orange;color: white;width: 20px;height:20px;position: relative;left: 60%;float: left;line-height: 20px;top: 9px;text-align: center;">2</div>
+            <span style="margin-left:12%;color: #5CACEE;">人</span></div>
+          <div class="summary_left_rectangular1"><span style="margin-left: 2%;font-size: 15px;color: #5CACEE;">直接接触乘客</span>
+            <div style="background-color: orange;color: white;width: 20px;height:20px;position: relative;left: 60%;float: left;line-height: 20px;top: 9px;text-align: center;">2</div>
+            <span style="margin-left:12%;color: #5CACEE;">人</span></div>
+          <div class="summary_left_line"></div>
+          <div class="summary_left_line1"></div>
+        </div>
+        <div  class="summary_right">
+          <div class="summary_left_cirle" style="background-color: #B4EEB4;">
+            <div class="summary_left_circle1" style="background-color: #008B00;">
+              <div style="float: left;
+              margin-top: 10%;
+              width: 100%;">
+                <span style="font-size: 16px;margin-left: 30%;">3</span><span style="font-size:10px">人</span><br>
+              <span style="font-size: 10px;margin:10% 0 0 10%;">确认司机</span>
+              </div></div>
+          </div>
+          <div class="summary_left_rectangular" style="background-color: #B4EEB4;border-color: #32CD32;">
+            <span style="margin-left: 2%;font-size: 15px;color: #008B00;">直接接触乘客</span>
+            <div style="background-color: orange;color: white;width: 20px;height:20px;position: relative;left: 60%;float: left;line-height: 20px;top: 9px;text-align: center;">2</div>
+            <span style="margin-left:12%;color: #008B00;">人</span>
+          </div>
+          <div class="summary_left_rectangular1" style="background-color: #B4EEB4;border-color: #32CD32;"> <span style="margin-left: 2%;font-size: 15px;color: #008B00;">直接接触乘客</span>
+            <div style="background-color: orange;color: white;width: 20px;height:20px;position: relative;left: 60%;float: left;line-height: 20px;top: 9px;text-align: center;">2</div>
+            <span style="margin-left:12%;color: #008B00;">人</span></div>
+          <div class="summary_left_line" style="background-color: #32CD32;"></div>
+          <div class="summary_left_line1" style="background-color: #32CD32;"></div>
+        </div>
+      </div>
+      <div class="summary" style="position: relative;top: 10px;">
+        <div class="summary_text">出租车疫情溯源数据查询</div>
+        <div class="inquire_left">
+          <el-tabs v-model="activeName" @tab-click="handleClick">
+            <el-tab-pane label="司机查询" name="first">
+              <div style="margin-top:0px;margin-left: 15%;">
+                <div class="form-group form-group-sm">司机电话
+                  <el-input v-model="query.siji.phone" type="text" size="small"  placeholder="司机电话" style="width: 190px; height: 30px ; left: 15px" ></el-input>
+                </div>
+                <div class="form-group form-group-sm">
+                  车牌号码
+                  <el-input type="text" v-model="query.siji.vehicle" size="small"  placeholder="车牌号码" style="width: 190px; height: 30px ; left: 15px" ></el-input>
+                </div>
+                <div class="form-group form-group-sm">
+                  开始时间
+                  <div type="calendar" style="left: 15px;" >
+                    <el-date-picker
+                            style="width: 190px;height: 30px"
+                            v-model="query.siji.stime"
+                            size="small"
+                            type="datetime"
+                            placeholder="选择开始日期时间"
+                            default-time="00:00:00">
+                    </el-date-picker>
+                  </div>
+                </div>
+                <div class="form-group form-group-sm">
+                  结束时间
+                  <div type="calendar" style="left: 15px;">
+                    <el-date-picker
+                            v-model="query.siji.etime"
+                            style="width: 190px;height: 30px"
+                            size="small"
+                            type="datetime"
+                            placeholder="选择结束日期时间"
+                            default-time="00:00:00">
+                    </el-date-picker>
+                  </div>
+                </div>
+                </el-date-picker>
+                <a class="btn btn-primary btn-sm" id="yqksh-select" @click="handleQueryClick">查询</a>
+              </div>
+            </el-tab-pane>
+            <el-tab-pane label="乘客查询" name="second">
+              <div style="margin-top:0px;margin-left: 15%;">
+                <div class="form-group form-group-sm">
+                  乘客电话
+                  <el-input v-model="query.ck.phone" type="text" size="small"  placeholder="乘客电话" style="width: 190px; height: 30px ; left: 15px" ></el-input>
+                </div>
+                <div class="form-group form-group-sm">
+                  开始时间
+                  <div type="calendar" style="left: 15px;" >
+                    <el-date-picker
+                            style="width: 190px;height: 30px"
+                            v-model="query.ck.stime"
+                            size="small"
+                            type="datetime"
+                            placeholder="选择开始日期时间"
+                            default-time="00:00:00">
+                    </el-date-picker>
+                  </div>
+                </div>
+                <div class="form-group form-group-sm">
+                  结束时间
+                  <div type="calendar" style="left: 15px;">
+                    <el-date-picker
+                            v-model="query.ck.etime"
+                            style="width: 190px;height: 30px"
+                            size="small"
+                            type="datetime"
+                            placeholder="选择结束日期时间"
+                            default-time="00:00:00">
+                    </el-date-picker>
+                  </div>
+                </div>
+                </el-date-picker>
+                <a class="btn btn-primary btn-sm" id="yqksh-select1" @click="handleQueryClick1">查询</a>
+              </div>
+            </el-tab-pane>
+          </el-tabs>
+
+        </div>
+        <div class="shadow"></div>
+        <div class="inquire_right">
+          <div style="height: 25px;line-height: 25px;">号码查询结果</div>
+          <div class="Treechart" id="Treechart"></div>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function(Vue, _, moment, $) {
+        var vm = new Vue({
+          el: "#root",
+          data: function() {
+            return {
+              data:{
+              children: [],
+              name: ""
+          } ,
+              infoData:{},
+              query:{
+                siji:{
+                  stime: moment(new Date()).format('YYYY-MM-DD 00:00:00'),
+                  etime:moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+                  vehicle:'浙AT1464',
+                  phone:''},
+                ck:{
+                  stime: moment(new Date()).format('YYYY-MM-DD 00:00:00'),
+                  etime:moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+                  phone:'13958078087'
+
+                }
+
+              },
+              activeName: 'first'
+            };
+          },
+          mounted() {
+            let _this=this
+            this.$nextTick(() =>{
+              this.setCharts()
+              this.handleQueryClick()
+              this.getTodyInfo()
+              setInterval(function(){
+                _this.getTodyInfo()
+              },30000);
+            })
+          },
+          methods: {
+            setCharts(){
+              option = {
+              tooltip: {
+                  trigger: 'item',
+                  triggerOn: 'mousemove',
+                  itemStyle:{
+                    borderColor:'#c23531',
+                      },
+              },
+              series: [
+                  {
+                  areaStyle:{
+                      itemStyle:{
+                          borderColor: '#c23531',
+                    }
+                  },
+                      type: 'tree',
+                      data: [this.data],
+
+                      top: '2%',
+                      left: '7%',
+                      bottom: '1%',
+                      right: '20%',
+                      width:'80%',
+
+                      symbolSize: 7,
+
+                      label: {
+                          position: 'bottom',
+                          verticalAlign: 'middle',
+                          align: 'center',
+                          fontSize: 10,
+
+                      },
+
+                      leaves: {
+                          label: {
+                              position: 'right',
+                              verticalAlign: 'middle',
+                              align: 'left'
+                          }
+                      },
+
+                      expandAndCollapse: true,
+                      animationDuration: 550,
+                      animationDurationUpdate: 750
+                  },
+              ]
+            };
+            //获取dom容器
+            var myChart = echarts.init(document.getElementById('Treechart'));
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+            },
+            handleQueryClick(){
+              const {vehicle, phone}=this.query.siji
+              if(vehicle==''&&phone==''){
+               return this.$message.error("请输入车牌号码或手机号码！！");
+              }
+              let _self = this
+              _self.data = {'children':[],'name':_self.query.siji.vehicle}
+            console.info('query')
+              console.info('time::',this.query.siji.stime ==null)
+            $.ajax({
+              type:"POST",
+              url:"../../yqcx/findsjqzsy",
+              data:{"stime":( this.query.siji.stime == null) ? "":moment(this.query.siji.stime).format('YYYY-MM-DD HH:mm:ss') ,"etime":(this.query.siji.etime == null )? '':moment(this.query.siji.etime).format('YYYY-MM-DD HH:mm:ss') ,"phone":this.query.siji.phone,'vehicle':_self.query.siji.vehicle },
+              dataType: 'json',
+              success:function(data){
+                let sdata = data[0]
+                let info = {}
+                info.name = _self.query.ck.vehicle
+                info.children = []
+                for(let i=0;i<sdata.list1.length;i++){
+                  info.children.push({
+                    name:sdata.list1[i].CKDH,
+                    children:[]
+                  })
+                  for(let j =0 ;j<sdata.list2.length;j++){
+                    if(sdata.list1[i].CKDH == sdata.list2[j].CKDH){
+                      info.children[i].children.push({
+                        name:sdata.list2[j].CPHM
+                      })
+                    }
+                  }
+                }
+                _self.data = info
+                _self.setCharts()
+                console.info('data:',_self.data)
+              },
+              error:function(e){
+                console.info('error')
+              }
+            })
+
+          },
+            handleQueryClick1(){
+              const {phone}=this.query.ck
+              if(phone==''){
+                return this.$message.error("请输入手机号码！！");
+              }
+              let _self = this
+              _self.data = {'children':[],'name':_self.query.ck.phone}
+              console.info('query11111')
+              $.ajax({
+                type:"POST",
+                url:"../../yqcx/findckqzsy",
+                data:{"stime": ( this.query.ck.stime == null) ? "":moment(this.query.ck.stime).format('YYYY-MM-DD HH:mm:ss'),"etime":( this.query.ck.etime == null) ? "":moment(this.query.ck.etime).format('YYYY-MM-DD HH:mm:ss'),"phone":_self.query.ck.phone},
+                dataType: 'json',
+                success:function(data){
+                  // console.info('data:',data)
+                  let sdata = data[0]
+                  let info = {}
+                  info.name = _self.query.ck.phone
+                  info.children = []
+                  for(let i=0;i<sdata.list1.length;i++){
+                    info.children.push({
+                      name:sdata.list1[i].CPHM,
+                      children:[]
+                    })
+                    for(let j =0 ;j<sdata.list2.length;j++){
+                      if(sdata.list1[i].CPHM == sdata.list2[j].CPHM){
+                        info.children[i].children.push({
+                          name:sdata.list2[j].CKDH
+                        })
+                      }
+                    }
+                  }
+                  _self.data = info
+                  _self.setCharts()
+                  console.info('zldata:',_self.data)
+                },
+                error:function(e){
+                  console.info('error')
+                }
+              })
+
+            },
+          getTodyInfo(){
+              let _self = this
+            $.ajax({
+              type:"POST",
+              url:'../../yqcx/findTodayInformation',
+              data:'',
+              dataType:'json',
+              success:function(data){
+                console.info('success:',data)
+                _self.infoData = data[0]
+
+                console.info('infoData:',_self.infoData.zcsjsl)
+              },
+              error:function(data){
+                console.info('error',data)
+              }
+            })
+          },
+            handleClick(tab, event) {
+              console.log(tab, event);
+            }
+          },
+
+        });
+      })(Vue, _, moment, jQuery);
+
+      // $("#yqksh-select").on("click",function(){
+
+      // })
+
+    </script>
+  </body>
+</html>

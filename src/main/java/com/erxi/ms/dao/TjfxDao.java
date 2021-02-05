@@ -684,38 +684,52 @@ public interface TjfxDao {
 					tj += " and DRIVER_AGE >=20 ";
 				}
 			}
-			
-			String sql = "select (select count(*) COUNT from (select t.*,ti.ASSESS_SCORE,ti.ASSESS_YEAR from (select "
-					+ " b.* from (select gpc.* from"
-//					+ " tb_global_vehicle gv,"
-					+ " TB_GLOBAL_PERSON_CERTIFICATE gpc force INDEX(plate_number)"
-//					+ " where REPLACE(gpc.plate_number,'.','')=gv.plate_number and gv.industry=090 and gv.business_scope_code = 1400  AND gv.STATUS_NAME='营运' AND gpc.plate_number LIKE '浙A%'"
-					+ ") b where 1=1 and id_number is not null and (id,id_number) in (select max(id),id_number from"
-					+ " (select gpc.id,gpc.id_number from"
-//					+ " tb_global_vehicle gv,"
-					+ " TB_GLOBAL_PERSON_CERTIFICATE gpc force INDEX(plate_number)"
-//					+ " where REPLACE(gpc.plate_number,'.','')=gv.plate_number and gv.industry=090 and gv.business_scope_code = 1400  AND gv.STATUS_NAME='营运' AND gpc.plate_number LIKE '浙A%'"
-					+ ") c group by id_number) ";
+
+//			String sql = "select (select count(*) COUNT from (select t.*,ti.ASSESS_SCORE,ti.ASSESS_YEAR from (select "
+//					+ " b.* from (select gpc.* from"
+////					+ " tb_global_vehicle gv,"
+//					+ " TB_GLOBAL_PERSON_CERTIFICATE gpc force INDEX(plate_number)"
+////					+ " where REPLACE(gpc.plate_number,'.','')=gv.plate_number and gv.industry=090 and gv.business_scope_code = 1400  AND gv.STATUS_NAME='营运' AND gpc.plate_number LIKE '浙A%'"
+//					+ ") b where 1=1 and id_number is not null and (id,id_number) in (select max(id),id_number from"
+//					+ " (select gpc.id,gpc.id_number from"
+////					+ " tb_global_vehicle gv,"
+//					+ " TB_GLOBAL_PERSON_CERTIFICATE gpc force INDEX(plate_number)"
+////					+ " where REPLACE(gpc.plate_number,'.','')=gv.plate_number and gv.industry=090 and gv.business_scope_code = 1400  AND gv.STATUS_NAME='营运' AND gpc.plate_number LIKE '浙A%'"
+//					+ ") c group by id_number) ";
+//			sql += tj;
+//			sql += " ) t left join (select ti.ASSESS_SCORE,ti.ASSESS_YEAR,ti.id_number from TB_TAXI_INTEGRITY_INFO_OUT ti "
+//					+ "where (ti.id_number,ti.ASSESS_YEAR) in (select id_number,max(ti.ASSESS_YEAR) from TB_TAXI_INTEGRITY_INFO_OUT ti  group by id_number)) ti  "
+//					+ "on ti.id_number=t.id_number " ;
+//			sql+=")c ) as count, tt.* from (select t.*,ti.ASSESS_SCORE,ti.ASSESS_YEAR from (select"
+//					+ " b.* from (select gpc.* from"
+////					+ " tb_global_vehicle gv,"
+//					+ " TB_GLOBAL_PERSON_CERTIFICATE gpc force INDEX(plate_number)"
+////					+ " where REPLACE(gpc.plate_number,'.','')=gv.plate_number and gv.industry=090 and gv.business_scope_code = 1400  AND gv.STATUS_NAME='营运' AND gpc.plate_number LIKE '浙A%'"
+//					+ ") b where 1=1 and id_number is not null and (id,id_number) in (select max(id),id_number from"
+//					+ " (select gpc.id,gpc.id_number from"
+////					+ " tb_global_vehicle gv,"
+//					+ " TB_GLOBAL_PERSON_CERTIFICATE gpc force INDEX(plate_number)"
+////					+ " where REPLACE(gpc.plate_number,'.','')=gv.plate_number and gv.industry=090 and gv.business_scope_code = 1400  AND gv.STATUS_NAME='营运' AND gpc.plate_number LIKE '浙A%'"
+//					+ " ) c group by id_number) ";
+//			sql += tj;
+//			sql += " ) t left join (select ti.ASSESS_SCORE,ti.ASSESS_YEAR,ti.id_number from TB_TAXI_INTEGRITY_INFO_OUT ti "
+//					+ "where (ti.id_number,ti.ASSESS_YEAR) in (select id_number,max(ti.ASSESS_YEAR) from TB_TAXI_INTEGRITY_INFO_OUT ti group by id_number)) ti  "
+//					+ "on ti.id_number=t.id_number "
+//					+ ") tt ";
+//			sql +=" order by PLATE_NUMBER limit "+((pageIndex-1)*pageSize)+","+pageSize;
+//			System.out.println(sql);
+//			return sql;
+
+			String sql = "select (select count(1) COUNT from ("
+					+ " select b.* from  (select * from (select * from  TB_GLOBAL_PERSON_CERTIFICATE order by updated_time desc) p where id_number is not null group by id_number) b where 1=1";
+			sql += tj;
+			sql += " ) temp ) as count, tt.* from (select t.*,ti.ASSESS_SCORE,ti.ASSESS_YEAR from ("
+					+ " select b.* from  (select * from (select * from  TB_GLOBAL_PERSON_CERTIFICATE order by updated_time desc) p where id_number is not null group by id_number) b where 1=1";
 			sql += tj;
 			sql += " ) t left join (select ti.ASSESS_SCORE,ti.ASSESS_YEAR,ti.id_number from TB_TAXI_INTEGRITY_INFO_OUT ti "
-					+ "where (ti.id_number,ti.ASSESS_YEAR) in (select id_number,max(ti.ASSESS_YEAR) from TB_TAXI_INTEGRITY_INFO_OUT ti  group by id_number)) ti  "
-					+ "on ti.id_number=t.id_number " ;
-			sql+=")c ) as count, tt.* from (select t.*,ti.ASSESS_SCORE,ti.ASSESS_YEAR from (select"
-					+ " b.* from (select gpc.* from"
-//					+ " tb_global_vehicle gv,"
-					+ " TB_GLOBAL_PERSON_CERTIFICATE gpc force INDEX(plate_number)"
-//					+ " where REPLACE(gpc.plate_number,'.','')=gv.plate_number and gv.industry=090 and gv.business_scope_code = 1400  AND gv.STATUS_NAME='营运' AND gpc.plate_number LIKE '浙A%'"
-					+ ") b where 1=1 and id_number is not null and (id,id_number) in (select max(id),id_number from"
-					+ " (select gpc.id,gpc.id_number from"
-//					+ " tb_global_vehicle gv,"
-					+ " TB_GLOBAL_PERSON_CERTIFICATE gpc force INDEX(plate_number)"
-//					+ " where REPLACE(gpc.plate_number,'.','')=gv.plate_number and gv.industry=090 and gv.business_scope_code = 1400  AND gv.STATUS_NAME='营运' AND gpc.plate_number LIKE '浙A%'"
-					+ " ) c group by id_number) ";
-			sql += tj;
-			sql += " ) t left join (select ti.ASSESS_SCORE,ti.ASSESS_YEAR,ti.id_number from TB_TAXI_INTEGRITY_INFO_OUT ti "
-					+ "where (ti.id_number,ti.ASSESS_YEAR) in (select id_number,max(ti.ASSESS_YEAR) from TB_TAXI_INTEGRITY_INFO_OUT ti group by id_number)) ti  "
-					+ "on ti.id_number=t.id_number " 
-					+ ") tt ";
+					+ " where (ti.id_number,ti.ASSESS_YEAR) in (select id_number,max(ti.ASSESS_YEAR) from TB_TAXI_INTEGRITY_INFO_OUT ti group by id_number)) ti  "
+					+ " on ti.id_number=t.id_number "
+					+ " ) tt ";
 			sql +=" order by PLATE_NUMBER limit "+((pageIndex-1)*pageSize)+","+pageSize;
 			System.out.println(sql);
 			return sql;
@@ -778,21 +792,30 @@ public interface TjfxDao {
 				}
 			}
 			
-			String sql = "select t.*,ti.ASSESS_SCORE,ti.ASSESS_YEAR from (select"
-					+ " b.* from (select gpc.* from"
-//					+ " tb_global_vehicle gv,"
-					+ " TB_GLOBAL_PERSON_CERTIFICATE gpc force INDEX(plate_number)"
-//					+ " where REPLACE(gpc.plate_number,'.','')=gv.plate_number and gv.industry=090 and gv.business_scope_code = 1400  AND gv.STATUS_NAME='营运' AND gpc.plate_number LIKE '浙A%'"
-					+ ") b where 1=1 and id_number is not null and (id,id_number) in (select max(id),id_number from"
-					+ " (select gpc.* from"
-//					+ " tb_global_vehicle gv,"
-					+ " TB_GLOBAL_PERSON_CERTIFICATE gpc force INDEX(plate_number)"
-//					+ " where REPLACE(gpc.plate_number,'.','')=gv.plate_number and gv.industry=090 and gv.business_scope_code = 1400  AND gv.STATUS_NAME='营运' AND gpc.plate_number LIKE '浙A%'"
-					+ ") c group by id_number) ";
+//			String sql = "select t.*,ti.ASSESS_SCORE,ti.ASSESS_YEAR from (select"
+//					+ " b.* from (select gpc.* from"
+////					+ " tb_global_vehicle gv,"
+//					+ " TB_GLOBAL_PERSON_CERTIFICATE gpc force INDEX(plate_number)"
+////					+ " where REPLACE(gpc.plate_number,'.','')=gv.plate_number and gv.industry=090 and gv.business_scope_code = 1400  AND gv.STATUS_NAME='营运' AND gpc.plate_number LIKE '浙A%'"
+//					+ ") b where 1=1 and id_number is not null and (id,id_number) in (select max(id),id_number from"
+//					+ " (select gpc.* from"
+////					+ " tb_global_vehicle gv,"
+//					+ " TB_GLOBAL_PERSON_CERTIFICATE gpc force INDEX(plate_number)"
+////					+ " where REPLACE(gpc.plate_number,'.','')=gv.plate_number and gv.industry=090 and gv.business_scope_code = 1400  AND gv.STATUS_NAME='营运' AND gpc.plate_number LIKE '浙A%'"
+//					+ ") c group by id_number) ";
+//			sql += tj;
+//			sql += " ) t left join (select ti.ASSESS_SCORE,ti.ASSESS_YEAR,ti.id_number from TB_TAXI_INTEGRITY_INFO_OUT ti "
+//					+ "where (ti.id_number,ti.ASSESS_YEAR) in (select id_number,max(ti.ASSESS_YEAR) from TB_TAXI_INTEGRITY_INFO_OUT ti  group by id_number)) ti  "
+//					+ "on ti.id_number=t.id_number ";
+//			System.out.println(sql);
+//			return sql;
+			String sql = "select t.*,ti.ASSESS_SCORE,ti.ASSESS_YEAR from ("
+					+ " select b.* from  (select * from (select * from  TB_GLOBAL_PERSON_CERTIFICATE order by updated_time desc) p where id_number is not null group by id_number) b  where 1=1";
 			sql += tj;
 			sql += " ) t left join (select ti.ASSESS_SCORE,ti.ASSESS_YEAR,ti.id_number from TB_TAXI_INTEGRITY_INFO_OUT ti "
-					+ "where (ti.id_number,ti.ASSESS_YEAR) in (select id_number,max(ti.ASSESS_YEAR) from TB_TAXI_INTEGRITY_INFO_OUT ti  group by id_number)) ti  "
-					+ "on ti.id_number=t.id_number ";
+					+ " where (ti.id_number,ti.ASSESS_YEAR) in (select id_number,max(ti.ASSESS_YEAR) from TB_TAXI_INTEGRITY_INFO_OUT ti group by id_number)) ti  "
+					+ " on ti.id_number=t.id_number ";
+			sql +=" order by PLATE_NUMBER ";
 			System.out.println(sql);
 			return sql;
 		}

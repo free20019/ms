@@ -38,4 +38,32 @@ public class ZlKey extends BasePrefix {
 	public static ZlKey selectvehi = new ZlKey(500, "sv");
 	//下拉区域
 	public static ZlKey selectarea = new ZlKey(500, "sa");
+
+	//监控中心车辆类型(定位)
+	//出租（巡游车）
+	public static ZlKey monitorXyc = new ZlKey(500, "mxyc");
+	//网约
+	public static ZlKey monitorWyc = new ZlKey(500, "mwyc");
+	//两客两货
+	public static ZlKey monitorLklh = new ZlKey(500, "mlklh");
+	//执法车
+	public static ZlKey monitorZfc = new ZlKey(500, "mzfc");
+	//执法终端
+	public static ZlKey monitorZfzd = new ZlKey(500, "mzfzd");
+	//对讲机
+	public static ZlKey monitorDjj = new ZlKey(500, "mdjj");
+
+	//监控中心车辆类型(车辆)
+	//出租（巡游车）
+	public static ZlKey vehicleXyc = new ZlKey(500, "vxyc");
+	//网约
+	public static ZlKey vehicleWyc = new ZlKey(500, "vwyc");
+	//两客两货
+	public static ZlKey vehicleLklh = new ZlKey(500, "vlklh");
+	//执法车
+	public static ZlKey vehicleZfc = new ZlKey(500, "vzfc");
+	//执法终端
+	public static ZlKey vehicleZfzd = new ZlKey(500, "vzfzd");
+	//对讲机
+	public static ZlKey vehicleDjj = new ZlKey(500, "vdjj");
 }

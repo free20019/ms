@@ -11,6 +11,8 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import com.erxi.ms.redis.RedisService;
+import com.erxi.ms.redis.ZlKey;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -66,6 +68,9 @@ public class TlaqAction {
 
 	@Autowired
 	private TlaqService tlaqServer;
+
+	@Autowired
+	RedisService redisService;
 
 	private DownloadAct downloadAct = new DownloadAct();
 
@@ -355,8 +360,12 @@ public class TlaqAction {
 	@ResponseBody
 	public String three() throws Exception {
 		String msg = "ok";
-		msg = tlaqServer.yyzl();
-		return msg;
+		if(redisService.exist(ZlKey.Comp,"")){
+			return FastJsonUtil.toJSONString(FastJsonUtil.stringToMap(redisService.get(ZlKey.Comp, "", String.class)));
+		}else{
+			msg = tlaqServer.yyzl();
+			return msg;
+		}
 	}
 
 	/**
@@ -514,8 +523,10 @@ public class TlaqAction {
 			HttpServletRequest request, 
 			@RequestParam("id") String id,
 			@RequestParam("qx") String qx,
-			@RequestParam("qxname") String qxname) {
-		return tlaqServer.qxglEdit(id,qx,qxname);
+			@RequestParam("qxname") String qxname,
+			@RequestParam("power") String power
+			) {
+		return tlaqServer.qxglEdit(id,qx,qxname,power);
 	}
 	
 	/**
@@ -595,5 +606,17 @@ public class TlaqAction {
 	public String faultMonitor() {
 		String msg = tlaqServer.faultMonitor();
 		return msg;
+	}
+
+	/**
+	 * 视频车辆树结构
+	 *
+	 * @return
+	 */
+	@RequestMapping(value = "/getStructure")
+	@ResponseBody
+	public Result<List<Map<String, Object>>> getStructure(@RequestParam("vhic") String vhic) {
+		System.out.println("vhic"+vhic);
+		return tlaqServer.getStructure(vhic);
 	}
 }

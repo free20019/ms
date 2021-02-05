@@ -1,0 +1,129 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>多车跟踪</title>
+  <link rel="stylesheet" href="../../resources/style/reset.css">
+  <link rel="stylesheet" href="../../resources/style/iconfont.css">
+  <script src="../../resources/script/vue.min.js"></script>
+  <link rel="stylesheet" href="../../resources/script/element-ui/lib/theme-chalk/index.css">
+  <script src="../../resources/script/element-ui/lib/index.js"></script>
+  <script src="../../resources/script/underscore-min.js"></script>
+  <script src="../../resources/script/jquery-1.12.1.min.js"></script>
+  <script src="../../resources/js/axios.min.js"></script>
+  <script src="../../resources/js/util.js"></script>
+  <script src="../../resources/script/util.js"></script>
+  <script
+    src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+  <link rel="stylesheet" href="../../resources/style/css/duochegenzong.css">
+  </link>
+</head>
+<style>
+  .mapWH {
+    width: 100%;
+    height: 100%;
+  }
+</style>
+<body>
+  <div class="panel-wrapper" id="root">
+    <div class="map-left" v-loading="loading.vhicLoading">
+      <el-radio-group class="tw-map-radio_left" v-model="radioCarType" @change="getVhicList">
+        <el-radio :label="0">巡游车</el-radio>
+        <el-radio :label="1">网约车</el-radio>
+        <el-radio :label="2">两客一危</el-radio>
+      </el-radio-group>
+      <el-input placeholder="请输入3位及以上车牌号码" v-model="vhicValue" @input="getVhicList">
+        <template slot="append">
+          <el-button slot="append" type="primary" icon="el-icon-search"></el-button>
+        </template>
+      </el-input>
+      <div class="tw-content">
+        <ul>
+          <li class="tw-li" class="clearfix" v-for="item in list.data">
+            <div class="cph" style="cursor:pointer">
+              <div class="tw-item" @click="getHistoryUtil(item.vehicle,item.radioCarType)">{{item.vehicle}}</div>
+            </div>
+            <div class="car-type">{{item.vhicType}}</div>
+          </li>
+        </ul>
+      </div>
+      <div class="tw-btn">
+        <el-button type="primary" @click="clearVhicList">清除</el-button>
+      </div>
+    </div>
+    <div class="map-content">
+      <div class="tw-map" v-loading="loading.mapLoading1">
+        <div class="tw-map-tool">
+          <div class="tw-title">{{map.vhic1}}</div>
+          <div class="tool-check-box">
+            <el-checkbox-group v-model="checkedType.carType1" @change="boxChange(1)">
+              <el-checkbox label="zfc">
+                <span>执法车</span>
+              </el-checkbox>
+              <el-checkbox label="djj">
+                <span>对讲机</span>
+              </el-checkbox>
+            </el-checkbox-group>
+          </div>
+          <i class="el-icon-error" @click="clearMap(1)"></i>
+        </div>
+        <div class="tw-map mapWH" id="map1"></div>
+      </div>
+      <div class="tw-map" v-loading="loading.mapLoading2">
+        <div class="tw-map-tool">
+          <div class="tw-title">{{map.vhic2}}</div>
+          <div class="tool-check-box">
+            <el-checkbox-group v-model="checkedType.carType2" @change="boxChange(2)">
+              <el-checkbox label="zfc">
+                <span>执法车</span>
+              </el-checkbox>
+              <el-checkbox label="djj">
+                <span>对讲机</span>
+              </el-checkbox>
+            </el-checkbox-group>
+          </div>
+          <i class="el-icon-error" @click="clearMap(2)"></i>
+        </div>
+        <div class="tw-map mapWH" id="map2"></div>
+      </div>
+      <div class="tw-map" v-loading="loading.mapLoading3">
+        <div class="tw-map-tool">
+          <div class="tw-title">{{map.vhic3}}</div>
+          <div class="tool-check-box">
+            <el-checkbox-group v-model="checkedType.carType3" @change="boxChange(3)">
+              <el-checkbox label="zfc">
+                <span>执法车</span>
+              </el-checkbox>
+              <el-checkbox label="djj">
+                <span>对讲机</span>
+              </el-checkbox>
+            </el-checkbox-group>
+          </div>
+          <i class="el-icon-error" @click="clearMap(3)"></i>
+        </div>
+        <div class="tw-map mapWH" id="map3"></div>
+      </div>
+      <div class="tw-map" v-loading="loading.mapLoading4">
+        <div class="tw-map-tool">
+          <div class="tw-title">{{map.vhic4}}</div>
+          <div class="tool-check-box">
+            <el-checkbox-group v-model="checkedType.carType4" @change="boxChange(4)">
+              <el-checkbox label="zfc">
+                <span>执法车</span>
+              </el-checkbox>
+              <el-checkbox label="djj">
+                <span>对讲机</span>
+              </el-checkbox>
+            </el-checkbox-group>
+          </div>
+          <i class="el-icon-error" @click="clearMap(4)"></i>
+        </div>
+        <div class="tw-map mapWH" id="map4"></div>
+      </div>
+    </div>
+  </div>
+  </div>
+  <script src="./duochegenzong.js"></script>
+</body>
+
+</html>

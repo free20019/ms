@@ -1,0 +1,35 @@
+.ip-layout {
+  background-color: #eff2f9;
+}
+
+.ip-layout .ip-layout {
+  -webkit-transition: all 0.5s;
+  transition: all 0.5s;
+}
+
+.ip-layout .ip-content {
+  -webkit-transition: all 0.5s;
+  transition: all 0.5s;
+}
+
+.ip-layout.full-screen .ip-sider {
+  left: -100px;
+}
+
+.ip-layout.full-screen .ip-layout {
+  width: calc(100%) !important;
+  margin-left: 0px !important;
+  -webkit-transition: all 0.5s;
+  transition: all 0.5s;
+}
+
+.ip-layout.full-screen .ip-layout .ip-top {
+  display: none;
+}
+
+.ip-layout.full-screen .ip-layout .ip-content {
+  height: calc(100% - 30px) !important;
+  -webkit-transition: all 0.5s;
+  transition: all 0.5s;
+}
+/*# sourceMappingURL=fullscreen.css.map */

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./resources/style/reset.css">
+    <link rel="stylesheet" type="text/css" href="resources/script/zTree/css/zTreeStyle/zTreeStyle.css" />
+    <link rel="stylesheet" href="./resources/script/bootstrap/css/bootstrap.css">
+    <link rel=" stylesheet" href="./resources/style/multiple.css">
+
+</head>
+
+<body>
+    <div class="template-wrapper" id="root">
+        <div class="template-header">
+            <div class="title">杭州市出租汽车服务管理系统</div>
+        </div>
+        <div class="template-left">
+            <div class="tree-panel">
+                <div class="tree-query">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="请输入" v-model="vhic" aria-describedby="basic-addon2" @keyup="vhicChange">
+                        <span class="input-group-addon" @click="vhicChange">
+                            <i class="glyphicon glyphicon-search"></i>
+                        </span>
+                    </div>
+                </div>
+                <ul id="databanzu" class="ztree tree-box"></ul>
+            </div>
+        </div>
+        <div class="template-body">
+            <div class="video-panel">
+                <div class="video-box" :class="{active: index== video.checkIndex}" v-for="(item, index) in video.data"
+                    :key="index" :style="[videoBoxStyle]">
+                    <object :id="'v_'+index" class="video-player"
+                        classid="clsid:EE4EA829-B8DA-4229-AC72-585AF45AD778"></object>
+
+                </div>
+            </div>
+            <div class="video-tool">
+                <div class="video-tool-item">
+                    车辆数：<span v-text="zs"></span> 在线数：<span v-text="zx"></span> 离线数：<span v-text="lx"></span>
+                </div>
+                <div class="video-tool-item">
+                    <a href="javascript:void(0)" class="btn btn-primary" @click="videoSplit(1)">1 x 1</a>
+                    <a href="javascript:void(0)" class="btn btn-primary" @click="videoSplit(2)">2 x 2</a>
+                    <a href="javascript:void(0)" class="btn btn-primary" @click="videoSplit(3)">3 x 3</a>
+                    <a href="javascript:void(0)" class="btn btn-primary" @click="videoSplit(4)">4 x 4</a>
+                </div>
+            </div>
+            <!-- <table class="table">
+                <tr class="table-row" v-for="(item, index) in video.split" :key="index">
+                    <td class="table-col" v-for="(item, index) in video.split" :key="index">
+
+                    </td>
+                </tr>
+            </table> -->
+        </div>
+    </div>
+
+    <script src="./resources/script/vue.min.js"></script>
+    <script src="./resources/script/jquery-1.12.1.min.js"></script>
+    <script type="text/javascript" src="resources/script/zTree/js/jquery.ztree.core-3.5.js"></script>
+
+    <script>
+        (function (Vue, zTree, ipHostOption) {
+            var vm = new Vue({
+                el: '#root',
+                data: function () {
+                    return {
+                        tree: {
+                            el: null,
+                            data: [],
+                            setting: { data: {}, callback: {} }
+                        },
+                        video: {
+                            split: 2,
+                            videoNum: 4, //当前视频数
+                            data: [],
+                            iPlayHandle: 0, // 是否播放
+                            checkIndex: 0 //选中样式及当前播放视频ID
+                        },
+                        vhic: '',
+                        zx:0,
+                        lx:0,
+                        zs:0
+                    }
+                },
+                computed: {
+                    videoBoxStyle: function () {
+                        var style = {}
+                        var split = this.video.split
+                        style.width = 100 / split + '%'
+                        style.height = 100 / split + '%'
+                        return style
+                    }
+                },
+                watch: {
+                    'tree.data': function (value) {
+                        this.tree.el = zTree.init($("#databanzu"), this.tree.setting, value);
+                    }
+                },
+                mounted: function () {
+                    // this.$nextTick(() => { })
+                    this.tree.setting.data = {
+                        simpleData: {
+                            enable: true,
+                            idKey: "id",
+                            pIdKey: "pId",
+                            rootPId: 0
+                        }
+                    }
+                    this.tree.setting.callback = {
+                        onClick: this.treeItemClick
+                    }
+                    this.initTree()
+                    this.resetVideo()
+                    setTree(0)
+                },
+                methods: {
+                    videoSplit: function(type) {
+                        this.video.split = type;
+                        this.video.videoNum= type*type; //当前视频数
+                        this.video.iPlayHandle= 0; // 是否播放
+                        this.video.checkIndex= 0; //选中样式及当前播放视频ID
+                        this.resetVideo()
+                    },
+                    vhicChange: function() {
+                        if(this.vhic.length>=3){
+                            setTree(1)
+                        }else if(this.vhic == '') setTree(0)
+                    },
+                    treeItemClick: function (event, treeId, treeNode) {
+                        // var treeItem = zTree.getZTreeObj("databanzu");
+                        if (treeNode.sim_num) {
+                            if (/off.png$/.test(treeNode.icon)) {
+                                this.tree.el.updateNode(this.playIconType('on', treeNode));
+                                this.tree.el.updateNode(treeNode.bfwz = this.video.checkIndex);
+                                this.play(treeNode.sim_num)
+                            } else {
+                                this.tree.el.updateNode(this.playIconType('off', treeNode));
+                                let obj = document.getElementById('v_' + treeNode.bfwz);
+                                obj.StreamPlayStopByTCP();
+                                this.tree.el.updateNode(treeNode.bfwz = '');
+                            }
+                        }
+                    },
+                    initTree: function () {
+                        if (!this.tree.el) {
+                            this.tree.el = zTree.init($('#databanzu'), this.tree.setting);
+                        }
+                    },
+                    resetVideo: function () {
+                        this.video.data = new Array(this.video.split * this.video.split)
+                    },
+                    playIconType: function (type, treeNode) {
+                        treeNode.icon = './resources/images/video/' + type + '.png';
+                        return treeNode
+                    },
+                    play: function (sim_num) {
+                        let treeNode = this.tree.el.getNodeByParam('bfwz', this.video.checkIndex)
+                        if (treeNode.sim_num != sim_num) {
+                            treeNode.icon = './resources/images/video/off.png'
+                            this.tree.el.updateNode(treeNode)
+                        }
+                        console.log('this.tree.el', treeNode)
+                        // this.tree.el.updateNode(this.tree.el.getNodes()[0].children[0].icon = './resources/images/video/on.png');
+                        let szAccount = sim_num;
+                        //注册服务IP、端口
+                        let PlayOCX = document.getElementById('v_' + this.video.checkIndex);
+                        let iConnHandle = PlayOCX.ConnectDeviceByACS(szAccount, ipHostOption.szRegIP,
+                            ipHostOption.iRegPort, "admin", "Admin12345");
+
+                        if (iConnHandle < 0) {
+                            // alert("连接设备失败！");
+                            return;
+                        }
+                        let iChannel = "1";
+
+                        //有视频播放，则先停止
+                        if (this.video.iPlayHandle > 0) {
+                            PlayOCX.StreamPlayStopByTCP();
+                        }
+                        //设置设备注册线路编号，以iVMS-7200添加设备选择注册线路匹配
+                        PlayOCX.SetDeviceNetLine(ipHostOption.iRegisterNo);
+                        //取流类型
+                        let iStreamType = '1';//1：子码流
+
+                        //客户端到流媒体采用TCP，流媒体到设备采用TCP取流
+                        //参数详情 流媒体服务器IP  流媒体服务器端口号  设备序列号  设备通道号(从1开始)  码流类型(0-主码流; 1-子码流)  媒体服务器请求前端视频流模式 0:UDP;1:TCP
+                        this.video.iPlayHandle = PlayOCX.StreamPlayStartByTCP(ipHostOption.szStreamServerIP,
+                            ipHostOption.iStreamServerPort, szAccount, iChannel, iStreamType, 1);
+
+                        //设置窗口的设备信息显示
+                        let szMode = "TCP";
+                        PlayOCX.SetDeviceInfoForShow(">>> 转发取流(" + szMode + ") <<<");
+                        this.video.checkIndex = (this.video.checkIndex + 1) % this.video.videoNum
+                    }
+                },
+            })
+            function setTree(type) {
+                var vhic = '';
+                if(type ==1) {
+                    vhic = vm.vhic
+                }
+                return $.ajax({
+                    type: "POST",
+                    // url: "http://60.191.5.236:8080/lklh/common/queryVhic",
+                    url: "http://localhost:8090/zhpt/claq/getStructure",
+                    data: {
+                        "vhic": vhic
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        var node = [];
+                        var videovehicle = data.data[0].videovehicle;
+                        var structure = data.data[0].structure;
+                        var data = new Date().getTime();
+                        if(vm.vhic.length<3) {
+                            var zs = videovehicle.length,zx=0,lx=0;
+                            for (var i = 0; i < structure.length; i++) {
+                                node.push({
+                                    id: structure[i].code,
+                                    name: structure[i].structure_name,
+                                    pId: structure[i].higher_ups
+                                });
+                            }
+                            for (var i = 0; i < videovehicle.length; i++) {
+                                if(data - videovehicle[i].SPEED_TIME < 1000*60*10) zx++;
+                                else lx++;
+                            }
+                            vm.zs = zs;
+                            vm.zx = zx;
+                            vm.lx = lx;
+                        }
+                        for (var i = 0; i < videovehicle.length; i++) {
+                            if(data - videovehicle[i].SPEED_TIME < 1000*60*10){
+                                node.push({
+                                    id: 'cl' + i,
+                                    name: videovehicle[i].vehi_no,
+                                    icon: "resources/images/video/mdton.png",
+                                    pId: videovehicle[i].code
+                                });
+                                for (var j = 0; j < videovehicle[i].passageway; j++) {
+                                    node.push({
+                                        id: 'td' + (j + 1),
+                                        name: '通道' + (j + 1),
+                                        icon: "resources/images/video/off.png",
+                                        pId: 'cl' + i,
+                                        sim_num: videovehicle[i].deviceid,
+                                        td: (j + 1),
+                                        bfwz: '',
+                                    });
+                                }
+                            }else {
+                                node.push({
+                                    id: 'cl' + i,
+                                    name: videovehicle[i].vehi_no,
+                                    icon: "resources/images/video/mdt.png",
+                                    pId: videovehicle[i].code
+                                });
+                            }
+                        }
+                        vm.tree.data = node;
+                        //zTree.init($("#databanzu"), setting, treeNodes);
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        // alert("提交失败!");
+                    }
+                });
+            }
+        })(Vue, $.fn.zTree, {
+            iRegPort: "7660",
+            iRegisterNo: 1,
+            iStreamServerPort: "7554",
+            szRegIP: "60.191.125.18",
+            szStreamServerIP: "60.191.125.18"
+        })
+    </script>
+
+
+
+</body>
+
+</html>

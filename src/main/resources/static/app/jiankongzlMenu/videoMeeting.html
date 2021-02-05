@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>视频会议</title>
+  <link rel="stylesheet" href="../../resources/style/reset.css">
+  <link rel="stylesheet" href="../../resources/style/iconfont.css">
+  <link rel="stylesheet" href="../../resources/script/element-ui/lib/theme-chalk/index.css" />
+  <link rel="stylesheet" href="../../resources/style/css/videoMeeting.css">
+</head>
+
+<body>
+  <div class="panel-wrapper" id="root">
+    <el-form :inline="true" class="query-bar">
+      <el-form-item>
+        <el-button type="primary" @click="handleQueryClick">查询</el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="handleAddVideoRoomDialog" v-show="isShow">创建会议</el-button>
+      </el-form-item>
+    </el-form>
+    <div class="query-wrapper">
+      <el-table border v-loading="table.loading" :data="table.data" height="100%">
+        <el-table-column align="center" type="index" label="序号" width="180">
+        </el-table-column>
+        <el-table-column align="center" prop="create_username" label="创建人">
+        </el-table-column>
+        <el-table-column align="center" prop="create_time" :formatter="formatterTableTime" label="创建时间">
+        </el-table-column>
+        <el-table-column align="center" prop="is_deleted" :formatter="formatterTableInState" label="状态">
+        </el-table-column>
+        <el-table-column align="center" prop="invite_users" label="会话成员">
+        </el-table-column>
+        <el-table-column align="center" label="操作">
+          <template slot-scope="scope">
+            <el-button :disabled="scope.row.is_deleted == 1" type="primary" @click="handleDelClick(scope.row.room_id)">
+              删除</el-button>
+            <el-button :disabled="scope.row.is_in == 0 || scope.row.is_deleted == 1" type="primary"
+              @click="handleJoinClick(scope.row.room_id)">加入会话</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+    <el-dialog @closed="handleDialogClose" width="650px" :visible.sync="dialog.display" title="创建会议">
+      <el-form label-width="110px">
+        <el-form-item label="房间名">
+          <el-input v-model="dialog.room_name"></el-input>
+        </el-form-item>
+        <el-form-item label="等待时间（秒）">
+          <el-input v-model="dialog.wait_time"></el-input>
+        </el-form-item>
+      </el-form>
+      <el-transfer ref="transfer" v-model="dialog.transfer" :data="dialog.transferData" :filterable="true"
+        :titles="['用户列表','选择加入会议的用户']"></el-transfer>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="handleDialogCancel">取 消</el-button>
+        <el-button type="primary" @click="submitDialog">确 定</el-button>
+      </span>
+    </el-dialog>
+  </div>
+
+  <script src="../../resources/script/vue.min.js"></script>
+  <script src="../../resources/script/underscore-min.js"></script>
+  <script src="../../resources/js/axios.min.js"></script>
+  <script src="../../resources/script/jquery-1.12.1.min.js"></script>
+  <script src="../../resources/script/element-ui/lib/index.js"></script>
+  <script src="https://cdn.bootcss.com/stomp.js/2.3.3/stomp.js"></script>
+  <script src="https://cdn.bootcss.com/sockjs-client/1.1.4/sockjs.js"></script>
+  <script src="../../resources/js/axios.min.js"></script>
+  <script src="../../resources/script/moment.min.js"></script>
+  <script src="../../resources/js/util.js"></script>
+  <script src="./videoMeeting.js"></script>
+
+  <script type="text/javascript">
+  </script>
+</body>
+
+</html>

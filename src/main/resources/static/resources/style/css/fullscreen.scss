@@ -1,0 +1,26 @@
+.ip-layout {
+  background-color: #eff2f9;
+  .ip-layout {
+    transition: all 0.5s;
+  }
+  .ip-content {
+    transition: all 0.5s;
+  }
+  &.full-screen {
+    .ip-sider {
+      left: -100px;
+    }
+    .ip-layout {
+      width: calc(100%) !important;
+      margin-left: 0px !important;
+      transition: all 0.5s;
+      .ip-top {
+        display: none;
+      }
+      .ip-content {
+        height: calc(100% - 30px) !important;
+        transition: all 0.5s;
+      }
+    }
+  }
+}

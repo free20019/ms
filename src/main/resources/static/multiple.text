@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="resources/script/zTree/css/zTreeStyle/zTreeStyle.css" />
+    <script src="resources/script/jquery-1.12.1.min.js"></script>
+    <script type="text/javascript" src="resources/script/zTree/js/jquery.ztree.core-3.5.js"></script>
+    <!--    <script type="text/javascript" src="resources/script/jquery.resizableColumns.js"></script>-->
+</head>
+
+<body style="height: 99%;">
+    <div style="height: 99%;">
+
+        <table width="100%" height="99%" class="table listext" data-resizable-columns-id="demo-table">
+            <thead>
+                <tr>
+                    <th style="white-space: nowrap;" data-resizable-column-id="#">车辆列表</th>
+                    <th style="white-space: nowrap;" data-resizable-column-id="first_name">视频监控</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="white-space: nowrap;width: 200px;height: 100%;vertical-align:top">
+                        <div style="height: 550px;overflow-y: auto;overflow-x: hidden;" title="车辆列表">
+
+
+                            <ul id="databanzu" class="ztree">
+                            </ul>
+
+                        </div>
+                    </td>
+                    <td style="white-space: nowrap;">
+                        <div style='height: 100%;'>
+                            <table cellpadding='0' cellspacing='0' border='1' bordercolor='#ffffff' width='100%'
+                                height="100%" align='center' id="videoDiv">
+                                <tr style="height: 50%">
+                                    <td><object id='v1' classid='clsid:EE4EA829-B8DA-4229-AC72-585AF45AD778'
+                                            width='100%' height='100%' style='margin: 0;'></object></td>
+                                    <td><object id='v2' classid='clsid:EE4EA829-B8DA-4229-AC72-585AF45AD778'
+                                            width='100%' height='100%' style='margin: 0;'></object></td>
+                                </tr>
+                                <tr style="height: 50%">
+                                    <td><object id='v3' classid='clsid:EE4EA829-B8DA-4229-AC72-585AF45AD778'
+                                            width='100%' height='100%' style='margin: 0;'></object></td>
+                                    <td><object id='v4' classid='clsid:EE4EA829-B8DA-4229-AC72-585AF45AD778'
+                                            width='100%' height='100%' style='margin: 0;'></object></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </td>
+
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+    <input type="hidden" id="RegIp" value="192.168.0.31">
+    <!-- 注册服务器ip 端口port -->
+    <input type="hidden" id="RegPort" value="7660">
+    <input type="hidden" id="StreamIp" value="192.168.0.31">
+    <!-- 流媒体服务器ip 端口port -->
+    <input type="hidden" id="StreamPort" value="7554">
+    <input type="hidden" id="AlarmIp" value="192.168.0.31">
+    <!-- 报警服务器ip 端口port -->
+    <input type="hidden" id="AlarmPort" value="7332">
+    <input type="hidden" id="RegisterNo" value="2">
+    <!-- 设备注册线路编号 -->
+    <input type="hidden" id="StreamType" value="1">
+    <!-- 流码类型 -->
+    <object id='ppvs' classid='clsid:EE4EA829-B8DA-4229-AC72-585AF45AD778' width='100%' height='100%'
+        style='margin: 0;display: none'></object>
+    <script type="text/javascript">
+        // function videoDiv() {
+        //     var zsb = $('<object>').attr({'id':'v1','classid':'clsid:EE4EA829-B8DA-4229-AC72-585AF45AD778'}).addClass('videoclass').on('click', function () {
+        //         alert(3)
+        //     });
+        //     return $('<td>').append(zsb).on('click', function () {
+        //         alert(1)
+        //     });
+        // }
+        window.onload = function () {
+            // $("table").resizableColumns({});
+
+            // $('#videoDiv').append($('<tr>').append(videoDiv()));
+            getteam();
+            try {
+                //根据控件的PorgID来判断是否注册，未注册则抛出异常
+                obj = new ActiveXObject("PPVSGUARD.PpvsguardCtrl.1");
+
+                //设置窗口模式
+                var PlayOCX = document.getElementById("v1");
+
+                if (typeof PlayOCX == "undefined" || PlayOCX == null) {
+                    alert("海康视频控件已注册但页面对象不存在！");
+                    return;
+                }
+                PlayOCX.SetActiveXShowMode(0, 0); //实时预览模式，需要修改模式或者窗口UI可参考SetActiveXShowMode接口说明
+            } catch (e) {
+                alert("海康视频控件未注册或未安装！");
+            }
+
+        }
+
+
+        function do_login() {
+            document.getElementById("TLMDvrAx").LoginStyle = 0;
+            var szServerIP = "123.157.159.2";
+            var nSeverPort = "10000";
+            var szUserName = "admin";
+            var szPassWord = "Admin12345";
+            var nRet = document.getElementById("TLMDvrAx").LoginServer(
+                szServerIP, nSeverPort, szUserName, szPassWord);
+            if (nRet) {
+                document.getElementById("TLMDvrAx").ShowWndStyle = 4;
+            } else {
+                alert("登陆失败！");
+            }
+        }
+
+        var treeNodes;
+        var zTree;
+
+        function getteam() {
+            $.ajax({
+                type: "POST",
+                // url: "http://60.191.5.236:8080/lklh/common/queryVhic",
+                url: "http://localhost:8090/zhpt/claq/getStructure",
+                data: {
+                    "vehi_no": $('#vediokeyword').val()
+                },
+                dataType: "json",
+                success: function (data) {
+                    var node = [];
+                    var videovehicle = data.data[0].videovehicle;
+                    var structure = data.data[0].structure;
+                    for (var i = 0; i < structure.length; i++) {
+                        node.push({
+                            id: structure[i].code,
+                            name: structure[i].structure_name,
+                            pId: structure[i].higher_ups
+                        });
+                    }
+                    for (var i = 0; i < videovehicle.length; i++) {
+                        node.push({
+                            id: 'cl' + i,
+                            name: videovehicle[i].vehi_no,
+                            icon: "resources/images/video/mdton.png",
+                            pId: videovehicle[i].code
+                        });
+                        for (var j = 0; j < videovehicle[i].passageway; j++) {
+                            node.push({
+                                id: 'td' + (j + 1),
+                                name: '通道' + (j + 1),
+                                icon: "resources/images/video/off.png",
+                                pId: 'cl' + i,
+                                sim_num: videovehicle[i].deviceid,
+                                td: (j + 1),
+                            });
+                        }
+                    }
+                    // for (var i = 0; i < data.length; i++) {
+                    //     if (date - data[i].STIME < 1000 * 60 * 10) {
+                    //         node.push({
+                    //             id: data[i].MDT_NO,
+                    //             name: data[i].VEHI_NO,
+                    //             icon: "resources/images/video/mdton.png",
+                    //             'lx': 'hksp',
+                    //             'camera': data[i].TC_NUM
+                    //         });
+                    //         for (var j = 0; j < 4; j++) {
+                    //             node.push({
+                    //                 id: 'td' + (j + 1),
+                    //                 pId: data[i].MDT_NO,
+                    //                 name: "通道" + (j + 1),
+                    //                 icon: "resources/images/video/off.png",
+                    //                 'lx': 'hksp',
+                    //                 'camera': data[i].TC_NUM,
+                    //                 'sim_num': data[i].MDT_NO,
+                    //                 'td': (j + 1),
+                    //                 'vehinum': data[i].VEHI_NO
+                    //             });
+                    //         }
+                    //     } else {
+                    //         node.push({
+                    //             id: data[i].MDT_NO,
+                    //             name: data[i].VEHI_NO,
+                    //             icon: "resources/images/video/mdt.png",
+                    //             'lx': 'hksp',
+                    //             'camera': data[i].VEHI_NO
+                    //         });
+                    //     }
+                    // }
+
+                    var treeNodes;
+                    var zTree;
+                    treeNodes = node;
+                    zTree = $.fn.zTree
+                        .init($("#databanzu"), setting, treeNodes);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert("提交失败!");
+                }
+            });
+        }
+        var playid1 = "0";
+        var playid2 = "0";
+        var playid3 = "0";
+        var playid4 = "0";
+
+        var oc = 0;
+
+        var setting = {
+            data: {
+                simpleData: {
+                    enable: true,
+                    idKey: "id",
+                    pIdKey: "pId",
+                    rootPId: 0
+                }
+            },
+            callback: {
+                onClick: function (event, treeId, treeNode) {
+                    var zTree = $.fn.zTree.getZTreeObj("databanzu");
+                    nodes = zTree.getSelectedNodes();
+                    if (treeNode.id == "td1") {
+                        if (playid1 == "0") {
+                            treeNode.icon = "resources/images/video/on.png";
+                            zTree.updateNode(treeNode);
+                            playid1 = "1";
+                            Play1(treeNode.sim_num);
+                        } else {
+                            treeNode.icon = "resources/images/video/off.png";
+                            zTree.updateNode(treeNode);
+                            var obj = document.getElementById("v1");
+                            obj.StreamPlayStopByTCP();
+                            playid1 = "0";
+                        }
+                    } else if (treeNode.id == "td2") {
+                        if (playid2 == "0") {
+                            treeNode.icon = "resources/images/video/on.png";
+                            zTree.updateNode(treeNode);
+                            playid2 = "1";
+                            Play2(treeNode.sim_num);
+                        } else {
+                            treeNode.icon = "resources/images/video/off.png";
+                            zTree.updateNode(treeNode);
+                            var obj = document.getElementById("v2");
+                            obj.StreamPlayStopByTCP();
+                            playid2 = "0";
+                        }
+                    } else if (treeNode.id == "td3") {
+                        if (playid3 == "0") {
+                            treeNode.icon = "resources/images/video/on.png";
+                            zTree.updateNode(treeNode);
+                            playid3 = "1";
+                            Play3(treeNode.sim_num);
+                        } else {
+                            treeNode.icon = "resources/images/video/off.png";
+                            zTree.updateNode(treeNode);
+                            var obj = document.getElementById("v3");
+                            obj.StreamPlayStopByTCP();
+                            playid3 = "0";
+                        }
+                    } else if (treeNode.id == "td4") {
+                        if (playid4 == "0") {
+                            treeNode.icon = "resources/images/video/on.png";
+                            zTree.updateNode(treeNode);
+                            playid4 = "1";
+                            Play4(treeNode.sim_num);
+                        } else {
+                            treeNode.icon = "resources/images/video/off.png";
+                            zTree.updateNode(treeNode);
+                            var obj = document.getElementById("v4");
+                            obj.StreamPlayStopByTCP();
+                            playid4 = "0";
+                        }
+                    }
+                }
+            }
+        }
+        var iPlayHandle1;
+        var iPlayHandle2;
+        var iPlayHandle3;
+        var iPlayHandle4;
+        var iRegPort = "7660";
+        var iRegisterNo = 1;
+        var iStreamServerPort = "7554";
+        var szRegIP = "60.191.125.18";
+        var szStreamServerIP = "60.191.125.18";
+        function Play1(sim_num) {
+
+            var szAccount = sim_num;
+            //注册服务IP、端口
+            var PlayOCX = document.getElementById("v1");
+
+            var iConnHandle = PlayOCX.ConnectDeviceByACS(szAccount, szRegIP,
+                iRegPort, "admin", "Admin12345");
+
+            if (iConnHandle < 0) {
+                alert("连接设备失败！");
+                return;
+            }
+            var iChannel = "1";
+
+            //有视频播放，则先停止
+            if (iPlayHandle1 > 0) {
+                PlayOCX.StreamPlayStopByTCP();
+            }
+            //设置设备注册线路编号，以iVMS-7200添加设备选择注册线路匹配
+            PlayOCX.SetDeviceNetLine(iRegisterNo);
+            //取流类型
+            var iStreamType = document.getElementById("StreamType").value;
+
+            //客户端到流媒体采用TCP，流媒体到设备采用TCP取流
+            iPlayHandle1 = PlayOCX.StreamPlayStartByTCP(szStreamServerIP,
+                iStreamServerPort, szAccount, iChannel, iStreamType, 1);
+
+            //设置窗口的设备信息显示
+            var szMode = "TCP";
+            PlayOCX.SetDeviceInfoForShow(">>> 转发取流(" + szMode + ") <<<");
+        }
+
+        function Play2(sim_num) {
+
+            var szAccount = sim_num;
+            //注册服务IP、端口
+            var PlayOCX = document.getElementById("v2");
+            var iConnHandle = PlayOCX.ConnectDeviceByACS(szAccount, szRegIP,
+                iRegPort, "admin", "Admin12345");
+
+            if (iConnHandle < 0) {
+                alert("连接设备失败！");
+                return;
+            }
+            var iChannel = "2";
+
+            //有视频播放，则先停止
+            if (iPlayHandle2 > 0) {
+                PlayOCX.StreamPlayStopByTCP();
+            }
+            //设置设备注册线路编号，以iVMS-7200添加设备选择注册线路匹配
+            PlayOCX.SetDeviceNetLine(iRegisterNo);
+            //取流类型
+            var iStreamType = document.getElementById("StreamType").value;
+
+            //客户端到流媒体采用TCP，流媒体到设备采用TCP取流
+            iPlayHandle2 = PlayOCX.StreamPlayStartByTCP(szStreamServerIP,
+                iStreamServerPort, szAccount, iChannel, iStreamType, 1);
+
+            //设置窗口的设备信息显示
+            var szMode = "TCP";
+            PlayOCX.SetDeviceInfoForShow(">>> 转发取流(" + szMode + ") <<<");
+        }
+
+        function Play3(sim_num) {
+
+            var szAccount = sim_num;
+            //注册服务IP、端口
+            var PlayOCX = document.getElementById("v3");
+            var iConnHandle = PlayOCX.ConnectDeviceByACS(szAccount, szRegIP,
+                iRegPort, "admin", "Admin12345");
+
+            if (iConnHandle < 0) {
+                alert("连接设备失败！");
+                return;
+            }
+            var iChannel = "3";
+
+            //有视频播放，则先停止
+            if (iPlayHandle3 > 0) {
+                PlayOCX.StreamPlayStopByTCP();
+            }
+            //设置设备注册线路编号，以iVMS-7200添加设备选择注册线路匹配
+            PlayOCX.SetDeviceNetLine(iRegisterNo);
+            //取流类型
+            var iStreamType = document.getElementById("StreamType").value;
+
+            //客户端到流媒体采用TCP，流媒体到设备采用TCP取流
+            iPlayHandle3 = PlayOCX.StreamPlayStartByTCP(szStreamServerIP,
+                iStreamServerPort, szAccount, iChannel, iStreamType, 1);
+
+            //设置窗口的设备信息显示
+            var szMode = "TCP";
+            PlayOCX.SetDeviceInfoForShow(">>> 转发取流(" + szMode + ") <<<");
+        }
+
+        function Play4(sim_num) {
+            var szAccount = sim_num;
+            //注册服务IP、端口
+            var PlayOCX = document.getElementById("v4"); onnHandle = PlayOCX.ConnectDeviceByACS(szAccount, szRegIP,
+                iRegPort, "admin", "Admin12345");
+
+            if (iConnHandle < 0) {
+                alert("连接设备失败！");
+                return;
+            }
+            var iChannel = "4";
+
+            //有视频播放，则先停止
+            if (iPlayHandle4 > 0) {
+                PlayOCX.StreamPlayStopByTCP();
+            }
+            //设置设备注册线路编号，以iVMS-7200添加设备选择注册线路匹配
+            PlayOCX.SetDeviceNetLine(iRegisterNo);
+            //取流类型
+            var iStreamType = document.getElementById("StreamType").value;
+
+            //客户端到流媒体采用TCP，流媒体到设备采用TCP取流
+            iPlayHandle4 = PlayOCX.StreamPlayStartByTCP(szStreamServerIP,
+                iStreamServerPort, szAccount, iChannel, iStreamType, 1);
+
+            //设置窗口的设备信息显示
+            var szMode = "TCP";
+            PlayOCX.SetDeviceInfoForShow(">>> 转发取流(" + szMode + ") <<<");
+        }
+
+    </script>
+
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+            list-style-type: none;
+        }
+
+        a,
+        img {
+            border: 0;
+        }
+
+        table {
+            empty-cells: show;
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        body {
+            font: 12px/180% Arial, Helvetica, sans-serif, "新宋体";
+        }
+
+        .demo {
+            width: 760px;
+            margin: 40px auto;
+        }
+
+        .demo h2 {
+            font-size: 18px;
+            height: 52px;
+            color: #3366cc;
+            text-align: center;
+        }
+
+        .listext th {
+            background: #eee;
+            color: #3366cc;
+        }
+
+        .listext th,
+        .listext td {
+            border: solid 1px #ddd;
+            text-align: left;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .rc-handle-container {
+            position: relative;
+        }
+
+        .rc-handle {
+            position: absolute;
+            width: 7px;
+            cursor: ew-resize;
+            *cursor: pointer;
+            margin-left: -3px;
+        }
+
+        /* #vediokeyword{ */
+        /*     width: 90px; */
+        /*     border: none; */
+        /*     height: 23px; */
+        /*     background: #fff; */
+        /*     overflow: hidden; */
+        /*     vertical-align: middle; */
+        /* } */
+        /* #cxbtn{ */
+        /*     width: 50px; */
+        /*     height: 25px; */
+        /*     text-align: center; */
+        /*     font-size: 13px; */
+        /*     color: #fff; */
+        /*     border: none; */
+        /*     overflow: hidden; */
+        /*     vertical-align: middle; */
+        /*     background: #008cd6; */
+        /*     outline: none; */
+        /*     cursor: pointer; */
+        /*     position: relative; */
+        /*     left: -4px; */
+        /*     top: -2px; */
+        /* } */
+        .queryVehicle {
+            width: 120px;
+            height: 25px;
+            position: relative;
+            border: 1px solid #888;
+            /*     box-shadow: -1px -1px 1px #888, 2px 2px 2px #888; */
+        }
+
+        .queryVehicle input {
+            width: 80px;
+            height: 23px;
+            line-height: 24px;
+            border: none;
+            font-size: 15px;
+            text-indent: 5px;
+            outline: none;
+        }
+
+        .queryVehicle button {
+            width: 40px;
+            height: 27px;
+            position: relative;
+            top: -1px;
+            right: 0;
+            border: none;
+            font-size: 13px;
+            color: #ffffff;
+            background: #3384fe;
+        }
+
+        .czbtn {
+            width: 60px;
+            height: 27px;
+            position: relative;
+            top: -1px;
+            right: 0;
+            border: none;
+            font-size: 13px;
+            color: #ffffff;
+            background: #3384fe;
+        }
+
+        .cztab {
+            width: 100%
+        }
+
+        .cztab td {
+            border: solid 1px #ddd;
+            text-align: left;
+            padding: 5px;
+            font-size: 14px;
+        }
+
+        .videoclass {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+    </style>
+</body>
+
+</html>

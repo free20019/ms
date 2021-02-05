@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>监控中心</title>
+    <link rel="stylesheet" href="../../resources/style/reset.css" />
+    <link rel="stylesheet" href="../../resources/style/iconfont.css" />
+    <link rel="stylesheet" href="../../resources/script/element-ui/lib/theme-chalk/index.css" />
+    <link href="css/video-js.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../resources/style/css/jkzx.css" />
+    <script src="../../resources/script/vue.min.js"></script>
+    <script src="../../resources/script/element-ui/lib/index.js"></script>
+    <script src="../../resources/script/underscore-min.js"></script>
+    <script src="../../resources/script/jquery-1.12.1.min.js"></script>
+    <!--<script src="https://unpkg.com/axios/dist/axios.min.js"></script>-->
+    <script src="../../resources/js/axios.min.js"></script>
+    <script src="../../resources/js/util.js"></script>
+    <script src="../../resources/script/util.js"></script>
+    <script
+        src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+    <!-- UI组件库 1.0 -->
+    <script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+    <script src="../../resources/script/util.js"></script>
+    <script src="js/video.min.js"></script>
+    <script src="js/videojs-flash.min.js"></script>
+
+</head>
+
+<body>
+    <div class="panel-wrapper" id="root">
+        <div class="map-tool">
+            <div class="tw-change-content">
+                <div class="item" :class="{'active':mapToolType == 'jkxq'}" @click="handleMapToolChange('jkxq')">监控详情
+                </div>
+                <div class="splite"></div>
+                <div class="item" :class="{'active':mapToolType == 'jklx'}" @click="handleMapToolChange('jklx')">监控类型
+                </div>
+            </div>
+            <div class="tool-check-box" v-show="mapToolType == 'jklx'">
+                <el-checkbox-group v-model="carType" @change="handleCheckBoxChange">
+                    <el-checkbox label="xyc">
+                        <span>巡游车</span>
+                    </el-checkbox>
+                    <el-checkbox label="wyc"><span>网约车</span></el-checkbox>
+                    <el-checkbox @change="lklhChange" label="lklh" :checked="lklhChecked"
+                        :indeterminate="lklhIndeterminate">
+                        <div class="check-box-title" @mouseover.native="handleCheckBox('lklh')">
+                            两客一危
+                            <div class="check-box-panel">
+                                <el-checkbox-group v-model="lklhType" @change="handleCheckBoxlklhChange">
+                                    <!--<el-checkbox label="pthy">普通货运</el-checkbox>-->
+                                    <!--<el-checkbox label="wxpc">危险品车</el-checkbox>-->
+                                    <!--<el-checkbox label="gcc">工程车</el-checkbox>-->
+                                    <!--<el-checkbox label="lykc">旅游客车</el-checkbox>-->
+                                    <el-checkbox label="pthy">班车客运</el-checkbox>
+                                    <el-checkbox label="wxpc">包车客运</el-checkbox>
+                                    <!--<el-checkbox label="gcc">普货</el-checkbox>-->
+                                    <el-checkbox label="lykc">危货</el-checkbox>
+                                </el-checkbox-group>
+                            </div>
+                        </div>
+                    </el-checkbox>
+                    <!-- <el-checkbox label="zfc">
+                        <span>执法车</span>
+                    </el-checkbox> -->
+                    <el-checkbox label="zfc" @change="zfcChange" :checked="zfcChecked"
+                        :indeterminate="zfcIndeterminate">
+                        <div class="check-box-title" @mouseover.native="handleCheckBox('zfc')">
+                            执法车
+                            <div class="check-box-panel" hidden>
+                                <el-checkbox-group v-model="zfcType" @change="handleCheckBoxzfcChange">
+                                    <el-checkbox label="ygzfc">运政执法车</el-checkbox>
+                                    <el-checkbox label="glzfc">路政执法车</el-checkbox>
+                                </el-checkbox-group>
+                            </div>
+                        </div>
+                    </el-checkbox>
+                    <!--<el-checkbox label="zfzd">-->
+                    <!--<span>执法终端</span>-->
+                    <!--</el-checkbox>-->
+                    <el-checkbox label="djj">
+                        <span>对讲机</span>
+                    </el-checkbox>
+                </el-checkbox-group>
+                <el-select v-model="czVideo" placeholder="场站视频" @change="handleStationSelectClick">
+                    <el-option v-for="item in czVideoOptions" :key="item.value" :label="item.label" :value="item.value">
+                    </el-option>
+                </el-select>
+            </div>
+            <div class="tool-check-box" style="padding-left: 30px;" v-show="mapToolType == 'jkxq'">
+                <el-radio-group v-model="mapToolRadio" @change="handleRadioChange">
+                    <el-radio label="3">执法车</el-radio>
+                    <el-radio label="5">对讲机</el-radio>
+                </el-radio-group>
+            </div>
+            <el-input class="tw-input-checkbox" v-show="mapToolType == 'jklx'" v-model="mapQuery.input" clearable
+                @clear="handleMapInputClearClick" placeholder="输入车牌号码">
+                <el-select v-model="mapQuery.type" slot="prepend" placeholder="请选择">
+                    <el-option label="巡游车" value="0"></el-option>
+                    <el-option label="网约车" value="1"></el-option>
+                    <el-option label="两客一危" value="2"></el-option>
+                    <el-option label="执法车" value="3"></el-option>
+                    <!--<el-option label="执法终端" value="4"></el-option>-->
+                    <el-option label="对讲机" value="5"></el-option>
+                </el-select>
+                <el-button slot="append" type="primary" icon="el-icon-search" @click="handleMapInputClick"></el-button>
+            </el-input>
+        </div>
+        <div class="map-content">
+            <div class="map-left" :class="{'show':mapToolType == 'jkxq'}">
+                <!-- <div class="top">
+                    <div class="item">总数：<span>{{mapLeft.total.length}}台</span></div>
+                    <div class="item">在线：<span style="color: #8cc24e;">{{mapLeft.totalZx}}台</span></div>
+                </div> -->
+                <div class="bottom">
+                    <div class="tw-danwei">
+                        <div class="list">
+                            <div v-if="mapToolRadio == '3'" :class="{'active':mapLeft.activeLi == item.structure_name}"
+                                class="li" @click="handleMapLeftMenuClick(item.structure_name)"
+                                v-for="item in mapLeft.list">
+                                {{item.structure_name}}
+                            </div>
+                            <div v-if="mapToolRadio == '5'" :class="{'active':mapLeft.activeLi == item.company}"
+                                class="li" @click="handleMapLeftMenuClick(item.company)" v-for="item in mapLeft.list">
+                                {{item.company}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tw-list-show">
+                        <div class="title">
+                            <div class="item">总数：<span>{{mapLeft.table.length}}台</span></div>
+                            <div class="item">在线：<span style="color: #8cc24e;">{{mapLeft.zx}}台</span></div>
+                        </div>
+                        <div class="table">
+                            <el-table ref="leftTable" @selection-change="handleLeftTableSelectionChange"
+                                v-loading="mapLeft.loading" height="100%" :data="mapLeft.table">
+                                <el-table-column align="center" type="selection" width="45">
+                                </el-table-column>
+                                <el-table-column align="center" prop="structure_name" key="structure_name"
+                                    v-if="mapToolRadio == '3' && mapLeft.activeLi == '全部'" label="单位" width="120">
+                                </el-table-column>
+                                <el-table-column align="center" prop="company" key="company"
+                                    v-if="mapToolRadio == '5' && mapLeft.activeLi == '全部'" label="单位" width="110">
+                                </el-table-column>
+                                <el-table-column key="cphm" align="center" prop="vehi_no" v-if="mapToolRadio == '3'"
+                                    label="车牌号码" min-width="85">
+                                </el-table-column>
+                                <el-table-column key="sbsyr" min-width="95" align="center" prop="name"
+                                    v-if="mapToolRadio == '5'" min-width="60" label="设备使用人">
+                                </el-table-column>
+                                <el-table-column key="dingwei" :width="mapLeft.activeLi == '全部' ? '60' : '120'"
+                                    align="center" label="设备定位">
+                                    <template slot-scope="scope">
+                                        <i class="iconfont icon-dingwei" :class="{'online': scope.row.isonline}"
+                                            @click="handleMapLeftLocationClick(scope.row)"></i>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="map-panel" v-show="mapToolType == 'jklx'">
+                <div class="panel" :class="{active:panelFlag.first}" ref="firstPanel">
+                    <div class="panel-title">
+                        今日在线量
+                    </div>
+                    <div class="panel-content">
+                        <div class="item">
+                            <div class="top">
+                                <div class="num" v-text="online.xyc">0</div>
+                                <span class="danwei">辆</span>
+                            </div>
+                            <div class="bottom">
+                                <i class="iconfont icon-car"></i>
+                                <span>巡游车</span>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="top">
+                                <span class="num" v-text="online.wyc">0</span>
+                                <span class="danwei">辆</span>
+                            </div>
+                            <div class="bottom">
+                                <i class="iconfont icon-car"></i>
+                                <span>网约车</span>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="top">
+                                <span class="num" v-text="online.lklh">0</span>
+                                <span class="danwei">辆</span>
+                            </div>
+                            <div class="bottom">
+                                <i class="iconfont icon-car"></i>
+                                <span>两客一危</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="title" :class="{active:panelFlag.first}" @click="handlePanelTitleClickFirst">监控主体</div>
+            </div>
+            <div class="map-panel" v-show="mapToolType == 'jklx'" style="top: 170px;">
+                <div class="panel" :class="{active:panelFlag.second}" ref="secondPanel">
+                    <div class="panel-title">
+                        今日在线量
+                    </div>
+                    <div class="panel-content">
+                        <div class="item two">
+                            <div class="top">
+                                <span class="num" v-text="online.zfc">0</span>
+                                <span class="danwei">辆</span>
+                            </div>
+                            <div class="bottom">
+                                <i class="iconfont icon-car"></i>
+                                <span>执法车</span>
+                            </div>
+                        </div>
+                        <!-- <div class="item">
+                            <div class="top">
+                                <span class="num" v-text="online.zfzd">0</span>
+                                <span class="danwei">台</span>
+                            </div>
+                            <div class="bottom">
+                                <i class="iconfont icon-car"></i>
+                                <span>执法终端</span>
+                            </div>
+                        </div> -->
+                        <div class="item two">
+                            <div class="top">
+                                <span class="num" v-text="online.djj">0</span>
+                                <span class="danwei">台</span>
+                            </div>
+                            <div class="bottom">
+                                <i class="iconfont icon-car"></i>
+                                <span>对讲机</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="title" :class="{active:panelFlag.second}" @click="handlePanelTitleClickSecond">执法力量</div>
+            </div>
+            <div class="map-tips">
+                <img style="float: left;margin-left: 10px;" height="30px" src="../../resources/images/jkzx/巡游车.png">
+                <div style="color: #ffffff; line-height: 30px;float: left;margin: 0 10px;">巡游车</div>
+                <img style="float: left;" height="30px" src="../../resources/images/jkzx/网约车.png">
+                <div style="color: #ffffff; line-height: 30px;float: left;margin: 0 10px;">网约车</div>
+                <img style="float: left;" height="30px" src="../../resources/images/jkzx/两客两货.png">
+                <div @click="handleFullScreen" style="color: #ffffff; line-height: 30px;float: left;margin: 0 10px;">
+                    两客一危</div>
+            </div>
+            <div class="map" :class="{'left':mapToolType == 'jkxq'}">
+                <div v-loading="mapLoading" id="jkzxMap"></div>
+            </div>
+        </div>
+        <div style="display:none">
+            <div class="tw-map-dialog-wrapper" ref="map-dialog">
+                <table v-if="mapDialog.type == '0'">
+                    <tr>
+                        <td>
+                            <b style="color:#3399FF">巡游车-{{mapDialog.form.vehi_no}}</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[所属公司]</b>：{{mapDialog.form.comp_name}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[速度]</b>：{{mapDialog.form.speed}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[SIM卡号]</b>：{{mapDialog.form.sim_num}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[终端号]</b>：{{mapDialog.form.mdt_no}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[车辆所属人]</b>：{{isNull(mapDialog.form.own_name)}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[联系电话]</b>：{{isNull(mapDialog.form.own_tel)}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[经度]</b>：{{mapDialog.form.longi}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[纬度]</b>：{{mapDialog.form.lati}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[方向]</b>：{{fxzh(mapDialog.form.angle)}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[GPS时间]</b>：{{mapDialog.form.stime}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[地理位置]</b>：{{mapAddress}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b class="tw-gjhf" @click="handleTrajectoryDialogClick(mapDialog.form.vehi_no)">[轨迹回放]</b>
+                        </td>
+                    </tr>
+                </table>
+                <table v-if="mapDialog.type == '1'">
+                    <tr>
+                        <td>
+                            <b style="color:#3399FF">网约车-{{mapDialog.form.vehicleno}}</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[速度]</b>：{{mapDialog.form.speed}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[APP 公司]</b>：{{mapDialog.form.abb_name}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[所属公司]</b>：{{mapDialog.form.name}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[营运状态]</b>：{{formatterType(mapDialog.form.bizstatus)}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[GPS时间]</b>：{{mapDialog.form.positiontime}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[地理位置]</b>：{{mapAddress}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b class="tw-gjhf" @click="handleTrajectoryDialogClick(mapDialog.form.vehicleno)">[轨迹回放]</b>
+                        </td>
+                    </tr>
+                </table>
+                <table v-if="mapDialog.type == '2'">
+                    <tr>
+                        <td>
+                            <b style="color:#3399FF">两客一危-{{mapDialog.form.vehi_num}}</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[品牌型号]</b>：{{mapDialog.form.brand_name}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[车辆类型]</b>：{{isNull(mapDialog.form.owner_name)}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[所属公司]</b>：{{mapDialog.form.comp_name}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[速度]</b>：{{mapDialog.form.speed}}KM/H
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[方向]</b>：{{mapDialog.form.direction}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[经度]</b>：{{mapDialog.form.longi}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[纬度]</b>：{{mapDialog.form.lati}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[GPS时间]</b>：{{mapDialog.form.stime}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[地理位置]</b>：{{mapAddress}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b class="tw-gjhf" @click="handleTrajectoryDialogClick(mapDialog.form.vehi_num)">[轨迹回放]</b>
+                        </td>
+                    </tr>
+                </table>
+                <table v-if="mapDialog.type == '3'">
+                    <tr>
+                        <td>
+                            <b style="color:#3399FF">
+                                执法车-{{mapDialog.form.vehicle_num}}
+                            </b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[单位名称]</b>：{{mapDialog.form.structure_name}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[GPS时间]</b>：{{mapDialog.form.speed_time}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[地理位置]</b>：{{mapAddress}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tw-infowindow-btn">
+                            <b @click="handleVideoDialogClick">视频</b>
+                            <b @click="handleTrajectoryDialogClick(mapDialog.form.vehicle_num)">轨迹回放</b>
+                        </td>
+                    </tr>
+                </table>
+                <table v-if="mapDialog.type == '4'">
+                    <tr>
+                        <td>
+                            <b style="color:#3399FF">执法终端-{{mapDialog.form.vehicle_num}}</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[GPS时间]</b>：{{mapDialog.form.speed_time}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[地理位置]</b>：{{mapAddress}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b class="tw-gjhf"
+                                @click="handleTrajectoryDialogClick(mapDialog.form.vehicle_num)">[轨迹回放]</b>
+                        </td>
+                    </tr>
+                </table>
+                <table v-if="mapDialog.type == '5'">
+                    <tr>
+                        <td>
+                            <b style="color:#3399FF">对讲机-{{mapDialog.form.vehicle_num}}</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[姓名]</b>：{{isNull(mapDialog.form.name)}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[单位名称]</b>：{{isNull(mapDialog.form.company)}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[GPS时间]</b>：{{mapDialog.form.speed_time}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[地理位置]</b>：{{mapAddress}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b class="tw-gjhf"
+                                @click="handleTrajectoryDialogClick(mapDialog.form.vehicle_num)">[轨迹回放]</b>
+                        </td>
+                    </tr>
+                </table>
+                <table v-if="mapDialog.type == '7'">
+                    <tr>
+                        <td>
+                            <b style="color:#3399FF">
+                                摄像头-{{mapDialog.form.position_name}}
+                            </b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[经度]</b>：{{mapDialog.form.longitude}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[纬度]</b>：{{mapDialog.form.latitude}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>[地理位置]</b>：{{mapAddress}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tw-infowindow-btn">
+                            <b @click="handleVideoDialogClick2(mapDialog.form.vedio_address)">视频</b>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div :class="{'init':init}" class="dialog-template" v-if="videoDialog.display">
+            <div class="dialog-body">
+                <div class="close">
+                    <span @click="handleDialogClose">x</span>
+                </div>
+                <div class="content">
+                    <div class="tw-left">
+                        <ul>
+                            <li :class="{'active':videoDialog.form.index == index}" @click="changeVideoWay(index)"
+                                v-for="(item , index) in videoDialog.form.arr">{{item.name}}</li>
+                        </ul>
+                    </div>
+                    <div class="tw-right" v-loading="videoDialog.loading">
+                        <video ref="video" id="video" class="video-js vjs-default-skin vjs-big-play-centered" controls
+                            preload="auto">
+                            <!--src: 规定媒体文件的 URL  type:规定媒体资源的类型-->
+                            <source :src="videoDialog.form.arr[videoDialog.form.index].src" type='rtmp/flv' />
+                        </video>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- <div class="openFlashTips"
+            style="width:300px;position:absolute;top:120px;left:225px;z-Index:9998;background-color: #ffffff;">
+            视频无法正常播放，请点击下方启用flash</div> -->
+        <!-- <a class="openFlash" href="http://www.adobe.com/go/getflashplayer" id="start_flash" rel="nofollow"
+            target="_blank" title="升级Flash插件">启用flash</a> -->
+    </div>
+    <!-- <div class="openFlashTips"><span class="text">视频无法正常播放，请点击下方启用flash</span></div>
+    <embed width="300" height="70" class="openFlash" type="application/x-shockwave-flash"> -->
+
+
+    <script src="./jkzx.js"></script>
+</body>
+
+</html>

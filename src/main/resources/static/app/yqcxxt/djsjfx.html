@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登记数据分析</title>
+    <link rel="stylesheet" href="../../resources/style/reset.css">
+    <link rel="stylesheet" href="../../resources/style/iconfont.css">
+    <link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+    <link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+    <link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+    <link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+    <link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+    <link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.css">
+    <link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+    <link rel="stylesheet" href="../../resources/style/main.css">
+    <link rel="stylesheet" href="../../resources/style/scale.css">
+    <script src="../../resources/script/jquery-1.12.1.min.js"></script>
+    <script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a"></script>
+    <script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+    <script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+    <script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+    <script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+    <script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+    <script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+    <script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+    <script src="../../resources/script/echarts.min.js"></script>
+    <script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+    <script src="../../resources/script/util.js"></script>
+    <script src="../../resources/script/layer/layer.js"></script>
+    <script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+    <script src="../../resources/js/scale.js"></script>
+    <!-- UI组件库 1.0 -->
+    <script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+    <script src="djsjfx.js"></script>
+    <style>
+        .panel-queryBar {padding: 10px 10px 0;}
+        .form-inline .form-group {margin-bottom: 10px;}
+        .dataListPanel.center {height: calc(100% - 50px);padding: 10px;}
+        [type='calendar'] {width: auto;}
+
+        /* dialog style */
+        .modal-dialog{margin-left:300px;}
+        .modal-content{width:950px;}
+        #djsjfxMap {min-height: 550px;height: 100%; border: 1px solid #c4d4fb;border-radius: 10px;}
+    </style>
+</head>
+<body>
+<div class="panel-wrapper" style="position: relative;">
+    <div class="panel-layout" layout="center">
+        <div class="panel-queryBar">
+            <form class="form-inline">
+
+                <div class="form-group form-group-sm">
+                    <div type="calendar">
+                        <i class="iconfont icon-chepai" type="icon"></i>
+                        <select class="form-control input-sm select2" id="djsjfx-cphm" data-placeholder="车牌号" style="width:188px;">
+                            <option/>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group form-group-sm" style="line-height: 0;">
+                    <div type="calendar">
+                        <i class="iconfont icon-qiye" type="icon"></i>
+                        <select class="form-control input-sm select2" id="djsjfx-gs" data-placeholder="业户" style="width:188px;padding-left: 30px">
+                            <option/>
+                        </select>
+                    </div>
+                </div>
+                <!--<div class="form-group form-group-sm">-->
+                    <!--<div type="calendar">-->
+                        <!--<i class="iconfont icon-dingwei" type="icon"></i>-->
+                        <!--<select class="form-control input-sm select2" id="djsjfx-address" data-placeholder="采集点" style="width:188px;padding-left: 30px">-->
+                        <!--</select>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <div class="form-group form-group-sm">
+                    <div type="calendar">
+                        <i class="iconfont icon-dingwei" type="icon"></i>
+                        <input type="text" class="form-control input-sm" id="djsjfx-value" placeholder="差值大于：X（手动输入）">
+                    </div>
+                </div>
+                <div class="form-group form-group-sm">
+                    <div type="calendar">
+                        <i class="glyphicon glyphicon-calendar" type="icon"></i>
+                        <input type="text" class="form-control input-sm" id="djsjfx-stateTime" placeholder="开始时间">
+                    </div>
+                </div>
+                <label>-</label>
+                <div class="form-group form-group-sm">
+                    <div type="calendar">
+                        <i class="glyphicon glyphicon-calendar" type="icon"></i>
+                        <input type="text" class="form-control input-sm" id="djsjfx-endTime" placeholder="结束时间">
+                    </div>
+                </div>
+                <div class="form-group form-group-sm">
+                    <a class="btn btn-primary btn-sm" id="djsjfx-select">查询</a>
+                    <!-- 					<a class="btn btn-primary btn-sm" id="djsjfx-reset">重置</a> -->
+                    <a class="btn btn-primary btn-sm" id="djsjfx-dc">导出</a>
+                </div>
+            </form>
+        </div>
+        <div class="dataListPanel center">
+            <div id="djsjfxTable"></div>
+        </div>
+    </div>
+    <!--<div id="djsjfxbigImage" class="bigImage">-->
+        <!--<img src="" id="djsjfxbig" class="big" width="auto" height="auto">-->
+
+        <!--<div id="djsjfximagetool" class="imagetool">-->
+            <!--<div class="rote" id="djsjfxleft-rote">顺时针旋转</div>-->
+            <!--<div class="rote" id="djsjfxright-rote">逆时针旋转</div>-->
+            <!--<div class="scale" id="djsjfxbigger">放大</div>-->
+            <!--<div class="scale" id="djsjfxsmaller">缩小</div>-->
+            <!--<div id="djsjfxclose" class="closed">关闭</div>-->
+        <!--</div>-->
+    <!--</div>-->
+</div>
+
+
+<!--<div class="modal fade" id="djsjfx-dialog" role="dialog">-->
+    <!--<div class="modal-dialog" role="document">-->
+        <!--<div class="modal-content">-->
+            <!--<div class="modal-header">-->
+                <!--<button type="button" class="close" data-dismiss="modal"-->
+                        <!--aria-label="Close">-->
+                    <!--<span aria-hidden="true">&times;</span>-->
+                <!--</button>-->
+                <!--<h4 class="modal-title">车辆轨迹</h4>-->
+            <!--</div>-->
+            <!--<div class="modal-body">-->
+                <!--<div id="djsjfxMap"></div>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
+<!--</div>-->
+</body>
+</html>

@@ -80,7 +80,7 @@ public interface YysjcxDao {
 				c++;
 			}
 			if (cph != null && !cph.isEmpty() && !cph.equals("null") && cph.length() > 0) {
-				tj += " and b.vhic like '%" + cph + "%'";
+				tj += " and c.cphm like '%" + cph + "%'";
 			}
 			if (gsm != null && !gsm.isEmpty() && !gsm.equals("null") && gsm.length() > 0) {
 				tj += " and c.ZGS = '"+gsm+"'";
@@ -90,13 +90,13 @@ public interface YysjcxDao {
 				tj += " and b.SHANGCHEDATE ='" + sdf.format(new Date()) + "'";
 			}
 			List<String> listDate=getMonthBetween(start,stop);
-			sql = " select (select count(1) from (select vhic from jjq"+listDate.get(0)+"_1 b,jjq_company c where CONCAT('浙',b.vhic) = c.cphm and b.flag = '1000000000'";
+			sql = " select (select count(1) from (select vhic from jjq"+listDate.get(0)+"_1 b,(select c.* ,SUBSTR(c.cphm ,- 6) cphm_new from jjq_company c) c where b.vhic = c.cphm_new and b.flag = '1000000000'";
 			sql += tj;
 			sql += ") m ) as COUNT, tt.* from (select t.* from (select "   
 //					cast(JICHENG as SIGNED)
-					+ " CONCAT('浙',b.vhic) CPH,"
+					+ " c.cphm CPH,"
 					+" c.ZGS, b.YINGYUN,date_format(b.SHANGCHE,'%Y-%m-%d %H:%i:%s') SCSJ,date_format(b.XIACHE,'%Y-%m-%d %H:%i:%s') XCSJ,timestampdiff(MINUTE, b.SHANGCHE, b.XIACHE) YYSJ,round(cast(b.JICHENG as SIGNED)/10,2) ZKLC,round(cast(b.KONGSHI as SIGNED)/10,2) KCLC,TIME_TO_SEC(str_to_date(DENGHOU,'%H%i%s')) DHSJ,b.JIAOYITYPE,round(cast(b.JINE as SIGNED)/100,2) YYJE"
-					+ "  from  jjq"+listDate.get(0)+"_1 b,jjq_company c where CONCAT('浙',b.vhic) = c.cphm and b.flag = '1000000000'";
+					+ "  from  jjq"+listDate.get(0)+"_1 b,(select c.* ,SUBSTR(c.cphm ,- 6) cphm_new from jjq_company c) c where b.vhic = c.cphm_new and b.flag = '1000000000'";
 			sql += tj;
 			sql += " order by b.SHANGCHE desc) t  limit "+((pageIndex-1)*pageSize)+","+pageSize+") tt ";
 			System.out.println("chaxunsql="+sql);
@@ -126,7 +126,7 @@ public interface YysjcxDao {
 				c++;
 			}
 			if (cph != null && !cph.isEmpty() && !cph.equals("null") && cph.length() > 0) {
-				tj += " and b.vhic like '%" + cph + "%'";
+				tj += " and c.cphm like '%" + cph + "%'";
 			}
 			if (gsm != null && !gsm.isEmpty() && !gsm.equals("null") && gsm.length() > 0) {
 				tj += " and c.ZGS = '"+gsm+"'";
@@ -137,10 +137,10 @@ public interface YysjcxDao {
 			}
 			List<String> listDate=getYysjcx.getMonthBetween(start,stop);
 			sql = " select  t.* from (select "
-					+ " CONCAT('浙',b.vhic) CPH,"
+					+ " c.cphm CPH,"
 					+" c.ZGS, b.YINGYUN,date_format(b.SHANGCHE,'%Y-%m-%d %H:%i:%s') SCSJ,date_format(b.XIACHE,'%Y-%m-%d %H:%i:%s') XCSJ"
 					+ ",timestampdiff(MINUTE, b.SHANGCHE, b.XIACHE) YYSJ,round(cast(b.JICHENG as SIGNED)/10,2) ZKLC,round(cast(b.KONGSHI as SIGNED)/10,2) KCLC,TIME_TO_SEC(str_to_date(DENGHOU,'%H%i%s')) DHSJ,b.JIAOYITYPE,round(cast(b.JINE as SIGNED)/100,2) YYJE"
-					+ "  from  jjq"+listDate.get(0)+"_1 b,jjq_company c where CONCAT('浙',b.vhic) = c.cphm and b.flag = '1000000000'";
+					+ "  from  jjq"+listDate.get(0)+"_1 b,(select c.* ,SUBSTR(c.cphm ,- 6) cphm_new from jjq_company c) c where b.vhic = c.cphm_new and b.flag = '1000000000'";
 			sql += tj;
 			sql += " order by b.SHANGCHE desc) t";
 			System.out.println("chaxunsqldc="+sql);

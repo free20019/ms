@@ -53,7 +53,7 @@ public class SbwxService {
 					redisService.set(Monitor.safetyMonitor,"",FastJsonUtil.toJSONString(monitorlist));
 //					System.out.println("-----xianle ----");
 				}
-        }, 1, 30, TimeUnit.SECONDS);
+        }, 1, 60, TimeUnit.SECONDS);
 	}
 	
 	 @DS("datasource1")

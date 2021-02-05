@@ -2,6 +2,7 @@ package com.erxi.ms.dao;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,8 +16,10 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.Update;
 
 import com.erxi.ms.result.Result;
+import org.springframework.stereotype.Repository;
 
 @Mapper
+@Repository
 public interface TlaqDao {
 	
 	/**
@@ -124,35 +127,51 @@ public interface TlaqDao {
 	@ResultType(String.class)
 	public List<Map<String, Object>> getVehiYear();
 	
+//	/**
+//	 * 查询驾驶员
+//	 */
+//	@Select("select case when DRIVER_AGE >=3 and DRIVER_AGE <5 then '3(含)至5年' "+
+//         "when DRIVER_AGE >=5 and DRIVER_AGE <10 then '5(含)至10年' "+
+//         "when DRIVER_AGE >=10 and DRIVER_AGE <15 then '10(含)至15年' "+
+//         "when DRIVER_AGE >=15 and DRIVER_AGE <20 then '15(含)至20年' "+
+//         "else '20年(含)以上'end as ti,count(*) as count "+
+//         "from (select t.*,ti.ASSESS_SCORE,ti.ASSESS_YEAR from (select "+
+//		 " b.* from (select gpc.* from "
+////		 + "tb_global_vehicle gv, "
+//		 + " TB_GLOBAL_PERSON_CERTIFICATE gpc force INDEX(plate_number) "
+////		 + "where REPLACE(gpc.plate_number,'.','')=gv.plate_number and gv.industry=090 and gv.business_scope_code = 1400  AND gv.STATUS_NAME='营运' AND gpc.plate_number LIKE '浙A%'"
+//		 + ") b where 1=1 and id_number is not null and (id,id_number) in (select max(id),id_number from"+
+//		 " (select gpc.id,gpc.id_number from"
+////		 + " tb_global_vehicle gv,"
+//		 + " TB_GLOBAL_PERSON_CERTIFICATE gpc force INDEX(plate_number)"
+////		 + " where REPLACE(gpc.plate_number,'.','')=gv.plate_number and gv.industry=090 and gv.business_scope_code = 1400  AND gv.STATUS_NAME='营运' AND gpc.plate_number LIKE '浙A%'
+//		 + " ) c group by id_number) "
+//		 + " ) t left join (select ti.ASSESS_SCORE,ti.ASSESS_YEAR,ti.id_number from TB_TAXI_INTEGRITY_INFO_OUT ti "+
+//		 "where (ti.id_number,ti.ASSESS_YEAR) in (select id_number,max(ti.ASSESS_YEAR) from TB_TAXI_INTEGRITY_INFO_OUT ti  group by id_number)) ti  "+
+//		 "on ti.id_number=t.id_number " +
+//         ") t group by case "+
+//         "when DRIVER_AGE >=3 and DRIVER_AGE <5 then '3(含)至5年' "+
+//         "when DRIVER_AGE >=5 and DRIVER_AGE <10 then '5(含)至10年' "+
+//         "when DRIVER_AGE >=10 and DRIVER_AGE <15 then '10(含)至15年' "+
+//         "when DRIVER_AGE >=15 and DRIVER_AGE <20 then '15(含)至20年' "+
+//         "else '20年(含)以上'" +
+//        " end order by ti")
 	/**
 	 * 查询驾驶员
 	 */
 	@Select("select case when DRIVER_AGE >=3 and DRIVER_AGE <5 then '3(含)至5年' "+
-         "when DRIVER_AGE >=5 and DRIVER_AGE <10 then '5(含)至10年' "+
-         "when DRIVER_AGE >=10 and DRIVER_AGE <15 then '10(含)至15年' "+
-         "when DRIVER_AGE >=15 and DRIVER_AGE <20 then '15(含)至20年' "+
-         "else '20年(含)以上'end as ti,count(*) as count "+
-         "from (select t.*,ti.ASSESS_SCORE,ti.ASSESS_YEAR from (select "+
-		 " b.* from (select gpc.* from "
-//		 + "tb_global_vehicle gv, "
-		 + " TB_GLOBAL_PERSON_CERTIFICATE gpc force INDEX(plate_number) "
-//		 + "where REPLACE(gpc.plate_number,'.','')=gv.plate_number and gv.industry=090 and gv.business_scope_code = 1400  AND gv.STATUS_NAME='营运' AND gpc.plate_number LIKE '浙A%'"
-		 + ") b where 1=1 and id_number is not null and (id,id_number) in (select max(id),id_number from"+
-		 " (select gpc.id,gpc.id_number from"
-//		 + " tb_global_vehicle gv,"
-		 + " TB_GLOBAL_PERSON_CERTIFICATE gpc force INDEX(plate_number)"
-//		 + " where REPLACE(gpc.plate_number,'.','')=gv.plate_number and gv.industry=090 and gv.business_scope_code = 1400  AND gv.STATUS_NAME='营运' AND gpc.plate_number LIKE '浙A%'
-		 + " ) c group by id_number) "
-		 + " ) t left join (select ti.ASSESS_SCORE,ti.ASSESS_YEAR,ti.id_number from TB_TAXI_INTEGRITY_INFO_OUT ti "+
-		 "where (ti.id_number,ti.ASSESS_YEAR) in (select id_number,max(ti.ASSESS_YEAR) from TB_TAXI_INTEGRITY_INFO_OUT ti  group by id_number)) ti  "+
-		 "on ti.id_number=t.id_number " +
-         ") t group by case "+
-         "when DRIVER_AGE >=3 and DRIVER_AGE <5 then '3(含)至5年' "+
-         "when DRIVER_AGE >=5 and DRIVER_AGE <10 then '5(含)至10年' "+
-         "when DRIVER_AGE >=10 and DRIVER_AGE <15 then '10(含)至15年' "+
-         "when DRIVER_AGE >=15 and DRIVER_AGE <20 then '15(含)至20年' "+
-         "else '20年(含)以上'" + 
-        " end order by ti")
+			"when DRIVER_AGE >=5 and DRIVER_AGE <10 then '5(含)至10年' "+
+			"when DRIVER_AGE >=10 and DRIVER_AGE <15 then '10(含)至15年' "+
+			"when DRIVER_AGE >=15 and DRIVER_AGE <20 then '15(含)至20年' "+
+			"else '20年(含)以上'end as ti,count(1) as count "+
+			"from (select * from (select * from  TB_GLOBAL_PERSON_CERTIFICATE order by updated_time desc) p where id_number is not null group by id_number) pp" +
+			" group by case "+
+			"when DRIVER_AGE >=3 and DRIVER_AGE <5 then '3(含)至5年' "+
+			"when DRIVER_AGE >=5 and DRIVER_AGE <10 then '5(含)至10年' "+
+			"when DRIVER_AGE >=10 and DRIVER_AGE <15 then '10(含)至15年' "+
+			"when DRIVER_AGE >=15 and DRIVER_AGE <20 then '15(含)至20年' "+
+			"else '20年(含)以上'" +
+			" end order by ti")
 	@ResultType(String.class)
 	public List<Map<String, Object>> getPerson();
 	
@@ -160,20 +179,21 @@ public interface TlaqDao {
 	/**
 	 * 查询驾驶员驾龄
 	 */
-	@Select("select t.id_number from (select "+
-		 " b.* from (select gpc.* from"
-//		 + " tb_global_vehicle gv, "
-		 + " TB_GLOBAL_PERSON_CERTIFICATE gpc force INDEX(plate_number)"
-//		 + " where REPLACE(gpc.plate_number,'.','')=gv.plate_number and gv.industry=090 and gv.business_scope_code = 1400  AND gv.STATUS_NAME='营运' AND gpc.plate_number LIKE '浙A%'"
-		 + ") b where 1=1 and id_number is not null and (id,id_number) in (select max(id),id_number from"
-		 +" (select gpc.id,gpc.id_number from "
-//		 + "tb_global_vehicle gv,"
-		 + " TB_GLOBAL_PERSON_CERTIFICATE gpc force INDEX(plate_number)"
-//		 + " where REPLACE(gpc.plate_number,'.','')=gv.plate_number and gv.industry=090 and gv.business_scope_code = 1400  AND gv.STATUS_NAME='营运' AND gpc.plate_number LIKE '浙A%'"
-		 + ") c group by id_number) "+
-		 " ) t left join (select ti.ASSESS_SCORE,ti.ASSESS_YEAR,ti.id_number from TB_TAXI_INTEGRITY_INFO_OUT ti "+
-		 "where (ti.id_number,ti.ASSESS_YEAR) in (select id_number,max(ti.ASSESS_YEAR) from TB_TAXI_INTEGRITY_INFO_OUT ti  group by id_number)) ti  "+
-		 "on ti.id_number=t.id_number ")
+//	@Select("select t.id_number from (select "+
+//		 " b.* from (select gpc.* from"
+////		 + " tb_global_vehicle gv, "
+//		 + " TB_GLOBAL_PERSON_CERTIFICATE gpc force INDEX(plate_number)"
+////		 + " where REPLACE(gpc.plate_number,'.','')=gv.plate_number and gv.industry=090 and gv.business_scope_code = 1400  AND gv.STATUS_NAME='营运' AND gpc.plate_number LIKE '浙A%'"
+//		 + ") b where 1=1 and id_number is not null and (id,id_number) in (select max(id),id_number from"
+//		 +" (select gpc.id,gpc.id_number from "
+////		 + "tb_global_vehicle gv,"
+//		 + " TB_GLOBAL_PERSON_CERTIFICATE gpc force INDEX(plate_number)"
+////		 + " where REPLACE(gpc.plate_number,'.','')=gv.plate_number and gv.industry=090 and gv.business_scope_code = 1400  AND gv.STATUS_NAME='营运' AND gpc.plate_number LIKE '浙A%'"
+//		 + ") c group by id_number) "+
+//		 " ) t left join (select ti.ASSESS_SCORE,ti.ASSESS_YEAR,ti.id_number from TB_TAXI_INTEGRITY_INFO_OUT ti "+
+//		 "where (ti.id_number,ti.ASSESS_YEAR) in (select id_number,max(ti.ASSESS_YEAR) from TB_TAXI_INTEGRITY_INFO_OUT ti  group by id_number)) ti  "+
+//		 "on ti.id_number=t.id_number ")
+	@Select("select distinct id_number from TB_GLOBAL_PERSON_CERTIFICATE  where id_number is not null")
 	@ResultType(String.class)
 	public List<Map<String, Object>> getPersoncount();
 	
@@ -266,6 +286,40 @@ public interface TlaqDao {
 	public List<Map<String, Object>> findFaultMonitor();
 
 	/**
+	 * 视频树结构
+	 */
+	@Select("<script>" +
+			" select * from tb_structure s" +
+			" where 1=1" +
+			" <if test='power_company!=null and power_company != \"\"  '>" +
+			"  and s.structure_name in" +
+			" <foreach collection='power_company' index='index' item='item' open='(' separator=',' close=')'>" +
+			" #{item}" +
+			" </foreach>"+
+			" </if>" +
+			"</script>")
+	@ResultType(String.class)
+	public List<Map<String, Object>> getStructure(HashMap<String, Object> map);
+
+	@Select("<script>" +
+			" select v.*, l.*, s.structure_name from tb_video_vehicle v " +
+			" left join tb_zf_gps_loc l on v.deviceid = l.vehicle_num" +
+			" left join tb_structure s on s.code = v.code" +
+			" where 1=1" +
+			" <if test='vhic!=null and vhic != \"\" and vhic.length&gt;2'>" +
+			" and v.vehi_no like CONCAT('%',#{vhic},'%')" +
+			" </if>" +
+			" <if test='power_company!=null and power_company != \"\"  '>" +
+			"  and s.structure_name in" +
+			" <foreach collection='power_company' index='index' item='item' open='(' separator=',' close=')'>" +
+			" #{item}" +
+			" </foreach>"+
+			" </if>" +
+			"</script>")
+	@ResultType(String.class)
+	public List<Map<String, Object>> getVideoVehicle(HashMap<String, Object> map);
+
+	/**
 	 * 报警管理
 	 * @param pageSize 
 	 * @param pageIndex 
@@ -347,8 +401,8 @@ public interface TlaqDao {
 	 * @param xm
 	 * @return
 	 */
-	@Update("update TB_TAXI_USER set menu = #{qx},menus = #{qxname} where id = #{id}")
-	public int qxglEdit(@Param("id")String id, @Param("qx")String qx,  @Param("qxname")String qxname);
+	@Update("update TB_TAXI_USER set menu = #{qx},menus = #{qxname}, power = #{power} where id = #{id}")
+	public int qxglEdit(@Param("id")String id, @Param("qx")String qx,  @Param("qxname")String qxname,  @Param("power")String power);
 	
 	/**
 	 * 用户上线

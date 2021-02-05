@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>轨迹回放</title>
+  <link rel="stylesheet" href="../../resources/style/reset.css" />
+  <link rel="stylesheet" href="../../resources/style/css/gjhf/font/iconfont.css" />
+  <link rel="stylesheet" href="../../resources/style/css/gjhf.css" />
+  <link rel="stylesheet" href="../../resources/script/element-ui/lib/theme-chalk/index.css" />
+  <script src="../../resources/script/vue.min.js"></script>
+  <script src="../../resources/script/element-ui/lib/index.js"></script>
+  <script src="../../resources/script/underscore-min.js"></script>
+  <script src="../../resources/script/jquery-1.12.1.min.js"></script>
+  <script src="../../resources/js/axios.min.js"></script>
+  <script src="../../resources/js/util.js"></script>
+  <script
+    src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+  <!-- UI组件库 1.0 -->
+  <script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+  <script src="../../resources/script/util.js"></script>
+
+</head>
+
+<body>
+  <div class="panel-wrapper" id="root">
+    <div class="tw-lay-left">
+      <el-radio-group class="tw-radio" v-model="query.type" @change="handleRadioChange">
+        <el-radio :label="0">巡游车</el-radio>
+        <el-radio :label="1">网约车</el-radio>
+        <el-radio :label="2">两客一危</el-radio>
+        <el-radio :label="3">执法车</el-radio>
+        <!--<el-radio :label="3">运政执法车</el-radio>-->
+        <!--<el-radio :label="4">路政执法车</el-radio>-->
+        <el-radio :label="5">对讲机</el-radio>
+      </el-radio-group>
+      <el-form class="tw-form" :inline="true" size="mini">
+        <!--<el-form-item>-->
+        <!--<el-input placeholder="车牌号"></el-input>-->
+        <!--</el-form-item>-->
+        <el-form-item>
+          <el-autocomplete class="inline-input" v-model="query.vehicle" :fetch-suggestions="handleInputSearch"
+            placeholder="请输入三位有效字符" :trigger-on-focus="false">
+          </el-autocomplete>
+        </el-form-item>
+        <el-form-item>
+          <el-date-picker v-model="query.stime" type="datetime" placeholder="开始日期">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="-">
+          <el-date-picker v-model="query.etime" type="datetime" placeholder="结束日期">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="handleSelectClick">查询</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" id="id-bofang">
+            <i style="font-size:12px" class="iconfont icon-bofang"></i>
+          </el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" id="id-shuaxin">
+            <i style="font-size:12px" class="iconfont icon-shuaxin"></i>
+          </el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" id="id-zanting">
+            <i style="font-size:12px" class="iconfont icon-zanting"></i>
+          </el-button>
+        </el-form-item>
+      </el-form>
+      <div class="tw-table">
+        <el-table border :data="tableData" height="calc(100%)">
+          <el-table-column prop="vehicle" align="center" label="设备编号"></el-table-column>
+          <el-table-column prop="date" align="center" label="定位时间"></el-table-column>
+        </el-table>
+      </div>
+    </div>
+    <div class="tw-lay-right">
+      <div id="map" v-loading="mapLoading"></div>
+    </div>
+  </div>
+
+  <script src="./gjhf.js"></script>
+</body>
+
+</html>

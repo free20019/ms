@@ -5,6 +5,7 @@ import com.erxi.ms.config.DS;
 import com.erxi.ms.controller.CommonAction;
 import com.erxi.ms.dao.CommonDao;
 import com.erxi.ms.domain.User;
+import com.erxi.ms.entity.Action;
 import com.erxi.ms.exception.GlobalException;
 import com.erxi.ms.redis.RedisService;
 import com.erxi.ms.redis.UserKey;
@@ -186,6 +187,7 @@ public class CommonService {
 		}
 	}
 
+	@DS("datasource1")
 	public Result<List<Map<String, Object>>> menu() {
 		String name = UserContext.getUser().getUsername();
 		System.out.println("name:"+name);
@@ -196,7 +198,7 @@ public class CommonService {
 		Map<String, Object> mn = new HashMap<String, Object>();
 		List<Map<String, Object>> allmenu = new ArrayList<Map<String, Object>>();
 		
-		List<Map> xxfwMenu = new ArrayList<Map>();
+		List<Map> xxfwMenu = new ArrayList<Map>();  
 		List<Map> zhtjMenu = new ArrayList<Map>();
 		List<Map> wsfwMenu = new ArrayList<Map>();
 		List<Map> czgzMenu = new ArrayList<Map>();
@@ -207,7 +209,9 @@ public class CommonService {
 		List<Map> zcsjMenu = new ArrayList<Map>();
 		List<Map> xxgxybsMenu = new ArrayList<Map>();
 		List<Map> qxglMenu = new ArrayList<Map>();
-		
+		List<Map> yqcxMenu = new ArrayList<Map>();
+		List<Map> jiankongzlMenu = new ArrayList<Map>();
+
 		System.out.println("menus length:"+menus.length);
 		for (int i = 0; i < menus.length; i++) {
 			if(menus[i] != ""){
@@ -242,11 +246,19 @@ public class CommonService {
 					}else if(n.equals("qxglMenu")){
 						qxglMenu.add(m);
 						System.out.println("qxglMenu coming:"+qxglMenu.size());
+					}else if(n.equals("yqcxMenu")){
+						yqcxMenu.add(m);
+						System.out.println("yqcxMenu coming:"+yqcxMenu.size());
+					}else if(n.equals("jiankongzlMenu")){
+						jiankongzlMenu.add(m);
+						System.out.println("jiankongzlMenu coming:"+jiankongzlMenu.size());
 					}
 				}
 			}
 		}
 		System.out.println("qxglMenu length"+qxglMenu.size());
+		System.out.println("yqcxMenu length"+yqcxMenu.size());
+		System.out.println("jiankongzlMenu length"+jiankongzlMenu.size());
 		System.out.println("xxfwMenu length"+xxfwMenu.size());
 		mn.put("xxfwMenu", xxfwMenu);
 		mn.put("zhtjMenu", zhtjMenu);
@@ -259,12 +271,15 @@ public class CommonService {
 		mn.put("zcsjMenu", zcsjMenu);
 		mn.put("xxgxybsMenu", xxgxybsMenu);
 		mn.put("qxglMenu", qxglMenu);
-		
+		mn.put("yqcxMenu", yqcxMenu);
+		mn.put("jiankongzlMenu", jiankongzlMenu);
+
 		System.out.println("mn"+mn.toString());
 		allmenu.add(mn);
 		return Result.success(allmenu);
 	}
-	
+
+	@DS("datasource1")
 	public Result<List<Map<String, Object>>> power() {
 		String name = UserContext.getUser().getUsername();
 		System.out.println("name:"+name);
@@ -277,5 +292,10 @@ public class CommonService {
 	public static void main(String[] args) {
 		String jsonString =  "{name: 'tsclcx', title: '目标车辆查找', icon: 'icon-tsclcz', href: 'app/xxfwgl/tsclcx.html'},";
 		System.out.println(FastJsonUtil.stringToMap(jsonString));
+	}
+
+	@DS("datasource1")
+	public void addDatabase(Action action) {
+		commonDao.addDatabase(action);
 	}
 }

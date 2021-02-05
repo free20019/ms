@@ -354,27 +354,28 @@ public interface WsfwDao {
 			String searchDate=sdf.format(calendar.getTime()).substring(0,6);
 			int c=0;
 			if(stime!=null&&!stime.isEmpty()&&!stime.equals("null")&&stime.length()>0&&!stime.equals("开始时间")){
-				tj += " and DAY >='"+stime.replaceAll("-","")+"'";
+				tj += " and b.DAY >='"+stime.replaceAll("-","")+"'";
 				c++;
 				searchDate = stime.replaceAll("-","").substring(0,6);
 			}
 			if(etime!=null&&!etime.isEmpty()&&!etime.equals("null")&&etime.length()>0&&!etime.equals("结束时间")){
-				tj += " and DAY <='"+etime.replaceAll("-","")+"'";
+				tj += " and b.DAY <='"+etime.replaceAll("-","")+"'";
 				c++;
 				searchDate = etime.replaceAll("-","").substring(0,6);
 			}
 			if(company!=null&&!company.isEmpty()&&!company.equals("null")&&company.length()>0&&!company.equals("公司")){
-				tj += " and FGS = '"+company+"'";
+				tj += " and b.FGS = '"+company+"'";
 			}
 			if(vehicle!=null&&!vehicle.isEmpty()&&!vehicle.equals("null")&&vehicle.length()>0&&!vehicle.equals("车牌号")){
-				tj += " and CPHM = '"+vehicle.replace("浙", "")+"'";
+				tj += " and c.cphm = '"+vehicle+"'";
 			}
-			String sql = "select (select count(distinct CPHM) from jjq_tj_"+searchDate+"_day where 1 = 1 and type = 5 and FGS <> ''";
+			String sql = "select (select count(distinct b.CPHM) from jjq_tj_"+searchDate+"_day b,jjq_company c " +
+					" where 1 = 1 and type = 5 and b.FGS <> '' and b.CPHM = SUBSTR(c.cphm,-6) ";
 			sql += tj;				
-			sql += ") as COUNT, CONCAT('浙',CPHM) CPHM,FGS,ceil(sum(zlc)) ZLC from jjq_tj_"+searchDate+"_day " +
-                    " where 1 = 1 and type = 5 and FGS <> ''";
+			sql += ") as COUNT, c.cphm CPHM,b.FGS,ceil(sum(zlc)) ZLC from jjq_tj_"+searchDate+"_day  b,jjq_company c " +
+					" where 1 = 1 and type = 5 and b.FGS <> '' and b.CPHM = SUBSTR(c.cphm,-6) ";
             sql += tj;		
-			sql +=" group by CPHM limit "+((pageIndex-1)*pageSize)+","+pageSize;
+			sql +=" group by c.cphm limit "+((pageIndex-1)*pageSize)+","+pageSize;
 			System.out.println("sql2="+sql);
 			return sql;
 			
@@ -391,25 +392,25 @@ public interface WsfwDao {
 			String searchDate=sdf.format(calendar.getTime()).substring(0,6);
 			int c=0;
 			if(stime!=null&&!stime.isEmpty()&&!stime.equals("null")&&stime.length()>0&&!stime.equals("开始时间")){
-				tj += " and DAY >='"+stime.replaceAll("-","")+"'";
+				tj += " and b.DAY >='"+stime.replaceAll("-","")+"'";
 				c++;
 				searchDate = stime.replaceAll("-","").substring(0,6);
 			}
 			if(etime!=null&&!etime.isEmpty()&&!etime.equals("null")&&etime.length()>0&&!etime.equals("结束时间")){
-				tj += " and DAY <='"+etime.replaceAll("-","")+"'";
+				tj += " and b.DAY <='"+etime.replaceAll("-","")+"'";
 				c++;
 				searchDate = etime.replaceAll("-","").substring(0,6);
 			}
 			if(company!=null&&!company.isEmpty()&&!company.equals("null")&&company.length()>0&&!company.equals("公司")){
-				tj += " and FGS = '"+company+"'";
+				tj += " and b.FGS = '"+company+"'";
 			}
 			if(vehicle!=null&&!vehicle.isEmpty()&&!vehicle.equals("null")&&vehicle.length()>0&&!vehicle.equals("车牌号")){
-				tj += " and CPHM = '"+vehicle.replace("浙", "")+"'";
+				tj += " and c.cphm = '"+vehicle+"'";
 			}
-			String sql = "select CONCAT('浙',CPHM) CPHM,FGS,ceil(sum(zlc)) ZLC from jjq_tj_"+searchDate+"_day " +
-                    " where 1 = 1 and type = 5 and FGS <> ''";
+			String sql = "select c.cphm CPHM,b.FGS,ceil(sum(zlc)) ZLC from jjq_tj_"+searchDate+"_day b,jjq_company c " +
+					" where 1 = 1 and type = 5 and b.FGS <> '' and b.CPHM = SUBSTR(c.cphm,-6) ";
             sql += tj;		
-			sql +=" group by CPHM ";
+			sql +=" group by c.cphm ";
 			System.out.println("sql2dc="+sql);
 			return sql;		
 		}
@@ -427,28 +428,29 @@ public interface WsfwDao {
 			String searchDate=sdf.format(calendar.getTime()).substring(0,6);
 			int c=0;
 			if(stime!=null&&!stime.isEmpty()&&!stime.equals("null")&&stime.length()>0&&!stime.equals("开始时间")){
-				tj += " and DAY >='"+stime.replaceAll("-","")+"'";
+				tj += " and b.DAY >='"+stime.replaceAll("-","")+"'";
 				c++;
 				searchDate = stime.replaceAll("-","").substring(0,6);
 			}
 			if(etime!=null&&!etime.isEmpty()&&!etime.equals("null")&&etime.length()>0&&!etime.equals("结束时间")){
-				tj += " and DAY <='"+etime.replaceAll("-","")+"'";
+				tj += " and b.DAY <='"+etime.replaceAll("-","")+"'";
 				c++;
 				searchDate = etime.replaceAll("-","").substring(0,6);
 			}
 			if(company!=null&&!company.isEmpty()&&!company.equals("null")&&company.length()>0&&!company.equals("公司")){
-				tj += " and FGS = '"+company+"'";
+				tj += " and b.FGS = '"+company+"'";
 			}
 			if(vehicle!=null&&!vehicle.isEmpty()&&!vehicle.equals("null")&&vehicle.length()>0&&!vehicle.equals("车牌号码")){
-				tj += " and CONCAT('浙',CPHM)= '"+vehicle+"'";
+				tj += " and c.cphm= '"+vehicle+"'";
 			}
-			String sql = "select (select count(distinct CPHM) from jjq_tj_"+searchDate+"_day where 1 = 1 and type = 5 ";
+			String sql = "select (select count(distinct b.CPHM) from jjq_tj_"+searchDate+"_day b,jjq_company c " +
+					" where 1 = 1 and b.type = 5  and b.CPHM = SUBSTR(c.cphm,-6) ";
 			sql += tj;	
-			sql += ") as COUNT,  t.*,v.* from (select CONCAT('浙',CPHM) CPHM, sum(tjcs) as YYCS, sum(jine) as YYJE,ceil(sum(zlc)) as ZLC, ceil(sum(kslc)) as KSLC, ceil(sum(szlc)) as ZKLC,ceil(sum(YSSC)) as ZKSJ, ceil(sum(dhsj)) as ZKDHSJ," +
-                    " CONCAT(round((sum(szlc) / sum((zlc)))*100, 2),'%') SZL from jjq_tj_"+searchDate+"_day " +
-                    " where 1 = 1 and type = 5 ";
+			sql += ") as COUNT,  t.*,v.* from (select c.cphm CPHM, sum(tjcs) as YYCS, sum(jine) as YYJE,ceil(sum(zlc)) as ZLC, ceil(sum(kslc)) as KSLC, ceil(sum(szlc)) as ZKLC,ceil(sum(YSSC)) as ZKSJ, ceil(sum(dhsj)) as ZKDHSJ," +
+                    " CONCAT(round((sum(szlc) / sum((zlc)))*100, 2),'%') SZL from jjq_tj_"+searchDate+"_day b,jjq_company c " +
+                    " where 1 = 1 and b.type = 5 and b.CPHM = SUBSTR(c.cphm,-6) ";
             sql += tj ;		
-			sql +=" group by CPHM limit "+((pageIndex-1)*pageSize)+","+pageSize;
+			sql +=" group by c.cphm limit "+((pageIndex-1)*pageSize)+","+pageSize;
 			sql +=") t left join vw_vehicle v on v.vehi_no=t.CPHM";
 			System.out.println("SFsql="+sql);
 			return sql;
@@ -466,26 +468,26 @@ public interface WsfwDao {
 			String searchDate=sdf.format(calendar.getTime()).substring(0,6);
 			int c=0;
 			if(stime!=null&&!stime.isEmpty()&&!stime.equals("null")&&stime.length()>0&&!stime.equals("开始时间")){
-				tj += " and DAY >='"+stime.replaceAll("-","")+"'";
+				tj += " and b.DAY >='"+stime.replaceAll("-","")+"'";
 				c++;
 				searchDate = stime.replaceAll("-","").substring(0,6);
 			}
 			if(etime!=null&&!etime.isEmpty()&&!etime.equals("null")&&etime.length()>0&&!etime.equals("结束时间")){
-				tj += " and DAY <='"+etime.replaceAll("-","")+"'";
+				tj += " and b.DAY <='"+etime.replaceAll("-","")+"'";
 				c++;
 				searchDate = etime.replaceAll("-","").substring(0,6);
 			}
 			if(company!=null&&!company.isEmpty()&&!company.equals("null")&&company.length()>0&&!company.equals("公司")){
-				tj += " and FGS = '"+company+"'";
+				tj += " and b.FGS = '"+company+"'";
 			}
 			if(vehicle!=null&&!vehicle.isEmpty()&&!vehicle.equals("null")&&vehicle.length()>0&&!vehicle.equals("车牌号码")){
-				tj += " and CONCAT('浙',CPHM)= '"+vehicle+"'";
+				tj += " and c.cphm= '"+vehicle+"'";
 			}
-			String sql = "select t.*,v.* from (select CONCAT('浙',CPHM) CPHM, sum(tjcs) as YYCS, sum(jine) as YYJE,ceil(sum(zlc)) as ZLC, ceil(sum(kslc)) as KSLC, ceil(sum(szlc)) as ZKLC,ceil(sum(YSSC)) as ZKSJ, ceil(sum(dhsj)) as ZKDHSJ," +
-                    " CONCAT(round((sum(szlc) / sum((zlc)))*100, 2),'%') SZL from jjq_tj_"+searchDate+"_day " +
-                    " where 1 = 1 and type = 5 ";
+			String sql = "select t.*,v.* from (select c.cphm CPHM, sum(tjcs) as YYCS, sum(jine) as YYJE,ceil(sum(zlc)) as ZLC, ceil(sum(kslc)) as KSLC, ceil(sum(szlc)) as ZKLC,ceil(sum(YSSC)) as ZKSJ, ceil(sum(dhsj)) as ZKDHSJ," +
+                    " CONCAT(round((sum(szlc) / sum((zlc)))*100, 2),'%') SZL from jjq_tj_"+searchDate+"_day b,jjq_company c " +
+					" where 1 = 1 and b.type = 5 and b.CPHM = SUBSTR(c.cphm,-6) ";
             sql += tj ;		
-			sql +=" group by CPHM ";
+			sql +=" group by c.cphm ";
 			sql +=") t left join vw_vehicle v on v.vehi_no=t.CPHM";
 			System.out.println("SFsqldc="+sql);
 			return sql;

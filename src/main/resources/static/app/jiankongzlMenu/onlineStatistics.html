@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>在线统计</title>
+  <link rel="stylesheet" href="../../resources/style/reset.css">
+  <link rel="stylesheet" href="../../resources/style/iconfont.css">
+  <link rel="stylesheet" href="../../resources/script/element-ui/lib/theme-chalk/index.css" />
+  <link rel="stylesheet" href="../../resources/style/css/onlineStatistics.css">
+</head>
+
+<body>
+  <div class="panel-wrapper" id="root">
+    <div class="panel-left">
+      <el-tree :data="query.treeData" show-checkbox node-key="id" :props="query.defaultProps"
+        :default-expanded-keys="[-1]" ref="tree">
+      </el-tree>
+    </div>
+    <div class="panel-right">
+      <el-form :inline="true" class="query-bar" ref="queryBar">
+
+        <el-form-item label="开始时间">
+          <el-date-picker v-model="query.stime" type="date" placeholder="选择日期">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="结束时间">
+          <el-date-picker v-model="query.etime" type="date" placeholder="选择日期">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="handleQueryClick">查询</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="handleExcelClick">导出</el-button>
+        </el-form-item>
+      </el-form>
+      <div class="query-wrapper" ref="queryPanel">
+        <el-table v-if="table.type === 0" border v-loading="table.loading" :data="filterTableList"
+          height="calc(100% - 42px)">
+          <el-table-column align="center" type="index" label="序号" width="130" key="1xh">
+          </el-table-column>
+          <el-table-column align="center" prop="structure_name" label="单位" key="1dw">
+          </el-table-column>
+          <el-table-column align="center" prop="vehi_no" label="车牌号" key="1cphm">
+          </el-table-column>
+          <el-table-column align="center" prop="online_time" label="在线时长" key="1zxsc">
+          </el-table-column>
+          <el-table-column align="center" prop="mileage" label="里程统计" key="1lctj">
+          </el-table-column>
+          <el-table-column align="center" label="操作" key="1cz">
+            <template slot-scope="scope">
+              <el-button @click="handleTableDetailClick(scope.row)" type="text">详情</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-table v-if="table.type === 1" border v-loading="table.loading" :data="filterTableList"
+          height="calc(100% - 42px)">
+          <el-table-column align="center" type="index" label="序号" width="130" key="2xh">
+          </el-table-column>
+          <el-table-column align="center" prop="stat_date" label="日期" key="2rq">
+          </el-table-column>
+          <el-table-column align="center" prop="structure_name" label="单位" key="2dw">
+          </el-table-column>
+          <el-table-column align="center" prop="vehi_no" label="车牌号" key="2cphm">
+          </el-table-column>
+          <el-table-column align="center" prop="online_time" label="在线时长" key="2zxsc">
+          </el-table-column>
+          <el-table-column align="center" prop="mileage" label="里程统计" key="2lctj">
+          </el-table-column>
+        </el-table>
+        <el-pagination background :page-size="table.pageSize" :current-page="table.currentPage" :total="table.total"
+          @current-change="handleTablePageCurrentChange">
+        </el-pagination>
+        <!-- <div class="total-tips">
+          查询单位内共计：（全天在线时长：{{total.time1}}，工时在线时长：{{total.time2}}）
+        </div> -->
+      </div>
+    </div>
+  </div>
+  </div>
+</body>
+
+<script src="../../resources/script/vue.min.js"></script>
+<script src="../../resources/script/underscore-min.js"></script>
+<script src="../../resources/js/axios.min.js"></script>
+<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+<script src="../../resources/script/element-ui/lib/index.js"></script>
+<script src="../../resources/js/axios.min.js"></script>
+<script src="../../resources/script/moment.min.js"></script>
+<script src="../../resources/js/util.js"></script>
+<script src="./onlineStatistics.js"></script>
+
+</html>

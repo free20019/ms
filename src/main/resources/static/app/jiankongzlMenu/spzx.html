@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>视频中心</title>
+  <link rel="stylesheet" href="../../resources/style/reset.css">
+  <link rel="stylesheet" href="../../resources/style/iconfont.css">
+  <link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+  <link rel="stylesheet" href="../../resources/script/element-ui/lib/theme-chalk/index.css">
+  <link rel="stylesheet" href="http://vjs.zencdn.net/7.3.0/video-js.min.css">
+  <link rel="stylesheet" href="../../resources/style/css/spzx.css">
+</head>
+
+<body>
+  <div class="tw-template-wrapper" id="root">
+    <div class="tw-lay-left">
+      <el-input v-model="tree.query" placeholder="请输入单位名称" @keyup.native="handleTreeQueryKeyup">
+        <template slot="append">
+          <el-button slot="append" type="primary" icon="el-icon-search" @click="handleTreeQueryKeyup"></el-button>
+        </template>
+      </el-input>
+      <div class="scrollbar-macosx tw-tree" v-loading="tree.loading">
+        <!-- 树结构 -->
+        <el-tree :data="tree.data" :props="tree.defaultProps">
+          <span class="custom-tree-node" slot-scope="{ node , data }" @dblclick="dbClickNode(node,data)">
+            <i class="icon" :class="[data.state?'icon-car-on':'icon-car-off']" v-if="data.deviceId"></i>
+            <i class="icon" :class="[data.active?'icon-aisle-on':'icon-aisle-off']" v-if="data.src"></i>
+            <!-- <el-badge :value="`${data.children.length} / ${data.onlineChildren.length}`" class="item"
+              v-if="data.onlineChildren">
+              <span class="node" v-text="node.label"></span>
+            </el-badge> -->
+            <span class="node">
+              <span class="title" v-text="node.label"></span>
+              <!-- <span class="babge" v-text="`${data.children.length} / ${data.onlineChildren.length}`"></span> -->
+              <span class="babge" v-text="showStructureNumber(node, data)"></span>
+            </span>
+          </span>
+        </el-tree>
+      </div>
+    </div>
+    <div class="tw-lay-right">
+      <div class="tw-btn-content">
+        <el-button style="float: left;" type="primary" @click="handleAllVideoCloseClick">全部停止</el-button>
+        <el-button @click="handleVideoNum(1)" style="float: left;" class="tw-btn_special" type="primary">
+          <div class="first">
+          </div>
+        </el-button>
+        <el-button @click="handleVideoNum(4)" style="float: left;" class="tw-btn_special" type="primary">
+          <div class="second">
+            <div style="border-top-left-radius: 3px;"></div>
+            <div style="border-top-right-radius: 3px;"></div>
+            <div style="border-bottom-left-radius: 3px;"></div>
+            <div style="border-bottom-right-radius: 3px;"></div>
+          </div>
+        </el-button>
+        <el-button @click="handleVideoNum(6)" style="float: left;" type="primary">6</el-button>
+        <el-button @click="handleVideoNum(16)" style="float: left;" type="primary">16</el-button>
+      </div>
+      <div class="video-content clearfix">
+        <div class="tw-video" :class="videoClass" v-for="(item, index) in video.data" :ref="item.id">
+          <div class="tw-video-close" @click="handleVideoCloseClick(item, index)">&times;</div>
+          <video :id="item.id" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto"></video>
+          <!-- <video v-if="item.src" :id="item.id" class="video-js vjs-default-skin vjs-big-play-centered" controls
+            preload="auto" data-setup='{}'>
+            src: 规定媒体文件的 URL  type:规定媒体资源的类型
+            <source :src='item.src' type='rtmp/flv' />
+          </video> -->
+        </div>
+      </div>
+    </div>
+    <!-- <div class="select-video-panel">123123</div> -->
+    <div class="select-video-panel" v-if="hasShowSelectedVideo">
+      <div class="select-video-item tw-video" :class="videoClass" v-for="(item, index) in video.data"
+        :key="`select-video-item_${index}`" v-text="index+1" @click="handleSelectedVideoItemClick(item, index)"></div>
+    </div>
+  </div>
+  <div class="openFlashTips"><span class="text">视频无法正常播放，请点击下方启用flash</span></div>
+  <embed width="300" height="70" class="openFlash" type="application/x-shockwave-flash">
+
+  <script src="../../resources/script/vue.min.js"></script>
+  <script src="../../resources/script/underscore-min.js"></script>
+  <script src="../../resources/js/axios.min.js"></script>
+  <script src="../../resources/script/jquery-1.12.1.min.js"></script>
+  <script src="../../resources/script/element-ui/lib/index.js"></script>
+  <script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+  <script src="http://vjs.zencdn.net/7.3.0/video.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/videojs-flash@2/dist/videojs-flash.min.js"></script>
+  <script src="../../resources/js/util.js"></script>
+  <script src="./spzx.api.js"></script>
+  <script src="./spzx.js"></script>
+</body>
+
+</html>

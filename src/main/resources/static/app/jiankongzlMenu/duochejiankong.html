@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>多车监控</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <link rel="stylesheet" href="../../resources/style/reset.css">
+  <link rel="stylesheet" href="../../resources/style/iconfont.css">
+  <script src="../../resources/script/vue.min.js"></script>
+  <link rel="stylesheet" href="../../resources/script/element-ui/lib/theme-chalk/index.css">
+  <script src="../../resources/script/element-ui/lib/index.js"></script>
+  <script src="../../resources/script/underscore-min.js"></script>
+  <script src="../../resources/script/jquery-1.12.1.min.js"></script>
+  <script src="../../resources/js/axios.min.js"></script>
+  <script src="../../resources/js/util.js"></script>
+  <script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a&plugin=AMap.Geocoder,AMap.MarkerClusterer"></script>
+  <link rel="stylesheet" href="../../resources/style/css/duochejiankong.css">
+  <!-- UI组件库 1.0 -->
+  <script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+  <script src="../../resources/script/util.js"></script>
+  </link>
+</head>
+
+<body>
+  <div class="panel-wrapper" id="root">
+    <div class="map-left">
+      <div class="tw-title">
+        关注车辆：
+      </div>
+      <el-radio-group class="tw-map-radio_left" v-model="query.radioCarType"  @change="handleRadioChange">
+        <el-radio :label="0">巡游车</el-radio>
+        <el-radio :label="1">网约车</el-radio>
+        <el-radio :label="2">两客一危</el-radio>
+      </el-radio-group>
+      <el-autocomplete class="inline-input" v-model="query.cphm" :fetch-suggestions="handleInputSearch"
+        placeholder="请输入三位有效字符" :trigger-on-focus="false" @select="handleInputSelect">
+        <template slot="append">
+          <el-button slot="append" type="primary" icon="el-icon-search"></el-button>
+        </template>
+      </el-autocomplete>
+
+      <div class="tw-content">
+        <ul>
+          <li class="tw-li" class="clearfix" v-for="item in forkList">
+            <div class="cph">
+              <div class="tw-item" v-text="item.vehicle_no"></div>
+            </div>
+            <div class="car-type" v-text="item.type_name"></div>
+          </li>
+        </ul>
+      </div>
+      <div class="tw-btn">
+        <el-button type="primary" @click="handleDeleteForkVehicle">清除</el-button>
+      </div>
+    </div>
+    <div class="map-content">
+      <div class="map-tool">
+        <div class="tool-title">执法力量</div>
+        <div class="tool-check-box">
+          <el-checkbox-group v-model="carType" @change="handleCheckBoxChange">
+            <el-checkbox label="zfc" @change="zfcChange" :checked="zfcChecked" :indeterminate="zfcIndeterminate">
+              <div class="check-box-title" @mouseover.native="handleCheckBox('zfc')">
+                执法车
+                <div class="check-box-panel" hidden>
+                  <el-checkbox-group v-model="zfcType" @change="handleCheckBoxzfcChange">
+                    <el-checkbox label="ygzfc">运管执法车</el-checkbox>
+                    <el-checkbox label="glzfc">公路执法车</el-checkbox>
+                    <el-checkbox label="gwc">公务车</el-checkbox>
+                  </el-checkbox-group>
+                </div>
+              </div>
+            </el-checkbox>
+            <!--<el-checkbox label="zfzd">-->
+              <!--<span>执法终端</span>-->
+            <!--</el-checkbox>-->
+            <el-checkbox label="djj">
+              <span>对讲机</span>
+            </el-checkbox>
+            <el-input class="tw-input-checkbox" v-model="mapQuery.input" placeholder="搜索执法设备" clearable @clear="handleMapInputClearClick" >
+              <template slot="append">
+                <el-button slot="append" type="primary" icon="el-icon-search"  @click="handleMapInputClick"></el-button>
+              </template>
+            </el-input>
+          </el-checkbox-group>
+        </div>
+      </div>
+
+      <div id="jkzxMap"></div>
+    </div>
+  </div>
+  <script src="./duochejiankong.js"></script>
+</body>
+
+</html>

@@ -34,7 +34,8 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		//拦截规则：除了login，其他都拦截判断
-		registry.addInterceptor(accessInterceptor).addPathPatterns("/**").excludePathPatterns("/common/do_login");
+		registry.addInterceptor(accessInterceptor).addPathPatterns("/**").excludePathPatterns("/common/do_login","/multiple.html","/multiple.html");
 		super.addInterceptors(registry);
 	}
+
 }

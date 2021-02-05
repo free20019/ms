@@ -432,9 +432,4 @@
 .item:hover[unit]:after {
   right: calc(.6em + 4px);
 }
-#lk{
-    padding-left: 20px;
-    padding-right: 20px;
-    cursor: pointer;
-}
 /*# sourceMappingURL=clfb.css.map */

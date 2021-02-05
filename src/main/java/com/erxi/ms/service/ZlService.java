@@ -24,6 +24,10 @@ public class ZlService {
 	
 	@Autowired
 	SbwxService sbwxService;
+
+	@Autowired
+	JkzxService jkzxService;
+
 	@Transactional
 	public void zl(){
 		ScheduledExecutorService service = Executors.newScheduledThreadPool(3);
@@ -32,8 +36,8 @@ public class ZlService {
             @Override
             public void run() {
                 System.out.println("-----zl redis init-----");
+
                 TlaqService.flag = true;
-                
                 try {
 					tlaqService.yyzl();
 					tlaqService.yyzls();
@@ -41,31 +45,60 @@ public class ZlService {
 					tlaqService.yyzlsss();
 					tlaqService.yyzlssss();
 					//重点抓拍车辆
-					tlaqService.focusMonitor();					
+					tlaqService.focusMonitor();
 					//故障车辆抓拍
 					tlaqService.faultMonitor();
-					
 					tlaqService.qyveh();
 					tlaqService.qycomp();
 					tlaqService.qyarea();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				
 				TlaqService.flag = false;
-				
+
 				WsfwServics.flag = true;
-				//计价器涉及公司
-				wsfwservics.qycomp();
-				WsfwServics.flag = false;
-				
 				SbwxService.flag = true;
-				//维修涉及公司
-				sbwxService.qycomp();
+				try {
+					//计价器涉及公司
+					wsfwservics.qycomp();
+					//维修涉及公司
+					sbwxService.qycomp();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				WsfwServics.flag = false;
 				SbwxService.flag = false;
-				
+
 				System.out.println("-----zl redis over-----");
+
+				System.out.println("-----zl jkzx redis init-----");
+				JkzxService.flag = true;
+				try {
+					jkzxService.getAllVehicleLocation();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				JkzxService.flag = false;
+
+				System.out.println("-----zl jkzx redis over-----");
             }
         }, 1, 300, TimeUnit.SECONDS);
+
+//		//延时1秒执行,每3分钟执行一次
+//		service.scheduleAtFixedRate(new Runnable() {
+//			@Override
+//			public void run() {
+//				System.out.println("-----zl jkzx redis init-----");
+//				JkzxService.flag = true;
+//				try {
+//					jkzxService.getAllVehicleLocation();
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//				JkzxService.flag = false;
+//
+//				System.out.println("-----zl jkzx redis over-----");
+//			}
+//		}, 1, 5*60, TimeUnit.SECONDS);
 	}
 }

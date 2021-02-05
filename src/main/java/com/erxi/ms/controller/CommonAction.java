@@ -2,7 +2,6 @@ package com.erxi.ms.controller;
 
 import com.erxi.ms.result.Result;
 import com.erxi.ms.service.CommonService;
-import com.erxi.ms.service.ZlService;
 import com.erxi.ms.vo.LoginVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,9 +38,6 @@ public class CommonAction {
 	
 	@Autowired
 	private CommonService commonService;
-	
-	@Autowired
-	private ZlService zlservice;
 	
 	
 	@RequestMapping(value = "/getLogin")

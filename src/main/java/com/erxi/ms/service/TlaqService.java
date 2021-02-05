@@ -1,5 +1,7 @@
 package com.erxi.ms.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.erxi.ms.config.DS;
 import com.erxi.ms.controller.ExcelUtil;
 import com.erxi.ms.dao.TlaqDao;
@@ -52,8 +54,8 @@ public class TlaqService {
 	
 	@Autowired
 	CommonService commonService;
-	
-	
+
+
 	/**
 	 * 标记redis取数据
 	 */
@@ -459,59 +461,125 @@ public class TlaqService {
 		}
 	}
 	public List<Map<String, Object>> findGjww(String stime, String etime, String vehino) {
-		String httpUrl = "http://115.236.61.148:9080/area3/history.action";
-		httpUrl = httpUrl+"?vehiid="+vehino+"&stime="+stime.replace(" ", "%20")+"&etime="+etime.replace(" ", "%20");
-//		String httpUrl = "115.236.61.148:9080/taximonitor/vhichistory.action";
-//		httpUrl = httpUrl+"?vehi_no="+vehino+"&stime="+stime.replace(" ", "%20")+"&etime="+etime.replace(" ", "%20");
-        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        URI uri =URI.create(httpUrl.toString());
-        HttpPost httpPost = new HttpPost(uri);
-        httpPost.setHeader("Content-Type", "application/json;charset=utf8");
-        CloseableHttpResponse response = null;
-        String result = "";
-        try {
-            response = httpClient.execute(httpPost);
-            HttpEntity responseEntity = response.getEntity();
-            result = EntityUtils.toString(responseEntity);
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (httpClient != null) {
-                    httpClient.close();
-                }
-                if (response != null) {
-                    response.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        List<Map<String, Object>> list = (List<Map<String, Object>>)parseJSON2Map(String.valueOf(result)).get("vehigps");	
-        double lc=0;
+//		String httpUrl = "http://115.236.61.148:9080/area3/history.action";
+//		httpUrl = httpUrl+"?vehiid="+vehino+"&stime="+stime.replace(" ", "%20")+"&etime="+etime.replace(" ", "%20");
+////		String httpUrl = "115.236.61.148:9080/taximonitor/vhichistory.action";
+////		httpUrl = httpUrl+"?vehi_no="+vehino+"&stime="+stime.replace(" ", "%20")+"&etime="+etime.replace(" ", "%20");
+//        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+//        URI uri =URI.create(httpUrl.toString());
+//        HttpPost httpPost = new HttpPost(uri);
+//        httpPost.setHeader("Content-Type", "application/json;charset=utf8");
+//        CloseableHttpResponse response = null;
+//        String result = "";
+//        try {
+//            response = httpClient.execute(httpPost);
+//            HttpEntity responseEntity = response.getEntity();
+//            result = EntityUtils.toString(responseEntity);
+//        } catch (ClientProtocolException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } finally {
+//            try {
+//                if (httpClient != null) {
+//                    httpClient.close();
+//                }
+//                if (response != null) {
+//                    response.close();
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        List<Map<String, Object>> list = (List<Map<String, Object>>)parseJSON2Map(String.valueOf(result)).get("vehigps");
+//        double lc=0;
+//		if (list.size()>0) {
+//			for(int i=0;i<list.size();i++){
+//				list.get(i).put("vehicle_num", list.get(i).get("vehinum"));
+//				list.get(i).put("SPEED", Double.valueOf((String) list.get(i).get("speed")));
+////				list.get(i).put("SPEED", String.valueOf(list.get(i).get("speed")));
+//				list.get(i).put("DIRECTION", list.get(i).get("direction"));
+//				list.get(i).put("STATE", String.valueOf(list.get(i).get("carstate")).endsWith("空车")?"0":"1");
+//				list.get(i).put("PX", list.get(i).get("longi"));
+//				list.get(i).put("PY", list.get(i).get("lati"));
+//				list.get(i).put("SPEED_TIME", list.get(i).get("speedtime"));
+//			}
+//			list.get(0).put("LC", 0);
+//			for(int i=1;i<list.size();i++){
+//				lc +=GetDistance(String.valueOf(list.get(i).get("PX")),String.valueOf(list.get(i).get("PY")),String.valueOf(list.get(i-1).get("PX")),String.valueOf(list.get(i-1).get("PY")));
+//        		BigDecimal bg = new BigDecimal(lc);
+//        		double lc1 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+//        		list.get(i).put("LC", lc1);
+//        	}
+//		}
+//		return list;
+
+
+		String httpUrl = "http://60.191.5.236:8090/subcenters/map/getHistory";
+		httpUrl = httpUrl+"?vhic="+vehino+"&stime="+stime.replace(" ", "%20")+"&etime="+etime.replace(" ", "%20");
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+		URI uri =URI.create(httpUrl.toString());
+		HttpPost httpPost = new HttpPost(uri);
+		httpPost.setHeader("Content-Type", "application/json;charset=utf8");
+		CloseableHttpResponse response = null;
+		String result = "";
+		try {
+			response = httpClient.execute(httpPost);
+			HttpEntity responseEntity = response.getEntity();
+			result = EntityUtils.toString(responseEntity);
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (httpClient != null) {
+					httpClient.close();
+				}
+				if (response != null) {
+					response.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		List<Map<String, Object>> list = strToList(result);
+		double lc=0;
 		if (list.size()>0) {
 			for(int i=0;i<list.size();i++){
-				list.get(i).put("vehicle_num", list.get(i).get("vehinum"));
-				list.get(i).put("SPEED", Double.valueOf((String) list.get(i).get("speed")));
-//				list.get(i).put("SPEED", String.valueOf(list.get(i).get("speed")));
-				list.get(i).put("DIRECTION", list.get(i).get("direction"));
-				list.get(i).put("STATE", String.valueOf(list.get(i).get("carstate")).endsWith("空车")?"0":"1");
-				list.get(i).put("PX", list.get(i).get("longi"));
-				list.get(i).put("PY", list.get(i).get("lati"));
-				list.get(i).put("SPEED_TIME", list.get(i).get("speedtime"));
+				list.get(i).put("vehicle_num", list.get(i).get("VEHICLE_NUM"));
+				list.get(i).put("SPEED", list.get(i).get("SPEED"));
+				list.get(i).put("DIRECTION", list.get(i).get("DIRECTION"));
+				list.get(i).put("STATE", list.get(i).get("STATE"));
+				list.get(i).put("PX", list.get(i).get("PX"));
+				list.get(i).put("PY", list.get(i).get("PY"));
+				list.get(i).put("SPEED_TIME", list.get(i).get("SPEEDTIME"));
 			}
 			list.get(0).put("LC", 0);
 			for(int i=1;i<list.size();i++){
+				if(list.get(i).get("PX")==null||list.get(i-1).get("PX")==null||list.get(i).get("PY")==null||list.get(i-1).get("PY")==null){
+					continue;
+				}
 				lc +=GetDistance(String.valueOf(list.get(i).get("PX")),String.valueOf(list.get(i).get("PY")),String.valueOf(list.get(i-1).get("PX")),String.valueOf(list.get(i-1).get("PY")));
-        		BigDecimal bg = new BigDecimal(lc);
-        		double lc1 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-        		list.get(i).put("LC", lc1);
-        	}
+				BigDecimal bg = new BigDecimal(lc);
+				double lc1 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+				list.get(i).put("LC", lc1);
+			}
 		}
 		return list;
 	}
+
+	//json字符串转换成List<Map>集合
+	public static List<Map<String, Object>> strToList(String jsonString) {
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		try {
+			list = JSON.parseObject(jsonString, new TypeReference<List<Map<String, Object>>>() {});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
+
 	//json to map
 	public static Map<String, Object> parseJSON2Map(String jsonStr){
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -870,6 +938,27 @@ public class TlaqService {
 		lists.add(map);
 		return Result.success(lists);
 	}
+
+	@DS("datasource1")
+	public Result<List<Map<String, Object>>> getStructure(String vhic) {
+		List<Map<String, Object>> Structure = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> videoVehicle = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		HashMap<String, Object> conditionMap = JkzxService.findConditionBytype("", null);
+		conditionMap.put("vhic",vhic);
+		Map map = new HashMap ();
+		if(null!=vhic&&vhic.length()>2) {
+			videoVehicle = tlaqDao.getVideoVehicle(conditionMap);
+			map.put("videovehicle",videoVehicle);
+		}else {
+			Structure =tlaqDao.getStructure(conditionMap);
+			videoVehicle = tlaqDao.getVideoVehicle(conditionMap);
+			map.put("structure", Structure);
+			map.put("videovehicle",videoVehicle);
+		}
+		list.add(map);
+		return Result.success(list);
+	}
 	
 	
 	private List<Map<String, Object>> allComp() {
@@ -902,8 +991,8 @@ public class TlaqService {
 		return Result.success(lists);
 	}
 
-	public Result<List<Map<String, Object>>> qxglEdit(String id, String qx, String qxname) {
-		int count = tlaqDao.qxglEdit(id,qx,qxname);
+	public Result<List<Map<String, Object>>> qxglEdit(String id, String qx, String qxname, String power) {
+		int count = tlaqDao.qxglEdit(id,qx,qxname,power);
 		if(count > 0){
 			return Result.error(CodeMsg.SUCCESS);
 		}else{

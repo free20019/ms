@@ -1,0 +1,394 @@
+<!--以下源码仅供参考,仅供二次开发调用，针对单一视频窗口,更多请参考开发文档./doc/iVMS-7200控件Ppvsguard应用开发说明文档.doc-->
+<!--Author:fan guanggao-->
+<!--Date:2013/01/16 15:21:35-->
+<!--Copyright:HangZhou Hikvision System Technology Co., Ltd. All Right Reserved-->
+<html>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=10">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+*{
+	margin: 0;
+	padding: 0;
+}
+body {
+	overflow: hidden;
+}
+#main 
+{
+	width: 100%;
+	height: 100%;
+	/*padding-bottom:10px;*/
+	/*margin: 0 auto;*/
+}
+#view
+{
+	/*margin-top:40px;*/
+	width:100%;
+	height:100%;
+}
+#playwindow
+{
+	/*margin-top:0px;*/
+	width:100%;
+	height:100%;
+	border-radius: 10px;
+}
+#control
+{
+	width:600px;
+	height:180px;
+	padding-left:0px;
+	padding-top:10px;
+	vertical-align:top;
+	background-color: rgba(0, 0, 0, 0.31);
+	position: absolute;
+	left: 0;
+	bottom: 0;
+}
+
+td,th 
+{
+	margin: 0px;
+	font-family: 宋体;
+	font-size: 12px;
+	color: #000000;
+}
+ul
+{
+	margin-left:0px;
+	padding: 0px;
+}
+li
+{
+	display:inline-block; 
+	list-style-type:none;
+	vertical-align:middle;
+	float:left;
+}
+.li_left
+{
+	padding-left:8px;
+	padding-top:6px;
+	width:80px;
+}
+.li_right
+{
+	padding-left:8px;
+	padding-top:2px;
+	width:250px;
+}
+.button
+{
+	width:120px;
+	text-align:center;
+	padding-top:4px;
+	cursor:hand;
+}
+.L_button
+{
+	width:240px;
+	text-align:center;
+	padding-top:4px;
+	cursor:hand;
+}
+</style>
+<title>实时预览</title>
+</head>
+<body onLoad="InitOcx()" onUnload="StopPlay(),DisConnect()">
+<div id="main" align="center">
+	<div id="view">
+		<div id="playwindow">
+			<!-- web应用中codebase参数可以为"../codebase/ppvsguard.cab#version=2,3,0,1234", 2,3,0,1234即为控件版本号-->
+			<object	classid="clsid:EE4EA829-B8DA-4229-AC72-585AF45AD778" codebase="" standby="Waiting..." 
+					id="ppvs" width="100%" height="100%" name="ocx1" title="视频"></object>
+		</div>
+		<div id="control">
+		<table cellpadding="0" cellspacing="1" style="line-height:22px;" width="100%" height="120px">
+			<tr>
+			<td align="center" rowspan = "3" colspan='4' style="display:none;"><textarea style="width:600px; height:66px" id="ShowMessage" cols="20" rows="5" readonly="readonly"></textarea>
+			</tr>
+		</table>
+		</div>
+	</div>
+</div>
+</body>
+</html>
+<script language="javascript">
+var iConnHandle = -1;		//连接设备返回句柄
+var iPlayHandle = -1;		//播放视频返回句柄
+
+var iChannel = 1;			//设备视频通道
+var iStreamType = 1;		//取设备流类型	0：主码流	1：子码流
+var iRegisterNo = 1;		//设备注册线路编号，以iVMS-7200平台添加设备时选择路线为标准，route1对应线路编号为1，route2对应线路编号为2,依次类推
+function getUrlParam(name) {   
+	 var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象  
+	 var r = window.location.search.substr(1).match(reg);  //匹配目标参数   
+	 if (r != null) return unescape(r[2]); return null; //返回参数值  
+} 
+//设备ID,即iVMS-7200管理平台中"配置中心"->"组织资源"中"设备ID"
+//document.getElementById("devid").value = "";
+
+//注册服务器IP、端口
+var szRegIP =  "60.191.125.18";
+var iRegPort = "7660";
+
+//流媒体服务器IP、端口
+var szStreamServerIP = "60.191.125.18";
+var iStreamServerPort = "7554";
+
+//报警服务器IP、端口
+//document.getElementById("AlarmIp").value = "60.191.125.18";
+//document.getElementById("AlarmPort").value = "7332";
+
+var obj = null;
+//初始化控件
+function InitOcx()
+{
+	if(window.ActiveXObject)
+	{
+		try
+		{
+			//根据控件的PorgID来判断是否注册，未注册则抛出异常
+			obj = new ActiveXObject("PPVSGUARD.PpvsguardCtrl.1");
+			
+			//设置窗口模式
+			var PlayOCX = document.getElementById("ppvs");
+			
+			if ( typeof PlayOCX == "undefined" || PlayOCX == null )
+			{
+				alert("控件已注册但页面对象不存在！");
+				return;
+			}
+			PlayOCX.SetActiveXShowMode(0,0);//实时预览模式，需要修改模式或者窗口UI可参考SetActiveXShowMode接口说明
+			
+			//document.getElementById("ShowMessage").value = "控件已注册并初始化完成！\r\n";
+			ConnDevice();
+		}
+		catch ( e )
+		{
+			alert("控件未注册或未安装！");
+		}
+	}
+}
+
+//连接设备
+function ConnDevice()
+{
+	//设备注册信息
+	var szAccount = getUrlParam("usename");
+	//var szAccount = document.getElementById("devid").value;
+	//注册服务IP、端口
+
+	var PreText = document.getElementById("ShowMessage").value;
+	var PlayOCX = document.getElementById("ppvs");
+	if ( typeof obj == "undefined" || obj == null )
+	{
+		alert("控件未注册！");
+		return;
+	}
+	if ( typeof PlayOCX == "undefined" || PlayOCX == null )
+	{
+		alert("控件已注册但页面对象不存在！");
+		return;
+	}
+	
+	if ( typeof szAccount == "undefined" || szAccount == null || szAccount == "")
+	{
+		alert("设备ID不能为空！");
+		return;
+	}
+	var ShowMsg = "停止预览失败！\r\n";
+	iConnHandle = PlayOCX.ConnectDeviceByACS(szAccount, szRegIP, iRegPort, "admin", "12345");
+
+	if (iConnHandle < 0)
+	{
+		ShowMsg = "连接设备失败！\r\n";
+	}
+	else
+	{
+		ShowMsg = "连接设备成功！\r\n";
+		Play();
+	}
+	document.getElementById("ShowMessage").value = PreText + ShowMsg;
+}
+
+//实时预览
+function Play()
+{
+	var PreText = document.getElementById("ShowMessage").value;
+	var ShowMsg = "正在预览中...\r\n";
+	if ( typeof obj == "undefined" || obj == null )
+	{
+		alert("控件未注册或未安装！");
+		return;
+	}
+	
+	var PlayOCX = document.getElementById("ppvs");
+	if ( typeof PlayOCX == "undefined" || PlayOCX == null )
+	{
+		alert("控件已注册但页面对象不存在！");
+		return;
+	}
+
+	if (iConnHandle < 0)
+	{
+		alert("请先连接设备，并确保连接成功！");
+		//document.getElementById("ShowMessage").value = PreText + ShowMsg;
+		return;
+	}
+	var szAccount = getUrlParam("usename")
+	//var szAccount = document.getElementById("devid").value;
+	//通道号 默认1
+	iChannel = "1";
+	//注册设备线路编号 默认1
+	iRegisterNo = "1";
+	//流媒体服务器信息
+	
+	//有视频播放，则先停止
+	if( iPlayHandle>0 )
+	{
+		StopPlay();
+	}
+	//设置设备注册线路编号，以iVMS-7200添加设备选择注册线路匹配
+	PlayOCX.SetDeviceNetLine(iRegisterNo);
+	//取流类型 默认1
+	iStreamType = "1";
+	//iStreamType = document.getElementById("StreamType").value;
+	
+	//客户端到流媒体采用TCP，流媒体到设备采用TCP取流
+	iPlayHandle = PlayOCX.StreamPlayStartByTCP(szStreamServerIP, iStreamServerPort, szAccount, iChannel, iStreamType, 1);
+			
+	if (-1 == iPlayHandle)
+	{
+		alert("预览失败！");
+		//document.getElementById("ShowMessage").value = PreText + ShowMsg;
+		return;		
+	}	
+		
+	//设置窗口的设备信息显示
+	var szMode = "TCP";
+	PlayOCX.SetDeviceInfoForShow( ">>> 转发取流("+szMode+") <<<" );
+}
+
+//停止预览
+function StopPlay()
+{	
+	var PreText = document.getElementById("ShowMessage").value;
+	var PlayOCX = document.getElementById("ppvs");
+	if ( typeof obj == "undefined" || obj == null )
+	{
+		alert("控件未注册或未安装！");
+		return;
+	}
+
+	if ( typeof PlayOCX == "undefined" || PlayOCX == null )
+	{
+		alert("控件已注册但页面对象不存在！");
+		return;
+	}
+
+	var ShowMsg = "停止预览失败！\r\n";
+	if( iPlayHandle >= 0 )
+	{
+		if(PlayOCX.StreamPlayStopByTCP())
+		{
+			iPlayHandle = -1;
+			ShowMsg = "预览已停止！\r\n"
+		}
+	}
+	else
+	{
+		ShowMsg = "预览未开启！\r\n";
+	}
+	document.getElementById("ShowMessage").value = PreText + ShowMsg;
+}
+
+</script>
+
+<!--右击事件捕捉后如下-->
+<script language="javascript" for=ppvs event="FullScreenWindow">
+//codes for Full Screen Window
+//双击视频区域，接口触发此消息，具体可以参考开发文档
+</script>
+
+<script language="javascript" for=ppvs event="PopMenuCloseRealPlay">
+//停止当前预览
+StopPlay();
+</script>
+ 
+<script language="javascript" for=ppvs event="PopMenuSnapShot">
+//手动抓图
+ChangePicPathT();
+SnapShotT();
+</script>
+ 
+<script language="javascript" for=ppvs event="PopMenuOpenSound">
+//声音控制
+OpenSound();
+</script>
+ 
+<script language="javascript" for=ppvs event="InsertDeviceInfo">
+//窗口显示设备信息
+ShowdevInfo();
+</script>
+ 
+<script language="javascript" for=ppvs event="MousePTZControl(iChannelNum,iPTZCommand,iAction)">
+//窗口鼠标控制云台
+</script>
+ 
+<script language="javascript" for=ppvs event="PopMenuCloseAllRealPlay">
+//关闭所有预览，循环关闭
+/*for (int i = 0; i < 实际视频窗口数; i ++)
+{
+	//循环关闭多个窗口
+}*/
+</script>
+
+<!--常见订阅消息，包括设备上下线通知、实时报警/GPS订阅-->
+<script language="javascript" for=ppvs event="GPSComeEx(szSampleTime, szDeviceID, szLng, szLat, szDirection, szSpeed,szRes)">
+//GPS信息
+/*
+szDeviceID：设备ID
+szLng：经度
+szLat：纬度
+szDirection：方位角
+szSpeed：速度
+*/
+var PreText = document.getElementById("ShowMessage").value;
+var GPSCome = PreText + "GPS[采样时间："+ szSampleTime +", 设备ID：" + szDeviceID+"，经度："+ szLng +"，纬度："+szLat+"，方位角："+szDirection+"，速度："+szSpeed + "]\r\n";
+document.getElementById("ShowMessage").value = GPSCome;
+</script>
+
+<script language="javascript" for=ppvs event="AlarmCome(AlarmTime,szDeviceID,AlarmType,AlarmAction,AlarmChannel,AlarmInChannel,DiskSerial)">
+//Alarm信息
+/*
+AlarmTime：报警上传的时间
+szDeviceID：设备ID
+AlarmType：报警类型
+AlarmAction：报警动作(报警开始0，报警结束1)
+AlarmChannel：报警通道
+AlarmInChannel：报警输入通道(外部报警时，标识报警输入的通道号)
+DiskSerial：硬盘序号(硬盘满、硬盘错报警时，标识硬盘号)
+*/
+var PreText = document.getElementById("ShowMessage").value;
+var AlarmCome = PreText + "Alarm[Time:" + AlarmTime + ",设备ID：" + szDeviceID+",报警类型："+ AlarmType +
+",报警动作："+ AlarmAction +"，报警通道："+ AlarmChannel +" 报警输入通道 "+ AlarmInChannel + "，硬盘序号：" + DiskSerial +"]\r\n";
+document.getElementById("ShowMessage").value = AlarmCome;
+</script>
+
+<script language="javascript" for=ppvs event="NotifyCome(P1,P2,P3)">
+//设备上下线通知,需要点击"订阅设备上下线通知"才可完成
+/*
+P1：订阅标识
+P2：上下线内容
+<Notify Type="DeviceInfo">
+<DeviceID>test</DeviceID><!--设备ID-->
+<OnOffLine>On</OnOffLine><!--On:在线或者上线，OFF:不在线或者掉线-->
+</Notify>
+P3：扩展项
+*/
+var PreText = document.getElementById("ShowMessage").value;
+var ShowMsg = PreText + "上下线信息:\r\n" + P2 + "\r\n";
+document.getElementById("ShowMessage").value = ShowMsg;
+</script>

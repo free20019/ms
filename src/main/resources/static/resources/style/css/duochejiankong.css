@@ -1,0 +1,259 @@
+.panel-wrapper {
+  position: relative;
+  padding: 5px 10px 10px;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+.map-tool {
+  position: absolute;
+  height: 60px;
+  left: 0;
+  right: 0;
+  background-color: #ffffff;
+  box-shadow: 1px 5px 10px #cccccc;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  z-index: 3;
+  display: flex;
+}
+.map-content {
+  position: relative;
+  height: 100%;
+  margin-left: 270px;
+}
+/* 地图 */
+.map-content > #jkzxMap {
+  height: 100%;
+}
+/* 地图左边内容 */
+.map-left {
+  position: absolute;
+  left: 10px;
+  top: 5px;
+  background-color: #ffffff;
+  bottom: 10px;
+  width: 250px;
+  box-shadow: 1px 8px 15px #acacac;
+  border-radius: 8px;
+}
+.map-tool .tool-title {
+  margin: 10px;
+  padding: 0 15px;
+  line-height: 40px;
+  border-right: 2px solid #cccccc;
+  font-size: 16px;
+}
+.tool-check-box .el-checkbox {
+  line-height: 60px;
+}
+/* 顶部工具栏 悬浮显示新的多选框样式 */
+.check-box-title {
+  position: relative;
+}
+.check-box-panel {
+  position: absolute;
+  background-color: #ffffff;
+  top: 35px;
+  left: -35px;
+  border-radius: 10px;
+  box-shadow: 1px 8px 15px #acacac;
+}
+.check-box-panel .el-checkbox {
+  display: none;
+}
+.check-box-panel::before {
+  content: '';
+  position: absolute;
+  height: 30px;
+  width: 100px;
+  top: -20px;
+}
+.check-box-title:hover .check-box-panel .el-checkbox {
+  display: block;
+  margin: 0;
+  padding: 0 18px 0 10px;
+}
+/* 地图右边悬浮框 */
+.map-content .map-panel {
+  position: absolute;
+  top: 10px;
+  right: 0;
+  z-index: 100;
+  display: flex;
+}
+/* 悬浮框标题 可点击 */
+.map-content .map-panel > .title {
+  width: 25px;
+  font-size: 15px;
+  line-height: 20px;
+  text-align: center;
+  background-color: #0b80e7;
+  color: #ffffff;
+  padding: 25px 4px; /* 控制整体框的高度 */
+  cursor: pointer;
+  user-select: none;
+}
+.map-content .map-panel > .title.active {
+  color: #10c3f1;
+}
+.map-content > .map-panel > .panel.active {
+  overflow: hidden;
+  transition: all 0.3s ease;
+  opacity: 1;
+  width: 370px;
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+  background-color: rgba(17, 142, 247, 0.9);
+}
+.map-content > .map-panel > .panel {
+  width: 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  opacity: 0;
+}
+/* 悬浮框面板内容标题 */
+.map-content .map-panel .panel > .panel-title {
+  font-size: 20px;
+  margin: 5px 0;
+  padding: 0 10px;
+  padding-left: 15px;
+  width: 130px;
+  color: #ffffff;
+  border-right: 3px solid #ffffff;
+  box-sizing: border-box;
+}
+.map-content .map-panel .panel > .panel-content {
+  height: calc(100% - 30px - 10px);
+  display: flex;
+  margin-top: 10px;
+}
+.map-content .map-panel .panel > .panel-content > .item {
+  width: calc((100% - 15px * 6) / 3);
+  margin: 0 15px;
+}
+/* 悬浮框下半部分的 上部 */
+.map-content .map-panel .panel > .panel-content > .item > .top {
+  position: relative;
+  height: 50%;
+  border-bottom: 1px solid #ffffff;
+  text-align: center;
+}
+.map-content
+  .map-panel
+  .panel
+  > .panel-content
+  > .item
+  > .top
+  span:first-child {
+  font-size: 20px;
+  color: #ffffff;
+  position: absolute;
+  bottom: 5px;
+  left: 20%;
+}
+.map-content .map-panel .panel > .panel-content > .item > .top span:last-child {
+  font-size: 14px;
+  position: absolute;
+  bottom: 5px;
+  right: 7px;
+  color: #ffffff;
+}
+/* 悬浮框下半部分的 下部 */
+.map-content .map-panel .panel > .panel-content > .item > .bottom {
+  position: relative;
+  height: 50%;
+}
+.map-content .map-panel .panel > .panel-content > .item > .bottom > .icon-car {
+  position: absolute;
+  font-size: 28px;
+  color: #ffffff;
+  top: 5px;
+  left: 8px;
+}
+.map-content .map-panel .panel > .panel-content > .item > .bottom > span {
+  position: absolute;
+  font-size: 13px;
+  color: #ffffff;
+  top: 15px;
+  right: 3px;
+}
+
+/* 输入框样式 */
+.el-input {
+  padding: 10px;
+  box-sizing: border-box;
+}
+.el-input > .el-input-group__append {
+  background-color: #1594fa;
+  color: #ffffff;
+  padding: 0 15px;
+  box-sizing: border-box;
+}
+/* 地图左边部分 具体样式 */
+.map-left > .tw-title {
+  background-color: #f2f5fa;
+  height: 40px;
+  line-height: 40px;
+  font-size: 16px;
+  padding-left: 20px;
+  margin-top: 15px;
+}
+.map-left > .tw-content {
+  height: calc(100% - 55px - 60px - 52px - 38px);
+  padding: 0 20px;
+  overflow: auto;
+}
+.map-left > .tw-btn {
+  padding: 8px 0;
+  text-align: center;
+}
+.map-left > .tw-btn > .el-button {
+  padding: 10px 80px;
+  border-radius: 10px;
+}
+/* 地图左边部分列表样式 */
+.tw-li {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px 0;
+}
+.tw-li > .cph {
+  background-color: #1593fb;
+  display: inline-block;
+  color: #ffffff;
+  padding: 3px 4px;
+}
+.tw-li > .cph > .tw-item {
+  padding: 4px 5px;
+  border: 1px solid #ffffff;
+  letter-spacing: 0.05em;
+  user-select: none;
+}
+.tw-li > .car-type {
+  display: inline-block;
+  color: #1593fb;
+  padding-left: 20px;
+  font-size: 15px;
+  user-select: none;
+}
+.tw-input-checkbox {
+  width: 200px;
+  padding-left: 20px;
+}
+.tw-input-checkbox > .el-input__inner {
+  height: 30px;
+  line-height: 30px;
+}
+/* 左边部分 单选框样式 */
+.tw-map-radio_left {
+  width: 100%;
+  padding: 8px 0 0 6px;
+  box-sizing: border-box;
+}
+.tw-map-radio_left > .el-radio {
+  line-height: 30px;
+}
+.tw-map-radio_left > .el-radio + .el-radio {
+  margin-left: 10px;
+}

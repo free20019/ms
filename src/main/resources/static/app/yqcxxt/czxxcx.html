@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>乘坐信息查询</title>
+    <link rel="stylesheet" href="../../resources/style/reset.css">
+    <link rel="stylesheet" href="../../resources/style/iconfont.css">
+    <link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+    <link rel="stylesheet" href="../../resources/script/scrollbar/scrollbar.css">
+    <link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid.min.css">
+    <link rel="stylesheet" href="../../resources/script/jsgrid/jsgrid-theme.min.css">
+    <link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+    <link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.css">
+    <link rel="stylesheet" href="../../resources/script/iPeakUI/style/style.css">
+    <link rel="stylesheet" href="../../resources/style/main.css">
+    <link rel="stylesheet" href="../../resources/style/scale.css">
+    <script src="../../resources/script/jquery-1.12.1.min.js"></script>
+    <script src="http://webapi.amap.com/maps?v=1.3&key=d0face2397384365119fbf558c48c10a"></script>
+    <script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+    <script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+    <script src="../../resources/script/scrollbar/jquery.scrollbar.js"></script>
+    <script src="../../resources/script/jsgrid/jsgrid.min.js"></script>
+    <script src="../../resources/script/jsgrid/i18n/jsgrid-zh-cn.js"></script>
+    <script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+    <script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+    <script src="../../resources/script/echarts.min.js"></script>
+    <script src="../../resources/script/iPeakUI/script/menuList.js"></script>
+    <script src="../../resources/script/util.js"></script>
+    <script src="../../resources/script/layer/layer.js"></script>
+    <script src="../../resources/script/iPeakUI/script/TabPanel.js"></script>
+    <script src="../../resources/js/scale.js"></script>
+    <!-- UI组件库 1.0 -->
+    <script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+    <script src="czxxcx.js"></script>
+    <style>
+        .panel-queryBar {padding: 10px 10px 0;}
+        .form-inline .form-group {margin-bottom: 10px;}
+        .dataListPanel.center {height: calc(100% - 50px);padding: 10px;}
+        [type='calendar'] {width: auto;}
+
+        /* dialog style */
+        .modal-dialog{margin-left:250px;}
+        .modal-content{width:950px;}
+        #czxxcxMap {min-height: 450px;height: 90%; border: 1px solid #c4d4fb;border-radius: 10px;}
+    </style>
+</head>
+<body>
+<div class="panel-wrapper" style="position: relative;">
+    <div class="panel-layout" layout="center">
+        <div class="panel-queryBar">
+            <form class="form-inline">
+
+                <div class="form-group form-group-sm">
+                    <div type="calendar">
+                        <i class="iconfont icon-chepai" type="icon"></i>
+                        <select class="form-control input-sm select2" id="czxxcx-cphm" data-placeholder="车牌号" style="width:188px;">
+                            <option/>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group form-group-sm" style="line-height: 0;">
+                    <div type="calendar">
+                        <i class="iconfont icon-qiye" type="icon"></i>
+                        <select class="form-control input-sm select2" id="czxxcx-gs" data-placeholder="业户" style="width:188px;padding-left: 30px">
+                            <option/>
+                        </select>
+                    </div>
+                </div>
+                <!--<div class="form-group form-group-sm">-->
+                    <!--<div type="calendar">-->
+                        <!--<i class="iconfont icon-dingwei" type="icon"></i>-->
+                        <!--<select class="form-control input-sm select2" id="czxxcx-address" data-placeholder="采集点" style="width:188px;padding-left: 30px">-->
+                        <!--</select>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <div class="form-group form-group-sm">
+                    <div type="calendar">
+                        <i class="iconfont icon-dingwei" type="icon"></i>
+                        <input type="text" class="form-control input-sm" id="czxxcx-phone" placeholder="乘客手机号码">
+                    </div>
+                </div>
+                <div class="form-group form-group-sm">
+                    <div type="calendar">
+                        <i class="glyphicon glyphicon-calendar" type="icon"></i>
+                        <input type="text" class="form-control input-sm" id="czxxcx-stateTime" placeholder="开始时间">
+                    </div>
+                </div>
+                <label>-</label>
+                <div class="form-group form-group-sm">
+                    <div type="calendar">
+                        <i class="glyphicon glyphicon-calendar" type="icon"></i>
+                        <input type="text" class="form-control input-sm" id="czxxcx-endTime" placeholder="结束时间">
+                    </div>
+                </div>
+                <div class="form-group form-group-sm">
+                    <a class="btn btn-primary btn-sm" id="czxxcx-select">查询</a>
+                    <!-- 					<a class="btn btn-primary btn-sm" id="czxxcx-reset">重置</a> -->
+                    <a class="btn btn-primary btn-sm" id="czxxcx-dc">导出</a>
+                </div>
+            </form>
+        </div>
+        <div class="dataListPanel center">
+            <div id="czxxcxTable"></div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="czxxcx-dialog" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">车辆轨迹</h4>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <div class="form-group form-group-sm"  style="display:inline-block;">
+                        <div type="calendar">
+                            <i class="glyphicon glyphicon-calendar" type="icon"></i>
+                            <input type="text" class="form-control input-sm" id="czxxcxgj-stateTime" placeholder="开始时间">
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm"  style="display:inline-block;">
+                        <div type="calendar">
+                            <i class="glyphicon glyphicon-calendar" type="icon"></i>
+                            <input type="text" class="form-control input-sm" id="czxxcxgj-endTime" placeholder="结束时间">
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm"  style="display:inline-block;">
+                        <a class="btn btn-primary btn-sm" id="czxxcxgj-select">查询</a>
+                    </div>
+                </div>
+                <div id="czxxcxMap"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

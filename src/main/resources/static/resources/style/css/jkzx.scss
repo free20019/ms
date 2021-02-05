@@ -1,0 +1,568 @@
+.panel-wrapper {
+  position: relative;
+  padding: 5px 10px 10px;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  // background-color: #eff2f9;
+}
+.map-tool {
+  position: relative;
+  height: 60px;
+  background-color: #ffffff;
+  box-shadow: 1px 5px 10px #cccccc;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  z-index: 1;
+  display: flex;
+}
+// 地图部分布局
+.map-content {
+  position: relative;
+  height: calc(100% - 60px);
+  .map-left {
+    position: absolute;
+    left: -600px;
+    top: 0;
+    bottom: 0;
+    width: 555px;
+    // transition: all 0.4s;
+    &.show {
+      left: 0;
+    }
+  }
+  // 地图
+  .map {
+    height: 100%;
+    width: 100%;
+    transition: all 0.4s;
+    &.left {
+      width: calc(100% - 535px);
+      margin-left: 535px;
+    }
+    #jkzxMap {
+      height: 100%;
+      width: 100%;
+    }
+  }
+}
+// 地图左边功能栏样式
+.map-left {
+  .top {
+    height: 35px;
+    line-height: 35px;
+    margin-bottom: 5px;
+    display: flex;
+    font-size: 16px;
+    width: calc(100%);
+    background-color: #fff;
+    box-shadow: 1px 2px 3px #cacaca;
+    border-radius: 5px;
+    .item {
+      flex: 1;
+      text-align: center;
+      font-size: 16px;
+      span {
+        font-weight: bold;
+        font-size: 17px;
+      }
+    }
+  }
+  .bottom {
+    height: calc(100%);
+    display: flex;
+    // 地图左边功能栏样式 ---左边
+    .tw-danwei {
+      width: 180px;
+      height: calc(100%);
+      background-color: #fff;
+      box-shadow: 1px 3px 7px #cacaca;
+      border-radius: 5px;
+      // .title {
+      //   text-align: center;
+      //   line-height: 40px;
+      //   font-size: 18px;
+      //   color: #0a84ed;
+      //   font-weight: bold;
+      // }
+      .list {
+        margin-top: 10px;
+        height: calc(100% - 10px);
+        .li {
+          cursor: pointer;
+          position: relative;
+          line-height: 30px;
+          color: #cccccc;
+          margin: 5px 0;
+          padding-left: 20px;
+          font-size: 17px;
+          &::after {
+            content: ">";
+            position: absolute;
+            bottom: 0;
+            right: 15px;
+          }
+          // 单位名称选中，active样式
+          &:hover,
+          &.active {
+            color: #0a84ed;
+            font-weight: bold;
+          }
+        }
+      }
+    }
+    // 地图左边功能栏样式 ---右边
+    .tw-list-show {
+      height: calc(100%);
+      width: 340px;
+      margin-left: 5px;
+      background-color: #fff;
+      box-shadow: 1px 3px 7px #acacac;
+      border-radius: 5px;
+      .title {
+        line-height: 40px;
+        display: flex;
+        position: relative;
+        .item {
+          flex: 1;
+          text-align: center;
+          font-size: 15px;
+          color: #cccccc;
+          span {
+            font-weight: bold;
+            font-size: 16px;
+          }
+        }
+        &::after {
+          content: "";
+          position: absolute;
+          height: 1px;
+          bottom: -1px;
+          left: 20px;
+          right: 20px;
+          background-color: #cccccc;
+        }
+      }
+      .table {
+        height: calc(100% - 41px);
+        box-sizing: border-box;
+        padding: 5px;
+      }
+    }
+  }
+}
+// 地图左边表格样式
+.table {
+  .el-table .cell {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+.map-tool {
+  .tool-title {
+    margin: 10px;
+    padding: 0 15px;
+    line-height: 40px;
+    border-right: 2px solid #cccccc;
+    font-size: 16px;
+  }
+}
+
+.tool-check-box {
+  flex: 1;
+  display: flex;
+}
+.tool-check-box {
+  .el-checkbox {
+    line-height: 60px;
+  }
+  .el-select {
+    margin-left: 15px;
+    .el-input__suffix {
+      right: 10px;
+    }
+  }
+}
+/* 顶部工具栏 悬浮显示新的多选框样式 */
+.check-box-title {
+  position: relative;
+}
+.check-box-panel {
+  position: absolute;
+  background-color: #ffffff;
+  top: 35px;
+  left: -35px;
+  border-radius: 10px;
+  box-shadow: 1px 8px 15px #acacac;
+}
+.check-box-panel {
+  .el-checkbox {
+    display: none;
+  }
+}
+.check-box-panel::before {
+  content: "";
+  position: absolute;
+  height: 30px;
+  width: 100px;
+  top: -20px;
+}
+.check-box-title {
+  &:hover {
+    .check-box-panel {
+      .el-checkbox {
+        display: block;
+        margin: 0;
+        padding: 0 18px 0 10px;
+      }
+    }
+  }
+}
+/* 地图右边悬浮框 */
+.map-content {
+  .map-panel {
+    position: absolute;
+    top: 10px;
+    right: 0;
+    z-index: 100;
+    display: flex;
+  }
+}
+/* 悬浮框标题 可点击 */
+.map-content {
+  .map-panel {
+    .title {
+      width: 25px;
+      font-size: 15px;
+      line-height: 20px;
+      text-align: center;
+      background-color: #0b80e7;
+      color: #ffffff;
+      padding: 25px 4px; /* 控制整体框的高度 */
+      cursor: pointer;
+      user-select: none;
+      &.active {
+        color: #10c3f1;
+      }
+    }
+  }
+}
+.map-content {
+  .map-panel {
+    .panel {
+      &.active {
+        overflow: hidden;
+        transition: all 0.3s ease;
+        opacity: 1;
+        width: 370px;
+        border-top-left-radius: 12px;
+        border-bottom-left-radius: 12px;
+        background-color: rgba(17, 142, 247, 0.9);
+      }
+    }
+  }
+}
+.map-content {
+  .map-panel {
+    .panel {
+      width: 0;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      opacity: 0;
+    }
+  }
+}
+/* 悬浮框面板内容标题 */
+.map-content {
+  .map-panel {
+    .panel {
+      .panel-content {
+        height: calc(100% - 30px - 10px);
+        display: flex;
+        margin-top: 10px;
+      }
+      .panel-title {
+        font-size: 20px;
+        margin: 5px 0;
+        padding: 0 10px;
+        padding-left: 15px;
+        width: 130px;
+        color: #ffffff;
+        border-right: 3px solid #ffffff;
+        box-sizing: border-box;
+      }
+    }
+  }
+}
+.map-content {
+  .map-panel {
+    .panel {
+      .panel-content {
+        .item {
+          width: calc((100% - 15px * 6) / 3);
+          margin: 0 15px;
+          .top {
+            /* 悬浮框下半部分的 上部 */
+            position: relative;
+            height: 50%;
+            border-bottom: 1px solid #ffffff;
+            text-align: center;
+            padding-top: 15px;
+            box-sizing: border-box;
+            .num {
+              font-size: 20px;
+              color: #ffffff;
+              line-height: 30.99px;
+            }
+            .danwei {
+              font-size: 14px;
+              position: absolute;
+              bottom: 5px;
+              right: 0px;
+              color: #ffffff;
+            }
+          }
+          /* 悬浮框下半部分的 下部 */
+          .bottom {
+            position: relative;
+            height: 50%;
+            .icon-car {
+              position: absolute;
+              font-size: 28px;
+              color: #ffffff;
+              top: 5px;
+              left: 8px;
+            }
+            span {
+              position: absolute;
+              font-size: 13px;
+              color: #ffffff;
+              top: 15px;
+              right: 3px;
+            }
+          }
+          &.two {
+            width: calc((100% - 30px * 4) / 2);
+            margin: 0 30px;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* 地图右下角注释 */
+.map-tips {
+  position: absolute;
+  right: 10px;
+  bottom: 0;
+  z-index: 3;
+  height: 30px;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+/* 输入框样式 */
+.el-input {
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+/* 地图上边 搜索框样式 */
+.tw-input-checkbox {
+  float: right;
+  width: 330px !important;
+  padding-left: 20px;
+}
+.tw-input-checkbox {
+  height: 100%;
+  input {
+    height: 100%;
+  }
+}
+.el-input {
+  .el-input-group__append {
+    background-color: #1594fa;
+    color: #ffffff;
+    padding: 0 15px;
+    box-sizing: border-box;
+  }
+}
+.tw-input-checkbox {
+  .el-input-group__prepend {
+    background-color: #fff;
+  }
+}
+.tw-input-checkbox {
+  .el-select {
+    width: 110px;
+  }
+}
+.tw-input-checkbox {
+  .el-input--suffix {
+    .el-input__inner {
+      padding-right: 15px;
+      padding-left: 10px;
+    }
+  }
+}
+/* 地图上边工具栏 切换按钮样式 */
+.tw-change-content {
+  height: calc(100% - 10px);
+  border-right: 1px solid #eeeeee;
+  padding: 0 30px;
+  margin: 5px 0;
+  margin-right: 10px;
+}
+
+.tw-change-content {
+  .item {
+    height: calc((100% - 1px) / 2);
+    letter-spacing: 0.2em;
+    line-height: 24.5px;
+    cursor: pointer;
+    user-select: none;
+    &:hover,
+    &.active {
+      color: #0b80e7;
+    }
+  }
+  .splite {
+    height: 1px;
+    width: 100%;
+    background-color: #cccccc;
+  }
+}
+/* 地图上边工具栏 单选框样式 */
+.tool-check-box .el-radio {
+  line-height: 60px !important;
+}
+// 地图视频弹出框样式
+.dialog-template {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2000;
+  padding: 10px;
+  padding-top: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+  display: none;
+  &.init {
+    display: block;
+  }
+  .dialog-body {
+    width: 700px;
+    height: 500px;
+    background: #fff;
+    margin: auto;
+    margin-top: 7vh;
+    border-radius: 2px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    padding: 0 10px 10px 10px;
+  }
+  .close {
+    height: 30px;
+    line-height: 30px;
+    font-size: 20px;
+    text-align: right;
+    padding-right: 10px;
+    span {
+      cursor: pointer;
+    }
+  }
+  .content {
+    height: calc(100% - 30px);
+    display: flex;
+    .tw-left {
+      width: 150px;
+      height: 100%;
+      ul {
+        height: 100%;
+        li {
+          margin: 0 5px 0 0;
+
+          line-height: 30px;
+          font-size: 16px;
+          text-align: center;
+          border-bottom: 1px solid #cccccc;
+          cursor: pointer;
+          &.active {
+            background-color: #eeeeee;
+          }
+        }
+      }
+    }
+    .tw-right {
+      flex: 1;
+      #video {
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+}
+// 轨迹回放
+.tw-infowindow-btn {
+  display: flex;
+  b {
+    flex: 1;
+    text-align: center;
+    cursor: pointer;
+    &:hover {
+      color: #3399ff;
+    }
+  }
+}
+.tw-gjhf {
+  cursor: pointer;
+  &:hover {
+    color: #3399ff;
+  }
+}
+.openFlash {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 9999;
+  transform: translate(-50%, calc(-50% - 40px));
+
+  &Tips {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 9999;
+
+    width: 100%;
+    height: 100%;
+
+    > .text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      background-color: #ffffff;
+      transform: translate(-50%, calc(-50% - 40px));
+      width: 300px;
+      height: 80px;
+
+      text-align: center;
+      line-height: 80px;
+      color: #666666;
+    }
+  }
+}
+.icon-dingwei {
+  color: #cccccc;
+  &.online {
+    color: #0886eb;
+  }
+  font-size: 20px;
+  cursor: pointer;
+}
+// .video-js .vjs-tech {
+//   z-index: 3;
+// }
+.vjs-has-started .vjs-control-bar {
+  z-index: 10 !important;
+}

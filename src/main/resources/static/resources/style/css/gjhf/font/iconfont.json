@@ -1,0 +1,443 @@
+{
+  "id": "680650",
+  "name": "杭州市出租汽车服务管理系统",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "682425",
+      "name": "播放",
+      "font_class": "bofang",
+      "unicode": "e60f",
+      "unicode_decimal": 58895
+    },
+    {
+      "icon_id": "719205",
+      "name": "停止",
+      "font_class": "zanting",
+      "unicode": "e672",
+      "unicode_decimal": 58994
+    },
+    {
+      "icon_id": "14284453",
+      "name": "新东方-刷新图标",
+      "font_class": "shuaxin",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "7459852",
+      "name": "红绿灯",
+      "font_class": "hld",
+      "unicode": "e612",
+      "unicode_decimal": 58898
+    },
+    {
+      "icon_id": "3850663",
+      "name": "卫星",
+      "font_class": "weixing",
+      "unicode": "e618",
+      "unicode_decimal": 58904
+    },
+    {
+      "icon_id": "2076282",
+      "name": " 订单",
+      "font_class": "details",
+      "unicode": "e897",
+      "unicode_decimal": 59543
+    },
+    {
+      "icon_id": "4933278",
+      "name": "标签",
+      "font_class": "lable",
+      "unicode": "e70f",
+      "unicode_decimal": 59151
+    },
+    {
+      "icon_id": "592049",
+      "name": "菜单",
+      "font_class": "menu",
+      "unicode": "e790",
+      "unicode_decimal": 59280
+    },
+    {
+      "icon_id": "4721304",
+      "name": "认证审核",
+      "font_class": "rzsh",
+      "unicode": "e62e",
+      "unicode_decimal": 58926
+    },
+    {
+      "icon_id": "5961306",
+      "name": "规则引擎",
+      "font_class": "qushi",
+      "unicode": "ec53",
+      "unicode_decimal": 60499
+    },
+    {
+      "icon_id": "3323209",
+      "name": "exit-fullscreen-o",
+      "font_class": "exit-fullscreen",
+      "unicode": "e99d",
+      "unicode_decimal": 59805
+    },
+    {
+      "icon_id": "3323224",
+      "name": "fullscreen-o",
+      "font_class": "fullscreen",
+      "unicode": "e9a1",
+      "unicode_decimal": 59809
+    },
+    {
+      "icon_id": "5789283",
+      "name": "围栏信息",
+      "font_class": "weilanxinxi",
+      "unicode": "e66c",
+      "unicode_decimal": 58988
+    },
+    {
+      "icon_id": "1305091",
+      "name": "系统运转情况",
+      "font_class": "xitongyunzhuanqingkuang",
+      "unicode": "e631",
+      "unicode_decimal": 58929
+    },
+    {
+      "icon_id": "577339",
+      "name": "攻略",
+      "font_class": "gonglve",
+      "unicode": "e73b",
+      "unicode_decimal": 59195
+    },
+    {
+      "icon_id": "474907",
+      "name": "异常管理",
+      "font_class": "yichangguanli",
+      "unicode": "e66d",
+      "unicode_decimal": 58989
+    },
+    {
+      "icon_id": "2817732",
+      "name": "车牌",
+      "font_class": "chepai",
+      "unicode": "e908",
+      "unicode_decimal": 59656
+    },
+    {
+      "icon_id": "4877052",
+      "name": "企业",
+      "font_class": "qiye",
+      "unicode": "e66e",
+      "unicode_decimal": 58990
+    },
+    {
+      "icon_id": "2674928",
+      "name": "箭头 右",
+      "font_class": "a-right",
+      "unicode": "e62d",
+      "unicode_decimal": 58925
+    },
+    {
+      "icon_id": "5371779",
+      "name": "箭头 右",
+      "font_class": "a-left",
+      "unicode": "e77d",
+      "unicode_decimal": 59261
+    },
+    {
+      "icon_id": "5370185",
+      "name": "取消关注-03-03-02",
+      "font_class": "attention-oll",
+      "unicode": "e66a",
+      "unicode_decimal": 58986
+    },
+    {
+      "icon_id": "5370186",
+      "name": "关注-03-03-02",
+      "font_class": "attention-all",
+      "unicode": "e66b",
+      "unicode_decimal": 58987
+    },
+    {
+      "icon_id": "5366687",
+      "name": "营运异常分析-03",
+      "font_class": "yyycfx",
+      "unicode": "e667",
+      "unicode_decimal": 58983
+    },
+    {
+      "icon_id": "5366688",
+      "name": "车辆营运情况分析-03",
+      "font_class": "clyyfx",
+      "unicode": "e668",
+      "unicode_decimal": 58984
+    },
+    {
+      "icon_id": "5366689",
+      "name": "出租乘运分析-03",
+      "font_class": "czcyxq",
+      "unicode": "e669",
+      "unicode_decimal": 58985
+    },
+    {
+      "icon_id": "5359937",
+      "name": "车辆监控跟踪-02",
+      "font_class": "cljkgz",
+      "unicode": "e655",
+      "unicode_decimal": 58965
+    },
+    {
+      "icon_id": "5359938",
+      "name": "车辆分布-02",
+      "font_class": "clfb",
+      "unicode": "e656",
+      "unicode_decimal": 58966
+    },
+    {
+      "icon_id": "5359939",
+      "name": "报警管理-02",
+      "font_class": "bjgl",
+      "unicode": "e657",
+      "unicode_decimal": 58967
+    },
+    {
+      "icon_id": "5359940",
+      "name": "车载设备维修-03",
+      "font_class": "czsbwx",
+      "unicode": "e658",
+      "unicode_decimal": 58968
+    },
+    {
+      "icon_id": "5359941",
+      "name": "多车监控-02",
+      "font_class": "dcjk",
+      "unicode": "e659",
+      "unicode_decimal": 58969
+    },
+    {
+      "icon_id": "5359942",
+      "name": "车载设备故障识别与分析-03",
+      "font_class": "czsbfx",
+      "unicode": "e65a",
+      "unicode_decimal": 58970
+    },
+    {
+      "icon_id": "5359943",
+      "name": "轨迹回放改造-02",
+      "font_class": "gjhf",
+      "unicode": "e65b",
+      "unicode_decimal": 58971
+    },
+    {
+      "icon_id": "5359944",
+      "name": "疑似绕路查询-02",
+      "font_class": "ysrlcx",
+      "unicode": "e65c",
+      "unicode_decimal": 58972
+    },
+    {
+      "icon_id": "5359945",
+      "name": "行业总览-02",
+      "font_class": "hyzl",
+      "unicode": "e65d",
+      "unicode_decimal": 58973
+    },
+    {
+      "icon_id": "5359946",
+      "name": "视频管理-02",
+      "font_class": "spgl",
+      "unicode": "e65e",
+      "unicode_decimal": 58974
+    },
+    {
+      "icon_id": "5359947",
+      "name": "区域应急指挥-02",
+      "font_class": "qyyjzl",
+      "unicode": "e65f",
+      "unicode_decimal": 58975
+    },
+    {
+      "icon_id": "5359948",
+      "name": "特殊车辆查找-02",
+      "font_class": "tsclcz",
+      "unicode": "e660",
+      "unicode_decimal": 58976
+    },
+    {
+      "icon_id": "5359949",
+      "name": "统计与分析-03",
+      "font_class": "zhtjfx",
+      "unicode": "e661",
+      "unicode_decimal": 58977
+    },
+    {
+      "icon_id": "5359950",
+      "name": "网上服务-03",
+      "font_class": "wlfw",
+      "unicode": "e662",
+      "unicode_decimal": 58978
+    },
+    {
+      "icon_id": "5359951",
+      "name": "信息服务于管理-03",
+      "font_class": "xxfwgl",
+      "unicode": "e663",
+      "unicode_decimal": 58979
+    },
+    {
+      "icon_id": "5359952",
+      "name": "运价异常查询-02",
+      "font_class": "yjyccx",
+      "unicode": "e664",
+      "unicode_decimal": 58980
+    },
+    {
+      "icon_id": "5359953",
+      "name": "滞留车辆查询-02",
+      "font_class": "zlclcx",
+      "unicode": "e665",
+      "unicode_decimal": 58981
+    },
+    {
+      "icon_id": "5359954",
+      "name": "重点关注车辆-02",
+      "font_class": "attention",
+      "unicode": "e666",
+      "unicode_decimal": 58982
+    },
+    {
+      "icon_id": "100609",
+      "name": "定位",
+      "font_class": "dingwei",
+      "unicode": "e611",
+      "unicode_decimal": 58897
+    },
+    {
+      "icon_id": "2073999",
+      "name": "清除",
+      "font_class": "qingchu",
+      "unicode": "e630",
+      "unicode_decimal": 58928
+    },
+    {
+      "icon_id": "1831138",
+      "name": "导入",
+      "font_class": "excel",
+      "unicode": "e654",
+      "unicode_decimal": 58964
+    },
+    {
+      "icon_id": "1201305",
+      "name": "导入",
+      "font_class": "daoru",
+      "unicode": "e653",
+      "unicode_decimal": 58963
+    },
+    {
+      "icon_id": "2402947",
+      "name": "文件",
+      "font_class": "wenjian",
+      "unicode": "e628",
+      "unicode_decimal": 58920
+    },
+    {
+      "icon_id": "4328019",
+      "name": "日期",
+      "font_class": "riqi",
+      "unicode": "e77c",
+      "unicode_decimal": 59260
+    },
+    {
+      "icon_id": "5109758",
+      "name": "下键头",
+      "font_class": "arrowTria",
+      "unicode": "e652",
+      "unicode_decimal": 58962
+    },
+    {
+      "icon_id": "4578368",
+      "name": "edit",
+      "font_class": "edit",
+      "unicode": "e732",
+      "unicode_decimal": 59186
+    },
+    {
+      "icon_id": "4578373",
+      "name": "key",
+      "font_class": "key",
+      "unicode": "e733",
+      "unicode_decimal": 59187
+    },
+    {
+      "icon_id": "4578387",
+      "name": "search",
+      "font_class": "search",
+      "unicode": "e736",
+      "unicode_decimal": 59190
+    },
+    {
+      "icon_id": "4584999",
+      "name": "alert",
+      "font_class": "alert",
+      "unicode": "e73e",
+      "unicode_decimal": 59198
+    },
+    {
+      "icon_id": "4585002",
+      "name": "delete",
+      "font_class": "delete",
+      "unicode": "e73f",
+      "unicode_decimal": 59199
+    },
+    {
+      "icon_id": "4586632",
+      "name": "car",
+      "font_class": "car",
+      "unicode": "e753",
+      "unicode_decimal": 59219
+    },
+    {
+      "icon_id": "4586652",
+      "name": "sound",
+      "font_class": "sound",
+      "unicode": "e75b",
+      "unicode_decimal": 59227
+    },
+    {
+      "icon_id": "4586887",
+      "name": "user",
+      "font_class": "user",
+      "unicode": "e75f",
+      "unicode_decimal": 59231
+    },
+    {
+      "icon_id": "4587568",
+      "name": "location",
+      "font_class": "location",
+      "unicode": "e769",
+      "unicode_decimal": 59241
+    },
+    {
+      "icon_id": "4587576",
+      "name": "save",
+      "font_class": "save",
+      "unicode": "e76b",
+      "unicode_decimal": 59243
+    },
+    {
+      "icon_id": "4587578",
+      "name": "sync",
+      "font_class": "sync",
+      "unicode": "e76d",
+      "unicode_decimal": 59245
+    },
+    {
+      "icon_id": "4588780",
+      "name": "poweroff",
+      "font_class": "poweroff",
+      "unicode": "e777",
+      "unicode_decimal": 59255
+    }
+  ]
+}
